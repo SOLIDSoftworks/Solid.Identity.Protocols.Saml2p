@@ -1,0 +1,41 @@
+﻿@page
+@model Solid.Identity.Protocols.Saml2p.Areas.__Saml2p.Pages.SamlResponseModel
+@{
+}
+<!DOCTYPE html>
+<html>
+<body>
+    <noscript>
+        <p>
+            Since your browser doesn't support JavaScript, you must press the Continue button to proceed.
+        </p>
+    </noscript>
+
+    <form id="samlform" action="@Model.Recipient" method="post" target="_self" asp-antiforgery="false">
+        <div>
+            <input type="hidden" name="SAMLResponse" value="@Model.SamlResponse" />
+            @if (Model.RelayState != null)
+            {
+                <input type="hidden" name="RelayState" value="@Model.RelayState" />
+            }
+        </div>
+        <noscript>
+            <div>
+                <input type="submit" value="Continue" />
+            </div>
+        </noscript>
+    </form>
+    <script>
+        function submitForm() {
+            document.forms.samlform.submit();
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", submitForm);
+        }
+        else {
+            submitForm();
+        }
+    </script>
+</body>
+</html>

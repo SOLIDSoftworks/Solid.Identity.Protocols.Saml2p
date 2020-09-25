@@ -1,0 +1,29 @@
+﻿@page
+@model Solid.Identity.Protocols.Saml2p.Areas.__Saml2p.Pages.AuthnRequestModel
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>POST data</title>
+</head>
+<body onload="document.getElementsByTagName('input')[0].click();">
+
+    <noscript>
+        <p>
+            <strong>Note:</strong> Since your browser does not support JavaScript, you must
+            press the button below once to proceed.
+        </p>
+    </noscript>
+
+    <form method="post" action="@Model.Destination">
+        <input type="submit" style=" display:none;" />
+
+        <input type="hidden" name="SAMLRequest" value="@Model.SamlRequest" />
+
+        <noscript>
+            <input type="submit" value="Submit" />
+        </noscript>
+
+    </form>
+</body>
+</html>

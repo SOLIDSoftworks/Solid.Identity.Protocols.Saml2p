@@ -1,0 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
+{
+    public class Issuer
+    {
+        public string Value { get; set; }
+    }
+}
