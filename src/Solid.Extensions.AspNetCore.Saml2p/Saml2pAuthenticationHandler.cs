@@ -31,7 +31,7 @@ namespace Solid.Extensions.AspNetCore.Saml2p
 
         protected override Task InitializeHandlerAsync()
         {
-            var idp = _provider.GetPartnerIdentityProvider(Options.PartnerId);
+            var idp = _provider.GetPartnerIdentityProvider(Options.IdentityProviderId);
             var acs = idp.ServiceProvider.AssertionConsumerServiceUrl;
             Options.CallbackPath = CreateCallbackPath(acs);
             return base.InitializeHandlerAsync();
@@ -51,7 +51,7 @@ namespace Solid.Extensions.AspNetCore.Saml2p
             }
         }
 
-        protected override Task HandleChallengeAsync(AuthenticationProperties properties) => Context.StartSsoAsync(Options.PartnerId);
+        protected override Task HandleChallengeAsync(AuthenticationProperties properties) => Context.StartSsoAsync(Options.IdentityProviderId);
 
         private string CreateCallbackPath(Uri assertionConsumerServiceUrl)
         {

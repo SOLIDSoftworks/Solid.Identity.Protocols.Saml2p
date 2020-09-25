@@ -42,7 +42,7 @@ namespace AspNetCore.IdpSample
             {
                 idp.WantsAuthnRequestsSigned = false;
                 idp.SsoEndpoint = new Uri("/saml/sso", UriKind.Relative);
-
+                
                 idp.ServiceProviders.Add(new PartnerSaml2pServiceProvider
                 {
                     Id = "https://localhost:44340/saml",
@@ -56,7 +56,7 @@ namespace AspNetCore.IdpSample
                 .AddCookie(o => o.LoginPath = "/login")
             ;
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

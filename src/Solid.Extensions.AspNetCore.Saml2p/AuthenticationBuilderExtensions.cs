@@ -8,14 +8,14 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class Solid_AspNetCore_Authentication_Saml2p_AuthenticationBuilderExtensions
     {
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string partnerId) =>
-            builder.AddSaml2p("Saml2p", partnerId);
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string partnerId) =>
-            builder.AddSaml2p(schemeName, schemeName, partnerId);
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string displayName, string partnerId) =>
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string identityProviderId) =>
+            builder.AddSaml2p("Saml2p", identityProviderId);
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string identityProviderId) =>
+            builder.AddSaml2p(schemeName, schemeName, identityProviderId);
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string displayName, string identityProviderId) =>
             builder.AddRemoteScheme<Saml2pAuthenticationOptions, Saml2pAuthenticationHandler>(schemeName, displayName, options =>
             {
-                options.PartnerId = partnerId;
+                options.IdentityProviderId = identityProviderId;
                 options.CallbackPath = "/sso_complete";
             });
         public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, Action<ISaml2pAuthenticationOptions> configure) =>

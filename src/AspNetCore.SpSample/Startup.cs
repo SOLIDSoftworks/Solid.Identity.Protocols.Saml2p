@@ -49,7 +49,7 @@ namespace AspNetCore.SpSample
                         Id = "https://localhost:44360/saml",
                         SsoEndpoint = new Uri("https://localhost:44360/saml/sso"),
                         CanInitiateSso = true,
-                        TokenSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)))
+                        AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)))
                     });
                 });
 
@@ -65,7 +65,7 @@ namespace AspNetCore.SpSample
                 .AddSaml2p("https://localhost:44360/saml")
             ;
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

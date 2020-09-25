@@ -15,10 +15,10 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 ValidIssuer = partner.Id,
                 ValidAudience = partner.ServiceProvider.Id
             };
-            parameters.ValidateIssuerSigningKey = parameters.RequireSignedTokens = partner.TokenSigningKey != null;
+            parameters.ValidateIssuerSigningKey = parameters.RequireSignedTokens = partner.AssertionSigningKey != null;
 
             if (parameters.ValidateIssuerSigningKey)
-                parameters.IssuerSigningKey = partner.TokenSigningKey;
+                parameters.IssuerSigningKey = partner.AssertionSigningKey;
 
             return parameters;
         }

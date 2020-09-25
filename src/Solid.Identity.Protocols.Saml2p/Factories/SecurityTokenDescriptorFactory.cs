@@ -52,13 +52,6 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             return descriptor;
         }
 
-        //private TimeSpan GetClockSkewTolerence(IPartnerServiceProvider partner)
-        //{
-        //    if (partner.ClockSkewTolerence != null) return partner.ClockSkewTolerence.Value;
-        //    _logger.LogDebug($"Partner SP {partner.EntityId} doesn't have clock skew tolerence defined. Using default from {partner.IdentityProvider.Issuer}.");
-        //    return partner.IdentityProvider.DefaultClockSkewTolerence;
-        //}
-
         private EncryptingCredentials GetEncryptingCredentials(PartnerSaml2pServiceProvider partner)
         {
             if (!partner.EncryptAssertion) return null;
