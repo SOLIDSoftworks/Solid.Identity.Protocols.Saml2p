@@ -13,6 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".repo", ".repo", "{2E49A8E8
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{561378E3-C944-4A4B-B217-55A56811A1F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".samples", ".samples", "{D09EB7D6-4898-4769-A70C-BA17332B9392}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Identity.Protocols.Sam2p.Tests", "Solid.Identity.Protocols.Sam2p.Tests\Solid.Identity.Protocols.Sam2p.Tests.csproj", "{45A2A69F-BEB2-437B-BFCD-55A1AAC16663}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,9 +29,16 @@ Global
 		{930BA85C-0E05-40EB-96D2-9E483F933DFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{930BA85C-0E05-40EB-96D2-9E483F933DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{930BA85C-0E05-40EB-96D2-9E483F933DFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663} = {561378E3-C944-4A4B-B217-55A56811A1F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {33722D1E-2E86-41A4-9D48-B7D1D787D678}

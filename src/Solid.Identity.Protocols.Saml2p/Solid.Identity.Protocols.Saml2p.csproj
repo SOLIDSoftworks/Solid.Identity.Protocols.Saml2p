@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include=".properties\InternalsVisibleTo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.IdentityModel.Tokens.Saml" Version="6.7.1" />
   </ItemGroup>
 </Project>
