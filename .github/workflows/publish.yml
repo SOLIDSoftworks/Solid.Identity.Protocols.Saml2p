@@ -1,0 +1,34 @@
+name: publish 0.1.x to nuget
+on:
+  push:
+    branches:
+      - master # Default release branch
+
+env:
+  version: 0.1.${{ github.run_number }}
+  package_version: 0.1.${{ github.run_number }}-beta  
+
+jobs:
+  publish:
+    name: build, test, pack, & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.200
+
+      - name: Install dependencies
+        run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
+      - name: Build
+        run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ env.version }}
+      - name: Test
+        run: dotnet test ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore --no-build
+      - name: Package
+        run: dotnet pack ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-build -p:Version=${{ env.package_version }} -o ./ 
+      - name: Push
+        run: |
+          dotnet nuget push Solid.Identity.Protocols.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+          dotnet nuget push Solid.Extensions.AspNetCore.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
