@@ -1,0 +1,20 @@
+﻿@page
+@model AspNetCore.IdpSample.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Login</h1>
+
+<form method="POST" >
+    <div>
+        <label asp-for="UserName"></label><br />
+        <input type="text" asp-for="UserName" />
+    </div>
+    <div>
+        <label asp-for="Password"></label><br />
+        <input type="password" asp-for="Password" />
+    </div>
+    <button type="submit">Login</button>
+</form>

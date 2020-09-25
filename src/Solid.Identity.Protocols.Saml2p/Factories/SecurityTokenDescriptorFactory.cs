@@ -62,29 +62,29 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         private EncryptingCredentials GetEncryptingCredentials(PartnerSaml2pServiceProvider partner)
         {
             if (!partner.EncryptAssertion) return null;
-            if (partner.EncryptionKey == null) 
-                throw new ArgumentNullException(nameof(partner.EncryptionKey));
+            if (partner.AssertionEncryptionKey == null) 
+                throw new ArgumentNullException(nameof(partner.AssertionEncryptionKey));
 
-            if(string.IsNullOrWhiteSpace(partner.EncryptionKeyWrapAlgorithm))
+            if(string.IsNullOrWhiteSpace(partner.AssertionEncryptionKeyWrapAlgorithm))
             {
-                if (!(partner.EncryptionKey is SymmetricSecurityKey symmetric))
-                    throw new ArgumentException($"{nameof(partner.EncryptionKey)} must be a {nameof(SymmetricSecurityKey)} if no {nameof(partner.EncryptionKeyWrapAlgorithm)} is provided.");
-                return new EncryptingCredentials(symmetric, partner.EncryptionAlgorithm);                    
+                if (!(partner.AssertionEncryptionKey is SymmetricSecurityKey symmetric))
+                    throw new ArgumentException($"{nameof(partner.AssertionEncryptionKey)} must be a {nameof(SymmetricSecurityKey)} if no {nameof(partner.AssertionEncryptionKeyWrapAlgorithm)} is provided.");
+                return new EncryptingCredentials(symmetric, partner.AssertionEncryptionAlgorithm);                    
             }
 
-            return new EncryptingCredentials(partner.EncryptionKey, partner.EncryptionKeyWrapAlgorithm, partner.EncryptionAlgorithm);
+            return new EncryptingCredentials(partner.AssertionEncryptionKey, partner.AssertionEncryptionKeyWrapAlgorithm, partner.AssertionEncryptionAlgorithm);
         }
 
         private SigningCredentials GetSigningCredentials(PartnerSaml2pServiceProvider partner)
         {
-            if (partner.SigningKey == null)
-                throw new ArgumentNullException(nameof(partner.SigningKey));
-            if (string.IsNullOrWhiteSpace(partner.SigningAlgorithm))
-                throw new ArgumentNullException(nameof(partner.SigningAlgorithm));
+            if (partner.AssertionSigningKey == null)
+                throw new ArgumentNullException(nameof(partner.AssertionSigningKey));
+            if (string.IsNullOrWhiteSpace(partner.AssertionSigningAlgorithm))
+                throw new ArgumentNullException(nameof(partner.AssertionSigningAlgorithm));
 
-            if (string.IsNullOrWhiteSpace(partner.SigningDigestAlgorithm))
-                return new SigningCredentials(partner.SigningKey, partner.SigningAlgorithm);
-            return new SigningCredentials(partner.SigningKey, partner.SigningAlgorithm, partner.SigningDigestAlgorithm);
+            if (string.IsNullOrWhiteSpace(partner.AssertionSigningDigestAlgorithm))
+                return new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm);
+            return new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm, partner.AssertionSigningDigestAlgorithm);
         }
     }
 }
