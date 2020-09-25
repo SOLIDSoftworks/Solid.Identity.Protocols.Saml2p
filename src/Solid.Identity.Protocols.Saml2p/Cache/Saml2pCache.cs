@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Cache
@@ -19,16 +20,16 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
 
         public Task CacheRequestAsync(string key, AuthnRequest request)
         {
-            var json = JsonConvert.SerializeObject(request);
-            return _inner.SetStringAsync(key, json);
+            var json = JsonSerializer.SerializeToUtf8Bytes(request);
+            return _inner.SetAsync(key, json);
         }
 
         public async Task<AuthnRequest> FetchRequestAsync(string key)
         {
-            var json = await _inner.GetStringAsync(key);
+            var json = await _inner.GetAsync(key);
             if (json == null) return null;
 
-            return JsonConvert.DeserializeObject<AuthnRequest>(json);
+            return JsonSerializer.Deserialize<AuthnRequest>(json);
         }
     }
 }
