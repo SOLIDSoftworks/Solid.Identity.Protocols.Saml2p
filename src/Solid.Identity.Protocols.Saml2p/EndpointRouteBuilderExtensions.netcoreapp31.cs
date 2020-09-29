@@ -26,14 +26,14 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, string idpId)
             => builder.MapSaml2pIdentityProvider(PathString.Empty, idpId);
 
-        public static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, PathString pathPrefix, string idpId)
+        public static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, string idpId, PathString pathPrefix)
         {
             var provider = builder.ServiceProvider.GetRequiredService<Saml2pOptionsProvider>();
             var idp = provider.GetIdentityProviderOptions(idpId);
             return builder.MapSaml2pIdentityProvider(pathPrefix, idp);
 
         }
-        static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, PathString pathPrefix, Saml2pIdentityProviderOptions idp)
+        static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, Saml2pIdentityProviderOptions idp, PathString pathPrefix)
         {
             var prefixes = builder.ServiceProvider.GetRequiredService<PathPrefixProvider>();
             prefixes.SetPrefix(idp.Id, pathPrefix);
