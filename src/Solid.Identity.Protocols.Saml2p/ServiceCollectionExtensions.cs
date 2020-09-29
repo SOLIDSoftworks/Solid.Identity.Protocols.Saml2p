@@ -78,7 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 })
                 .Configure(id, configure)
                 .PostConfigure<Saml2pIdentityProviderOptions>(id, PostConfigureLocalSaml2IdentityProvider)
-                .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pIdentityProviderOptions>>().Get(id))
+                .AddTransient(p => p.GetRequiredService<IOptionsMonitor<Saml2pIdentityProviderOptions>>().Get(id))
             ;
         }
 
@@ -94,6 +94,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pPartnerProvider>();
             services.TryAddTransient<Saml2pCache>();
             services.TryAddTransient<Saml2pOptionsProvider>();
+            services.TryAddSingleton<PathPrefixProvider>();
             services.TryAddScoped<IRazorPageRenderingService, RazorPageRenderingService>();
             services.AddMvcCore().AddRazorViewEngine();
 

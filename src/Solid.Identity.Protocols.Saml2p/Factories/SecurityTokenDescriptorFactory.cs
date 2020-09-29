@@ -34,7 +34,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 issuedAt = parsed;
 
             var now = _systemClock.UtcNow.DateTime;
-            var tolerence = partner.MaxClockSkew;
+            var tolerence = partner.MaxClockSkew ?? partner.IdentityProvider.MaxClockSkew ?? TimeSpan.Zero;
 
             var descriptor = new SecurityTokenDescriptor
             {

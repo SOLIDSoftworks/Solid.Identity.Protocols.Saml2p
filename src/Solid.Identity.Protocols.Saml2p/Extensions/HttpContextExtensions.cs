@@ -18,22 +18,83 @@ namespace Microsoft.AspNetCore.Http
         // Send AuthnRequest (StartSso)
         // Send SamlResponse (InitiateSso)
 
-        public static async Task AcceptSsoAsync(this HttpContext context)
+        public static bool CanAcceptSsoAs(this HttpContext context, string idpId)
         {
-            var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
-            await idp.AcceptSsoAsync();
+            var service = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
+            var idp = service.GetIdentityProviderOptions(idpId);
+            if (idp == null) return false;
+            return context.CanAcceptSsoAs(idp);
+        }
+        public static bool CanAcceptSsoAs(this HttpContext context, Saml2pIdentityProviderOptions idp)
+        {
+            // TODO: log
+            if (!idp.Enabled) return false;
+            if (!HttpMethods.IsPost(context.Request.Method)) return false;
+            var prefixes = context.RequestServices.GetRequiredService<PathPrefixProvider>();
+            return prefixes.GetPrefix(idp.Id).Add(idp.SsoEndpoint) == context.Request.Path;
         }
 
-        public static async Task InitiateSsoAsync(this HttpContext context)
+        //public static async Task AcceptSsoAsync(this HttpContext context)
+        //{
+        //    var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+        //    await idp.AcceptSsoAsync();
+        //}
+
+        public static async Task AcceptSsoAsAsync(this HttpContext context, Saml2pIdentityProviderOptions idp)
         {
-            var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
-            await idp.InitiateSsoAsync();
+            var service = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+            await service.AcceptSsoAsAsync(idp);
         }
 
-        public static async Task CompleteSsoAsync(this HttpContext context)
+        public static bool CanInitiateSsoAs(this HttpContext context, string idpId)
         {
-            var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
-            await idp.CompleteSsoAsync();
+            var service = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
+            var idp = service.GetIdentityProviderOptions(idpId);
+            if (idp == null) return false;
+            return context.CanInitiateSsoAs(idp);
+        }
+
+        public static bool CanInitiateSsoAs(this HttpContext context, Saml2pIdentityProviderOptions idp)
+        {
+            // TODO: log
+            if (!idp.Enabled) return false;
+            if (!HttpMethods.IsGet(context.Request.Method)) return false;
+            var prefixes = context.RequestServices.GetRequiredService<PathPrefixProvider>();
+            return prefixes.GetPrefix(idp.Id).Add(idp.SsoEndpoint).Add("/initiate") == context.Request.Path;
+
+        }
+
+        //public static async Task InitiateSsoAsync(this HttpContext context)
+        //{
+        //    var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+        //    await idp.InitiateSsoAsync();
+        //}
+
+        public static async Task InitiateSsoAsAsync(this HttpContext context, Saml2pIdentityProviderOptions idp)
+        {
+            var service = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+            await service.InitiateSsoAsAsync(idp);
+        }
+
+        public static bool CanCompleteSsoAs(this HttpContext context, Saml2pIdentityProviderOptions idp)
+        {
+            // TODO: log
+            if (!idp.Enabled) return false;
+            if (!HttpMethods.IsGet(context.Request.Method)) return false;
+            var prefixes = context.RequestServices.GetRequiredService<PathPrefixProvider>();
+            return prefixes.GetPrefix(idp.Id).Add(idp.SsoEndpoint).Add("/complete") == context.Request.Path;
+        }
+
+        //public static async Task CompleteSsoAsync(this HttpContext context)
+        //{
+        //    var idp = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+        //    await idp.CompleteSsoAsync();
+        //}
+
+        public static async Task CompleteSsoAsAsync(this HttpContext context, Saml2pIdentityProviderOptions idp)
+        {
+            var service = context.RequestServices.GetRequiredService<ISaml2pIdentityProviderService>();
+            await service.CompleteSsoAsAsync(idp);
         }
 
         public static Task StartSsoAsync(this HttpContext context, string partnerId)

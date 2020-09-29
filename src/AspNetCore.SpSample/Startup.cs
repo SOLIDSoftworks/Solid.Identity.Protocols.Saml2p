@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Solid.Extensions.AspNetCore.Saml2p;
 using Solid.Identity.Protocols.Saml2p.Authentication;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Serialization;
@@ -84,12 +83,6 @@ namespace AspNetCore.SpSample
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            //app.Use((context, next) =>
-            //{
-            //    var serializer = context.RequestServices.GetRequiredService<Saml2pSerializer>();
-            //    var request = 
-            //});
             app.UseHttpsRedirection();
 
             app.UseRouting();

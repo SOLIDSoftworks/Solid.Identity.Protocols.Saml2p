@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Solid.Extensions.AspNetCore.Saml2p;
 using Solid.Identity.Protocols.Saml2p.Authentication;
 using System;
 using System.Collections.Generic;

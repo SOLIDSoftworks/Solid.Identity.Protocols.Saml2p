@@ -30,9 +30,9 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
         }
 
         protected override Task InitializeHandlerAsync()
-        {
+        {            
             var idp = _provider.GetPartnerIdentityProvider(Options.IdentityProviderId);
-            Options.CallbackPath = idp.ServiceProvider.AssertionConsumerServiceEndpoint;
+            Options.CallbackPath = Context.Request.PathBase.Add(idp.ServiceProvider.AssertionConsumerServiceEndpoint);
             return base.InitializeHandlerAsync();
         }
 

@@ -78,12 +78,12 @@ namespace AspNetCore.IdpSample
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSaml2pIdentityProvider();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapAllSaml2pIdentityProviders();
                 endpoints.MapRazorPages();
             });
         }

@@ -7,10 +7,12 @@ using Solid.Identity.Protocols.Saml2p.Cache;
 using Solid.Identity.Protocols.Saml2p.Factories;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
+using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,20 +54,20 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             _razorPageRenderingService = razorPageRenderingService;
         }
 
-        public async Task AcceptSsoAsync()
+        public async Task AcceptSsoAsAsync(Saml2pIdentityProviderOptions idp)
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            if (!HttpMethods.IsPost(httpContext.Request.Method)) return;
+            if (!httpContext.CanAcceptSsoAs(idp)) return;
 
             var base64 = httpContext.Request.Form["SAMLRequest"].ToString();
             var xml = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
             var request = _serializer.DeserializeAuthnRequest(xml);
             if (request == null) return;
 
-            var partner = _partnerProvider.GetPartnerServiceProvider(request.Issuer);
-            // TODO: If partner doesn't exist, then respond with correct status
+            var partner = idp.ServiceProviders.FirstOrDefault(sp => sp.Id == request.Issuer);
 
-            if (!partner.Enabled || !partner.IdentityProvider.Enabled) return;
+            // TODO: log
+            if (!partner.Enabled) return;
 
             await _cache.CacheRequestAsync(request.Id, request);
 
@@ -80,21 +82,46 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             await partner.IdentityProvider.Events.AcceptSsoAsync(_provider, context);
         }
 
-        public async Task InitiateSsoAsync()
+        //public async Task AcceptSsoAsync()
+        //{
+        //    var httpContext = _httpContextAccessor.HttpContext;
+        //    if (!HttpMethods.IsPost(httpContext.Request.Method)) return;
+
+        //    var base64 = httpContext.Request.Form["SAMLRequest"].ToString();
+        //    var xml = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+        //    var request = _serializer.DeserializeAuthnRequest(xml);
+        //    if (request == null) return;
+
+        //    var partner = _partnerProvider.GetPartnerServiceProvider(request.Issuer);
+        //    // TODO: If partner doesn't exist, then respond with correct status
+
+        //    if (!partner.Enabled || !partner.IdentityProvider.Enabled) return;
+
+        //    await _cache.CacheRequestAsync(request.Id, request);
+
+        //    var context = new AcceptSsoContext
+        //    {
+        //        PartnerId = partner.Id,
+        //        Partner = partner,
+        //        Request = request,
+        //        User = httpContext.User,
+        //        ReturnUrl = GenerateReturnUrl(httpContext, request.Id)
+        //    };
+        //    await partner.IdentityProvider.Events.AcceptSsoAsync(_provider, context);
+        //}
+
+        public async Task InitiateSsoAsAsync(Saml2pIdentityProviderOptions idp)
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            if (!HttpMethods.IsGet(httpContext.Request.Method)) return;
+            if (!httpContext.CanInitiateSsoAs(idp)) return; 
             var partnerId = httpContext.Request.Query["partnerId"];
-
-            var partner = _partnerProvider.GetPartnerServiceProvider(partnerId);
-            // TODO: If partner doesn't exist, then respond with correct status
-
-            if (!partner.Enabled || !partner.IdentityProvider.Enabled) return;
+            var partner = idp.ServiceProviders.FirstOrDefault(sp => sp.Id == partnerId);
+            if (!partner.Enabled) return;
 
             var request = new AuthnRequest
             {
                 AssertionConsumerServiceUrl = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
-                Issuer = partner.Id                
+                Issuer = partner.Id
             };
             var key = $"idp_initiated_{Guid.NewGuid().ToString()}";
             await _cache.CacheRequestAsync(key, request);
@@ -109,15 +136,44 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             await partner.IdentityProvider.Events.InitiateSsoAsync(_provider, context);
         }
 
-        public async Task CompleteSsoAsync()
+        //public async Task InitiateSsoAsync()
+        //{
+        //    var httpContext = _httpContextAccessor.HttpContext;
+        //    if (!HttpMethods.IsGet(httpContext.Request.Method)) return;
+        //    var partnerId = httpContext.Request.Query["partnerId"];
+
+        //    var partner = _partnerProvider.GetPartnerServiceProvider(partnerId);
+        //    // TODO: If partner doesn't exist, then respond with correct status
+
+        //    if (!partner.Enabled || !partner.IdentityProvider.Enabled) return;
+
+        //    var request = new AuthnRequest
+        //    {
+        //        AssertionConsumerServiceUrl = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
+        //        Issuer = partner.Id                
+        //    };
+        //    var key = $"idp_initiated_{Guid.NewGuid().ToString()}";
+        //    await _cache.CacheRequestAsync(key, request);
+
+        //    var context = new InitiateSsoContext
+        //    {
+        //        PartnerId = partner.Id,
+        //        Partner = partner,
+        //        User = httpContext.User,
+        //        ReturnUrl = GenerateReturnUrl(httpContext, key)
+        //    };
+        //    await partner.IdentityProvider.Events.InitiateSsoAsync(_provider, context);
+        //}
+
+        public async Task CompleteSsoAsAsync(Saml2pIdentityProviderOptions idp)
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            if (!HttpMethods.IsGet(httpContext.Request.Method)) return;
+            if (!httpContext.CanCompleteSsoAs(idp)) return;
             var user = httpContext.User;
             var id = httpContext.Request.Query["id"];
             var request = await _cache.FetchRequestAsync(id);
             var partner = _partnerProvider.GetPartnerServiceProvider(request.Issuer);
-
+            if (!partner.Enabled) return;
             if (user.Identity.IsAuthenticated)
             {
                 var descriptor = _securityTokenDescriptorFactory.CreateSecurityTokenDescriptor(user.Identity as ClaimsIdentity, partner);
@@ -144,8 +200,44 @@ namespace Solid.Identity.Protocols.Saml2p.Services
                 var bytes = Encoding.UTF8.GetBytes(html);
                 await httpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             }
+        }
 
-        }        
+        //public async Task CompleteSsoAsync()
+        //{
+        //    var httpContext = _httpContextAccessor.HttpContext;
+        //    if (!HttpMethods.IsGet(httpContext.Request.Method)) return;
+        //    var user = httpContext.User;
+        //    var id = httpContext.Request.Query["id"];
+        //    var request = await _cache.FetchRequestAsync(id);
+        //    var partner = _partnerProvider.GetPartnerServiceProvider(request.Issuer);
+
+        //    if (user.Identity.IsAuthenticated)
+        //    {
+        //        var descriptor = _securityTokenDescriptorFactory.CreateSecurityTokenDescriptor(user.Identity as ClaimsIdentity, partner);
+        //        var createSecurityTokenContext = new CreateSecurityTokenContext
+        //        {
+        //            PartnerId = partner.Id,
+        //            Partner = partner,
+        //            TokenDescriptor = descriptor
+        //        };
+        //        await partner.IdentityProvider.Events.CreateSecurityTokenAsync(_provider, createSecurityTokenContext);
+        //        var token = _handler.CreateToken(descriptor) as Saml2SecurityToken;
+        //        var response = _factory.Create(partner, authnRequestId: request.Id, token: token);
+        //        var xml = _serializer.SerializeSamlResponse(response);
+        //        var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
+        //        var model = new SamlResponseModel
+        //        {
+        //            Recipient = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
+        //            SamlResponse = base64,
+        //            // TODO: RelayState = 
+        //        };
+        //        var html = await _razorPageRenderingService.RenderPageAsync(model, "SamlResponse", "__Saml2p");
+        //        httpContext.Response.StatusCode = 200;
+        //        httpContext.Response.ContentType = "text/html";
+        //        var bytes = Encoding.UTF8.GetBytes(html);
+        //        await httpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+        //    }
+        //}
 
         //private AuthnRequest GetAuthnRequest(HttpContext context)
         //{

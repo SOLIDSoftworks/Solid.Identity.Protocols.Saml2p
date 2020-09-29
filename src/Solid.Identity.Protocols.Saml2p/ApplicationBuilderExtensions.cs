@@ -12,53 +12,45 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class Solid_Identity_Protocols_Saml2p_ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseAllSaml2pIdentityProviders(this IApplicationBuilder builder)
         {
-            //var options = builder.ApplicationServices.GetService<IOptionsSnapshot<LocalSaml2pIdentityProvider>>();
-            //var idp = options.Get(id);
-            //// TODO: exception if doesn't exist
-            //var path = idp.SsoEndpoint.IsAbsoluteUri ? idp.SsoEndpoint.AbsolutePath : idp.SsoEndpoint.OriginalString;
-            //if (!path.StartsWith("/"))
-            //    path = "/";
-            //var pathMatch = new PathString(path);
+            var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
+            foreach (var idp in provider.GetAllIdentityProviderOptions())
+                builder.UseSaml2pIdentityProvider(idp);
+            return builder;
+        }
 
-            //var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
-
+        public static IApplicationBuilder UseAllSaml2pIdentityProviders(this IApplicationBuilder builder, PathString pathPrefix)
+        {
             return builder
-                .MapWhen(CanAcceptSso, b => b.Use((context, _) => context.AcceptSsoAsync()))
-                .MapWhen(CanInitiateSso, b => b.Use((context, _) => context.InitiateSsoAsync()))
-                .MapWhen(CanCompleteSso, b => b.Use((context, _) => context.CompleteSsoAsync()))
+                .Map(pathPrefix, b => b.UseAllSaml2pIdentityProviders())
             ;
         }
 
-        private static bool CanAcceptSso(HttpContext context)
+        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString pathPrefix, string idpId)
         {
-            if (!HttpMethods.IsPost(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
-            var idps = provider.GetIdentityProviderConfigurations();
+            var prefixes = builder.ApplicationServices.GetRequiredService<PathPrefixProvider>();
+            prefixes.SetPrefix(idpId, pathPrefix);
 
-            var current = context.Request.PathBase.Add(context.Request.Path);
-            return idps.Any(idp => idp.SsoEndpoint == current);
+            return builder
+                .Map(pathPrefix, b => b.UseSaml2pIdentityProvider(idpId))
+            ;
         }
 
-        private static bool CanInitiateSso(HttpContext context)
+        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, string idpId)
         {
-            if (!HttpMethods.IsGet(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
-            var idps = provider.GetIdentityProviderConfigurations();
-
-            var current = context.Request.PathBase.Add(context.Request.Path);
-            return idps.Any(idp => idp.SsoEndpoint.Add("/initiate") == current);
+            var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
+            var idp = provider.GetIdentityProviderOptions(idpId);
+            return builder.UseSaml2pIdentityProvider(idp);
         }
 
-        private static bool CanCompleteSso(HttpContext context)
+        private static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, Saml2pIdentityProviderOptions idp)
         {
-            if (!HttpMethods.IsGet(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
-            var idps = provider.GetIdentityProviderConfigurations();
-
-            var current = context.Request.PathBase.Add(context.Request.Path);
-            return idps.Any(idp => idp.SsoEndpoint.Add("/complete") == current);
+            return builder
+                .MapWhen(context => context.CanAcceptSsoAs(idp), b => b.Use((context, _) => context.AcceptSsoAsAsync(idp)))
+                .MapWhen(context => context.CanInitiateSsoAs(idp), b => b.Use((context, _) => context.InitiateSsoAsAsync(idp)))
+                .MapWhen(context => context.CanCompleteSsoAs(idp), b => b.Use((context, _) => context.CompleteSsoAsAsync(idp)))
+            ;
         }
     }
 }

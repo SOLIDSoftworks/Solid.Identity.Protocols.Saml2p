@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace Solid.Extensions.AspNetCore.Saml2p.Middleware
-{
-    public class InitiateSsoEndpointMiddleware
-    {
-    }
-}
+//namespace Solid.Extensions.AspNetCore.Saml2p.Middleware
+//{
+//    public class InitiateSsoEndpointMiddleware
+//    {
+//    }
+//}

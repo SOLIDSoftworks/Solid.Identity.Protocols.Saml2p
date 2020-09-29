@@ -17,9 +17,9 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
             _serviceProviderConfigurations = serviceProviderConfigurations;
         }
 
-        public IEnumerable<Saml2pIdentityProviderOptions> GetIdentityProviderConfigurations(bool includeDisabled = false) => _identityProviderConfigurations.Where(idp => idp.Enabled || includeDisabled);
-        public Saml2pIdentityProviderOptions GetIdentityProviderConfiguration(string id) => GetIdentityProviderConfigurations(includeDisabled: true).FirstOrDefault(idp => idp.Id == id);
-        public IEnumerable<Saml2pServiceProviderOptions> GetServiceProviderConfigurations(bool includeDisabled = false) => _serviceProviderConfigurations.Where(idp => idp.Enabled || includeDisabled);
-        public Saml2pServiceProviderOptions GetServiceProviderConfiguration(string id) => GetServiceProviderConfigurations(includeDisabled: true).FirstOrDefault(idp => idp.Id == id);
+        public IEnumerable<Saml2pIdentityProviderOptions> GetAllIdentityProviderOptions(bool includeDisabled = false) => _identityProviderConfigurations.Where(idp => idp.Enabled || includeDisabled);
+        public Saml2pIdentityProviderOptions GetIdentityProviderOptions(string id) => GetAllIdentityProviderOptions(includeDisabled: true).FirstOrDefault(idp => idp.Id == id);
+        public IEnumerable<Saml2pServiceProviderOptions> GetAllServiceProviderOptions(bool includeDisabled = false) => _serviceProviderConfigurations.Where(idp => idp.Enabled || includeDisabled);
+        public Saml2pServiceProviderOptions GetServiceProviderOptions(string id) => GetAllServiceProviderOptions(includeDisabled: true).FirstOrDefault(idp => idp.Id == id);
     }
 }
