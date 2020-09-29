@@ -19,9 +19,21 @@ using Solid.Identity.Tokens.Saml2;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public static class Solid_Identity_Protocols_Saml2p_ServiceCollectionExtensions
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
-        public static IServiceCollection AddSaml2pServiceProvider(this IServiceCollection services, string id, Action<Saml2pServiceProviderOptions> configure)
+        /// <summary>
+        /// Adds services for a local SAML2P service provider.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add the services to.</param>
+        /// <param name="name">
+        /// The name of the service provider configuration.
+        /// <para><paramref name="name"/> is used to pre-configure <see cref="Saml2pProvider.Id"/> and <see cref="Saml2pProvider.Name"/>.</para>
+        /// </param>
+        /// <param name="configure">An action to configure <see cref="Saml2pServiceProviderOptions"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
+        public static IServiceCollection AddSaml2pServiceProvider(this IServiceCollection services, string name, Action<Saml2pServiceProviderOptions> configure)
         {
             services.TryAddTransient<TokenValidationParametersFactory>();
             services.TryAddTransient<AuthnRequestFactory>();
@@ -29,18 +41,28 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .AddSaml2p()
-                .Configure<Saml2pServiceProviderOptions>(id, sp =>
+                .Configure<Saml2pServiceProviderOptions>(name, sp =>
                 {
-                    sp.Id = id;
-                    sp.Name = id;
+                    sp.Id = name;
+                    sp.Name = name;
                 })
-                .Configure(id, configure)
-                .PostConfigure<Saml2pServiceProviderOptions>(id, PostConfigureLocalSaml2pServiceProvider)
-                .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pServiceProviderOptions>>().Get(id))
+                .Configure(name, configure)
+                .PostConfigure<Saml2pServiceProviderOptions>(name, PostConfigureLocalSaml2pServiceProvider)
+                .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pServiceProviderOptions>>().Get(name))
             ;
         }
 
-        public static IServiceCollection AddSaml2pIdentityProvider(this IServiceCollection services, string id, Action<Saml2pIdentityProviderOptions> configure)
+        /// <summary>
+        /// Adds services for a local SAML2P identity provider.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add the services to.</param>
+        /// <param name="name">
+        /// The name of the identity provider configuration.
+        /// <para><paramref name="name"/> is used to pre-configure <see cref="Saml2pProvider.Id"/> and <see cref="Saml2pProvider.Name"/>.</para>
+        /// </param>
+        /// <param name="configure">An action to configure <see cref="Saml2pIdentityProviderOptions"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
+        public static IServiceCollection AddSaml2pIdentityProvider(this IServiceCollection services, string name, Action<Saml2pIdentityProviderOptions> configure)
         {
             services.TryAddTransient<ISaml2pIdentityProviderService, Saml2pIdentityProviderService>();
             services.TryAddTransient<SamlResponseFactory>();
@@ -49,14 +71,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .AddSaml2p()
-                .Configure<Saml2pIdentityProviderOptions>(id, idp =>
+                .Configure<Saml2pIdentityProviderOptions>(name, idp =>
                 {
-                    idp.Id = id;
-                    idp.Name = id;
+                    idp.Id = name;
+                    idp.Name = name;
                 })
-                .Configure(id, configure)
-                .PostConfigure<Saml2pIdentityProviderOptions>(id, PostConfigureLocalSaml2IdentityProvider)
-                .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pIdentityProviderOptions>>().Get(id))
+                .Configure(name, configure)
+                .PostConfigure<Saml2pIdentityProviderOptions>(name, PostConfigureLocalSaml2IdentityProvider)
+                .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pIdentityProviderOptions>>().Get(name))
             ;
         }
 
