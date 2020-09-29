@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var provider = builder.ServiceProvider.GetRequiredService<Saml2pOptionsProvider>();
             foreach (var idp in provider.GetAllIdentityProviderOptions())
-                builder.MapSaml2pIdentityProvider(pathPrefix, idp);
+                builder.MapSaml2pIdentityProvider(idp, pathPrefix);
             return builder;
         }
 
@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var provider = builder.ServiceProvider.GetRequiredService<Saml2pOptionsProvider>();
             var idp = provider.GetIdentityProviderOptions(idpId);
-            return builder.MapSaml2pIdentityProvider(pathPrefix, idp);
+            return builder.MapSaml2pIdentityProvider(idp, pathPrefix);
 
         }
         static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, Saml2pIdentityProviderOptions idp, PathString pathPrefix)
