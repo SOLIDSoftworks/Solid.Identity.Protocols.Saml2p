@@ -17,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using System.Security.Claims;
 
-namespace Solid.Extensions.AspNetCore.Saml2p
+namespace Solid.Identity.Protocols.Saml2p.Authentication
 {
     public class Saml2pAuthenticationHandler : RemoteAuthenticationHandler<Saml2pAuthenticationOptions>
     {
@@ -32,8 +32,7 @@ namespace Solid.Extensions.AspNetCore.Saml2p
         protected override Task InitializeHandlerAsync()
         {
             var idp = _provider.GetPartnerIdentityProvider(Options.IdentityProviderId);
-            var acs = idp.ServiceProvider.AssertionConsumerServiceUrl;
-            Options.CallbackPath = CreateCallbackPath(acs);
+            Options.CallbackPath = idp.ServiceProvider.AssertionConsumerServiceEndpoint;
             return base.InitializeHandlerAsync();
         }
 
@@ -52,14 +51,5 @@ namespace Solid.Extensions.AspNetCore.Saml2p
         }
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties) => Context.StartSsoAsync(Options.IdentityProviderId);
-
-        private string CreateCallbackPath(Uri assertionConsumerServiceUrl)
-        {
-            if (assertionConsumerServiceUrl.IsAbsoluteUri) return assertionConsumerServiceUrl.AbsolutePath;
-            var path = assertionConsumerServiceUrl.OriginalString;
-            if (!path.StartsWith("/"))
-                path = "/" + path;
-            return path;
-        }
     }
 }

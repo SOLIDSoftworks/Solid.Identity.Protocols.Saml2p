@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Solid.Extensions.AspNetCore.Saml2p
+namespace Solid.Identity.Protocols.Saml2p.Authentication
 {
     public class Saml2pAuthenticationOptions : RemoteAuthenticationOptions, ISaml2pAuthenticationOptions
     {

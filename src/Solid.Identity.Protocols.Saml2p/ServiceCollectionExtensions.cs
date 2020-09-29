@@ -29,7 +29,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .AddSaml2p()
-                .Configure<Saml2pServiceProviderOptions>(id, sp => sp.Id = id)
+                .Configure<Saml2pServiceProviderOptions>(id, sp =>
+                {
+                    sp.Id = id;
+                    sp.Name = id;
+                })
                 .Configure(id, configure)
                 .PostConfigure<Saml2pServiceProviderOptions>(id, PostConfigureLocalSaml2pServiceProvider)
                 .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pServiceProviderOptions>>().Get(id))
@@ -45,7 +49,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .AddSaml2p()
-                .Configure<Saml2pIdentityProviderOptions>(id, idp => idp.Id = id)
+                .Configure<Saml2pIdentityProviderOptions>(id, idp =>
+                {
+                    idp.Id = id;
+                    idp.Name = id;
+                })
                 .Configure(id, configure)
                 .PostConfigure<Saml2pIdentityProviderOptions>(id, PostConfigureLocalSaml2IdentityProvider)
                 .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pIdentityProviderOptions>>().Get(id))
@@ -63,7 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pSerializer>();
             services.TryAddTransient<Saml2pPartnerProvider>();
             services.TryAddTransient<Saml2pCache>();
-            services.TryAddTransient<Saml2pConfigurationProvider>();
+            services.TryAddTransient<Saml2pOptionsProvider>();
             services.TryAddScoped<IRazorPageRenderingService, RazorPageRenderingService>();
             services.AddMvcCore().AddRazorViewEngine();
 
@@ -74,14 +82,22 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             sp.IdentityProviders = new ReadOnlyCollection<PartnerSaml2pIdentityProvider>(sp.IdentityProviders.ToArray());
             foreach (var idp in sp.IdentityProviders)
+            {
                 idp.ServiceProvider = sp;
+                if (idp.Id == null)
+                    throw new ArgumentNullException(nameof(idp.Id), $"Partner IDP '{idp.Name}' missing Id.");
+            }
         }
 
         static void PostConfigureLocalSaml2IdentityProvider(Saml2pIdentityProviderOptions idp)
         {
             idp.ServiceProviders = new ReadOnlyCollection<PartnerSaml2pServiceProvider>(idp.ServiceProviders.ToArray());
             foreach (var sp in idp.ServiceProviders)
+            {
+                if (sp.Id == null)
+                    throw new ArgumentNullException(nameof(sp.Id), $"Partner SP '{sp.Name}' missing Id.");
                 sp.IdentityProvider = idp;
+            }
         }
     }
 }

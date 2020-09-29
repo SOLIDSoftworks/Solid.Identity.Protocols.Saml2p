@@ -69,7 +69,7 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
             var model = new AuthnRequestModel
             {
-                Destination = partner.SsoEndpoint,
+                Destination = new Uri(partner.BaseUrl, partner.SsoEndpoint),
                 SamlRequest = base64
             };
             var html = await _razorPageRenderingService.RenderPageAsync(model, "AuthnRequest", "__Saml2p");

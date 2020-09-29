@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Extensions.AspNetCore.Saml2p;
+using Solid.Identity.Protocols.Saml2p.Authentication;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 
@@ -44,11 +45,12 @@ namespace AspNetCore.SpSample
             services
                 .AddSaml2pServiceProvider("https://localhost:44340/saml", sp =>
                 {
-                    sp.AssertionConsumerServiceUrl = new Uri("/saml/sso", UriKind.Relative);
+                    sp.AssertionConsumerServiceEndpoint = "/saml/sso";
                     sp.IdentityProviders.Add(new PartnerSaml2pIdentityProvider
                     {
                         Id = "https://localhost:44360/saml",
-                        SsoEndpoint = new Uri("https://localhost:44360/saml/sso"),
+                        BaseUrl = new Uri("https://localhost:44360"),
+                        SsoEndpoint ="/saml/sso",
                         CanInitiateSso = true,
                         AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)))
                     });

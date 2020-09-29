@@ -16,7 +16,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             {
                 Id = $"_{Guid.NewGuid()}", // TODO: create id factory
                 SecurityToken = token, 
-                Destination = partner.AssertionConsumerServiceUrl,
+                Destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
                 IssueInstant = token?.Assertion.IssueInstant,
                 Issuer = partner.IdentityProvider.Id,
                 Status = Convert(status, subStatus),

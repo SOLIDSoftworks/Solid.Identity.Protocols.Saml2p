@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Providers
 {
-    public class Saml2pConfigurationProvider
+    public class Saml2pOptionsProvider
     {
         private IEnumerable<Saml2pIdentityProviderOptions> _identityProviderConfigurations;
         private IEnumerable<Saml2pServiceProviderOptions> _serviceProviderConfigurations;
 
-        public Saml2pConfigurationProvider(IEnumerable<Saml2pIdentityProviderOptions> identityProviderConfigurations, IEnumerable<Saml2pServiceProviderOptions> serviceProviderConfigurations)
+        public Saml2pOptionsProvider(IEnumerable<Saml2pIdentityProviderOptions> identityProviderConfigurations, IEnumerable<Saml2pServiceProviderOptions> serviceProviderConfigurations)
         {
             _identityProviderConfigurations = identityProviderConfigurations;
             _serviceProviderConfigurations = serviceProviderConfigurations;

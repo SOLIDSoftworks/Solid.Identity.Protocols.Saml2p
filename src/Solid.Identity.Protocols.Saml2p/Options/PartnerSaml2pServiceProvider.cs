@@ -8,6 +8,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class PartnerSaml2pServiceProvider : Saml2pServiceProvider
     {
+        public Uri BaseUrl { get; set; }
         public SecurityKey AssertionSigningKey { get; set; }
         public string AssertionSigningAlgorithm { get; set; } = SecurityAlgorithms.RsaSha256Signature;
         public string AssertionSigningDigestAlgorithm { get; set; } = SecurityAlgorithms.Sha256;

@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Solid.Identity.Protocols.Saml2p.Providers;
+using System.Linq;
 
 namespace Microsoft.AspNetCore.Builder
 {
-    public static class Solid_Identity_AspNetCore_Saml2p_ApplicationBuilderExtensions
+    public static class Solid_Identity_Protocols_Saml2p_ApplicationBuilderExtensions
     {
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder)
         {
@@ -21,6 +22,8 @@ namespace Microsoft.AspNetCore.Builder
             //    path = "/";
             //var pathMatch = new PathString(path);
 
+            //var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
+
             return builder
                 .MapWhen(CanAcceptSso, b => b.Use((context, _) => context.AcceptSsoAsync()))
                 .MapWhen(CanInitiateSso, b => b.Use((context, _) => context.InitiateSsoAsync()))
@@ -31,43 +34,31 @@ namespace Microsoft.AspNetCore.Builder
         private static bool CanAcceptSso(HttpContext context)
         {
             if (!HttpMethods.IsPost(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pConfigurationProvider>();
+            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
             var idps = provider.GetIdentityProviderConfigurations();
-            foreach(var idp in idps)
-            {
-                // TODO: maybe change SSO endpoint to PathString or string
-                var sso = new PathString(idp.SsoEndpoint.OriginalString);
-                if (sso == context.Request.Path) return true;
-            }
-            return false;
+
+            var current = context.Request.PathBase.Add(context.Request.Path);
+            return idps.Any(idp => idp.SsoEndpoint == current);
         }
 
         private static bool CanInitiateSso(HttpContext context)
         {
             if (!HttpMethods.IsGet(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pConfigurationProvider>();
+            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
             var idps = provider.GetIdentityProviderConfigurations();
-            foreach (var idp in idps)
-            {
-                // TODO: maybe change SSO endpoint to PathString or string
-                var sso = new PathString(idp.SsoEndpoint.OriginalString).Add("/initiate");
-                if (sso == context.Request.Path) return true;
-            }
-            return false;
+
+            var current = context.Request.PathBase.Add(context.Request.Path);
+            return idps.Any(idp => idp.SsoEndpoint.Add("/initiate") == current);
         }
 
         private static bool CanCompleteSso(HttpContext context)
         {
             if (!HttpMethods.IsGet(context.Request.Method)) return false;
-            var provider = context.RequestServices.GetRequiredService<Saml2pConfigurationProvider>();
+            var provider = context.RequestServices.GetRequiredService<Saml2pOptionsProvider>();
             var idps = provider.GetIdentityProviderConfigurations();
-            foreach (var idp in idps)
-            {
-                // TODO: maybe change SSO endpoint to PathString or string
-                var sso = new PathString(idp.SsoEndpoint.OriginalString).Add("/complete");
-                if (sso == context.Request.Path) return true;
-            }
-            return false;
+
+            var current = context.Request.PathBase.Add(context.Request.Path);
+            return idps.Any(idp => idp.SsoEndpoint.Add("/complete") == current);
         }
     }
 }

@@ -21,9 +21,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         public AuthnRequest CreateAuthnRequest(HttpContext context, PartnerSaml2pIdentityProvider idp)
         {
             var request = context.Request;
-            var acs = idp.ServiceProvider.AssertionConsumerServiceUrl;
-            if (!acs.IsAbsoluteUri)
-                acs = new Uri(GetBaseUrl(request), acs);
+            var acs = new Uri(GetBaseUrl(request), idp.ServiceProvider.AssertionConsumerServiceEndpoint);
             return new AuthnRequest
             {
                 Id = $"_{Guid.NewGuid()}",
@@ -31,7 +29,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 AssertionConsumerServiceUrl = acs,
                 IssueInstant = _systemClock.UtcNow.UtcDateTime,
                 Issuer = idp.ServiceProvider.Id,
-                Destination = idp.SsoEndpoint,
+                Destination = new Uri(idp.BaseUrl, idp.SsoEndpoint),
                 NameIdPolicy = new NameIdPolicy
                 {
                     Format = idp.NameIdPolicyFormat

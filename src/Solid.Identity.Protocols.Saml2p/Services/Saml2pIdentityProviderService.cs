@@ -93,7 +93,7 @@ namespace Solid.Identity.Protocols.Saml2p.Services
 
             var request = new AuthnRequest
             {
-                AssertionConsumerServiceUrl = partner.AssertionConsumerServiceUrl,
+                AssertionConsumerServiceUrl = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
                 Issuer = partner.Id                
             };
             var key = $"idp_initiated_{Guid.NewGuid().ToString()}";
@@ -134,7 +134,7 @@ namespace Solid.Identity.Protocols.Saml2p.Services
                 var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
                 var model = new SamlResponseModel
                 {
-                    Recipient = partner.AssertionConsumerServiceUrl,
+                    Recipient = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
                     SamlResponse = base64,
                     // TODO: RelayState = 
                 };

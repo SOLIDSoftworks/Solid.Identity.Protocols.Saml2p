@@ -42,12 +42,13 @@ namespace AspNetCore.IdpSample
             services.AddSaml2pIdentityProvider("https://localhost:44360/saml", idp =>
             {
                 idp.WantsAuthnRequestsSigned = false;
-                idp.SsoEndpoint = new Uri("/saml/sso", UriKind.Relative);
+                idp.SsoEndpoint = "/saml/sso";
                 
                 idp.ServiceProviders.Add(new PartnerSaml2pServiceProvider
                 {
                     Id = "https://localhost:44340/saml",
-                    AssertionConsumerServiceUrl = new Uri("https://localhost:44340/saml/sso"),
+                    BaseUrl = new Uri("https://localhost:44340"),
+                    AssertionConsumerServiceEndpoint = "/saml/sso",
                     AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)))
                 });
             });
