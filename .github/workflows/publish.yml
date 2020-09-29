@@ -32,6 +32,4 @@ jobs:
       - name: Package
         run: dotnet pack ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-build -p:Version=${{ env.package_version }} -o ./ 
       - name: Push
-        run: |
-          dotnet nuget push Solid.Identity.Protocols.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
-          dotnet nuget push Solid.Extensions.AspNetCore.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+        run: dotnet nuget push Solid.Identity.Protocols.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
