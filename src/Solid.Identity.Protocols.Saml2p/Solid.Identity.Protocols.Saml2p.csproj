@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Solid.Identity.Protocols.Saml2p</AssemblyName>
     <RootNamespace>Solid.Identity.Protocols.Saml2p</RootNamespace>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>    
   </PropertyGroup>
 
   <PropertyGroup>

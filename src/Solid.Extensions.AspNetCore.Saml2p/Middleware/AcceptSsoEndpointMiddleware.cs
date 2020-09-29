@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Solid.Identity.AspNetCore.Saml2p.Middleware
+namespace Solid.Extensions.AspNetCore.Saml2p.Middleware
 {
     public class AcceptSsoEndpointMiddleware
     {

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <AssemblyName>Solid.Identity.AspNetCore.Saml2p</AssemblyName>
-    <RootNamespace>Solid.Identity.AspNetCore.Saml2p</RootNamespace>
+    <AssemblyName>Solid.Extensions.AspNetCore.Saml2p</AssemblyName>
+    <RootNamespace>Solid.Extensions.AspNetCore.Saml2p</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
