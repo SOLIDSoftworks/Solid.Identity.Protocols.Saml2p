@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Solid.Identity.AspNetCore.Saml2p.Middleware;
 using Solid.Identity.Protocols.Saml2p.Configuration;
 using System;
 using System.Collections.Generic;
