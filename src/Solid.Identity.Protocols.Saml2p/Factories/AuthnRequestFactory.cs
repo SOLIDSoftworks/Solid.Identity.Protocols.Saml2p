@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Solid.Identity.Protocols.Saml2p.Configuration;
+using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;

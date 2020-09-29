@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Solid.Identity.Protocols.Saml2p.Configuration
+namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class Saml2pServiceProviderEvents
     {

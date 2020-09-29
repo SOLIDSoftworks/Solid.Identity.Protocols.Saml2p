@@ -1,5 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens.Saml2;
-using Solid.Identity.Protocols.Saml2p.Configuration;
+using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;

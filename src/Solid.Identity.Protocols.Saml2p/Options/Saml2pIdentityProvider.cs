@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Solid.Identity.Protocols.Saml2p.Configuration
+namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class Saml2pIdentityProvider : Saml2pProvider
     {

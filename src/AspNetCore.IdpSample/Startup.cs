@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Solid.Identity.Protocols.Saml2p.Configuration;
+using Solid.Identity.Protocols.Saml2p.Options;
 
 namespace AspNetCore.IdpSample
 {

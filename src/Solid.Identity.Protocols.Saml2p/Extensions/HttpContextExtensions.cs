@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Solid.Identity.Protocols.Saml2p.Abstractions.Services;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 using System.Security.Claims;
-using Solid.Identity.Protocols.Saml2p.Configuration;
+using Solid.Identity.Protocols.Saml2p.Options;
 
 namespace Microsoft.AspNetCore.Http
 {

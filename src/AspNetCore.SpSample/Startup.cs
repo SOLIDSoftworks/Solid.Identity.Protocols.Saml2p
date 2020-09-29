@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Extensions.AspNetCore.Saml2p;
-using Solid.Identity.Protocols.Saml2p.Configuration;
+using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 
 namespace AspNetCore.SpSample

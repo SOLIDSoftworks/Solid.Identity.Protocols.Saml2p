@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Solid.Identity.Protocols.Saml2p.Configuration
+namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class PartnerSaml2pIdentityProvider : Saml2pIdentityProvider
     {

@@ -1,4 +1,4 @@
-﻿using Solid.Identity.Protocols.Saml2p.Configuration;
+﻿using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
