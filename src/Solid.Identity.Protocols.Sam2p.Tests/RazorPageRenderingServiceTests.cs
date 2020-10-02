@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.ObjectPool;
 using Moq;
-using Solid.Identity.Protocols.Saml2p.Abstractions.Services;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;

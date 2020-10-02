@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Solid.Identity.Protocols.Saml2p.Abstractions.Services;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 using System.Security.Claims;
 using Solid.Identity.Protocols.Saml2p.Options;

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Solid.Identity.Protocols.Saml2p.Abstractions.Services;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace Solid.Identity.Protocols.Saml2p.Abstractions.Factories
+namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface IXmlReaderFactory
     {

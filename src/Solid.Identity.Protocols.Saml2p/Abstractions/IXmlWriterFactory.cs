@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml;
 
-namespace Solid.Identity.Protocols.Saml2p.Abstractions.Factories
+namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface IXmlWriterFactory
     {

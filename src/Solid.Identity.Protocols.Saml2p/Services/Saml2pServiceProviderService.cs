@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
-using Solid.Identity.Protocols.Saml2p.Abstractions.Services;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Areas.__Saml2p.Pages;
 using Solid.Identity.Protocols.Saml2p.Cache;
 using Solid.Identity.Protocols.Saml2p.Factories;

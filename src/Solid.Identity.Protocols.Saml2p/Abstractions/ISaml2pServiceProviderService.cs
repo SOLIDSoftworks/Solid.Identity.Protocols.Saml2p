@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Solid.Identity.Protocols.Saml2p.Abstractions.Services
+namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface ISaml2pServiceProviderService
     {

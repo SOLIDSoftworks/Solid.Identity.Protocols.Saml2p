@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 
-namespace Solid.Identity.Protocols.Saml2p.Abstractions.Factories
+namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface ISecurityTokenDescriptorFactory
     {
