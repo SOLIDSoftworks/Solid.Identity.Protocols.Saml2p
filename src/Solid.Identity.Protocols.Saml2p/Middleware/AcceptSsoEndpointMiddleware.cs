@@ -38,6 +38,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             if (!partner.Enabled)
                 throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
+            if (!partner.CanInitiateSso)
+                throw new SecurityException($"Partner '{partnerId}' is is not allowed to initiate SSO.");
+
             await Cache.CacheRequestAsync(request.Id, request);
 
             var ssoContext = new AcceptSsoContext
@@ -53,7 +56,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected override bool IsValidRequest(HttpContext context, out AuthnRequest request)
         {   
-            var base64 = context.Request.Form["SAMLRequest"].ToString();            
+            var base64 = context.Request.Form["SAMLRequest"].ToString();
             var xml = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
             request = _serializer.DeserializeAuthnRequest(xml);
             return request != null;

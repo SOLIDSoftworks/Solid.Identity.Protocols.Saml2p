@@ -55,7 +55,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
             if (user.Identity.IsAuthenticated)
             {
-                var descriptor = _descriptorFactory.CreateSecurityTokenDescriptor(user.Identity as ClaimsIdentity, partner);
+                var descriptor = await _descriptorFactory.CreateSecurityTokenDescriptorAsync(user.Identity as ClaimsIdentity, partner);
                 var createSecurityTokenContext = new CreateSecurityTokenContext
                 {
                     PartnerId = partner.Id,

@@ -33,6 +33,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             if (!partner.Enabled)
                 throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
+            if (!partner.IdentityProvider.CanInitiateSso)
+                throw new SecurityException($"Local IDP '{partner.IdentityProvider.Id}' is is not allowed to initiate SSO for partner '{partnerId}'.");
+
             var request = new AuthnRequest
             {
                 AssertionConsumerServiceUrl = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),

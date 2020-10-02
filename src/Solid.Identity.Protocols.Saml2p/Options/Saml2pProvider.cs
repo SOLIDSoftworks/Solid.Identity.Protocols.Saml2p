@@ -11,5 +11,6 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public TimeSpan? MaxClockSkew { get; set; }
         public string Binding { get; set; } = Saml2pConstants.Bindings.Post;
         public bool Enabled { get; set; } = true;
+        public bool CanInitiateSso { get; set; } = true;
     }
 }

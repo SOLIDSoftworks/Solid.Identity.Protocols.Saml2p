@@ -20,5 +20,6 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public SecurityKey AuthnRequestSignatureVerificationKey { get; set; }
         public Saml2pIdentityProviderOptions IdentityProvider { get; internal set; }
+        public bool AllowClaimsPassthrough { get; set; } = true;
     }
 }

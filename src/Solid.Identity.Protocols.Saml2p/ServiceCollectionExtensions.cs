@@ -81,6 +81,13 @@ namespace Microsoft.Extensions.DependencyInjection
             ;
         }
 
+        public static IServiceCollection AddSaml2pServiceProviderClaimStore<TClaimStore>(this IServiceCollection services)
+            where TClaimStore : class, IServiceProviderClaimsProvider
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IServiceProviderClaimsProvider, TClaimStore>());
+            return services;
+        }
+
         static IServiceCollection AddSaml2p(this IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
@@ -95,6 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pOptionsProvider>();
             services.TryAddSingleton<PathPrefixProvider>();
             services.TryAddSingleton<IRazorPageRenderingService, RazorPageRenderingService>();
+            services.AddSaml2pServiceProviderClaimStore<PassthroughClaimsProvider>();
             services.AddMvcCore().AddRazorViewEngine();
 
             return services;
