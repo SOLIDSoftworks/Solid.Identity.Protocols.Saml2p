@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
         public static IServiceCollection AddSaml2pIdentityProvider(this IServiceCollection services, string id, Action<Saml2pIdentityProviderOptions> configure)
         {
-            services.TryAddTransient<ISaml2pIdentityProviderService, Saml2pIdentityProviderService>();
+            //services.TryAddTransient<ISaml2pIdentityProviderService, Saml2pIdentityProviderService>();
             services.TryAddTransient<SamlResponseFactory>();
             services.TryAddTransient<ISecurityTokenDescriptorFactory, SecurityTokenDescriptorFactory>();
             //services.TryAddScoped<IdentityProviderContext>();
@@ -95,7 +95,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pCache>();
             services.TryAddTransient<Saml2pOptionsProvider>();
             services.TryAddSingleton<PathPrefixProvider>();
-            services.TryAddScoped<IRazorPageRenderingService, RazorPageRenderingService>();
+            services.TryAddSingleton<IRazorPageRenderingService, RazorPageRenderingService>();
             services.AddMvcCore().AddRazorViewEngine();
 
             return services;
@@ -103,7 +103,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         static void PostConfigureLocalSaml2pServiceProvider(Saml2pServiceProviderOptions sp)
         {
-            sp.IdentityProviders = new ReadOnlyCollection<PartnerSaml2pIdentityProvider>(sp.IdentityProviders.ToArray());
             foreach (var idp in sp.IdentityProviders)
             {
                 idp.ServiceProvider = sp;
@@ -114,7 +113,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         static void PostConfigureLocalSaml2IdentityProvider(Saml2pIdentityProviderOptions idp)
         {
-            idp.ServiceProviders = new ReadOnlyCollection<PartnerSaml2pServiceProvider>(idp.ServiceProviders.ToArray());
             foreach (var sp in idp.ServiceProviders)
             {
                 if (sp.Id == null)

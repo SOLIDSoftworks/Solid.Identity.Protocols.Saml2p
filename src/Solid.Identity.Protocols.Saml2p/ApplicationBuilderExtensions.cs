@@ -7,50 +7,46 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using System.Linq;
+using System.Threading.Tasks;
+using Solid.Identity.Protocols.Saml2p.Middleware;
 
 namespace Microsoft.AspNetCore.Builder
 {
     public static class Solid_Identity_Protocols_Saml2p_ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseAllSaml2pIdentityProviders(this IApplicationBuilder builder)
-        {
-            var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
-            foreach (var idp in provider.GetAllIdentityProviderOptions())
-                builder.UseSaml2pIdentityProvider(idp);
-            return builder;
-        }
-
-        public static IApplicationBuilder UseAllSaml2pIdentityProviders(this IApplicationBuilder builder, PathString pathPrefix)
+        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path, string idpId)
         {
             return builder
-                .Map(pathPrefix, b => b.UseAllSaml2pIdentityProviders())
+                .MapPost(path, b => b.UseAcceptSsoEndpoint(path, idpId))
+                .MapGet(path.Add("/initiate"), b => b.UseInitiateSsoEndpoint(path, idpId))
+                .MapGet(path.Add("/complete"), b => b.UseCompleteSsoEndpoint(path, idpId))
             ;
         }
 
-        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString pathPrefix, string idpId)
-        {
-            var prefixes = builder.ApplicationServices.GetRequiredService<PathPrefixProvider>();
-            prefixes.SetPrefix(idpId, pathPrefix);
+        internal static IApplicationBuilder UseAcceptSsoEndpoint(this IApplicationBuilder builder, PathString path, string idpId) => builder.UsePathBase(path).UseMiddleware<AcceptSsoEndpointMiddleware>(idpId);
+        internal static IApplicationBuilder UseInitiateSsoEndpoint(this IApplicationBuilder builder, PathString path, string idpId) => builder.UsePathBase(path).UseMiddleware<InitiateSsoEndpointMiddleware>(idpId);
+        internal static IApplicationBuilder UseCompleteSsoEndpoint(this IApplicationBuilder builder, PathString path, string idpId) => builder.UsePathBase(path).UseMiddleware<CompleteSsoEndpointMiddleware>(idpId);
 
-            return builder
-                .Map(pathPrefix, b => b.UseSaml2pIdentityProvider(idpId))
+        private static IApplicationBuilder MapGet(this IApplicationBuilder builder, PathString path, Action<IApplicationBuilder> configure)
+            => builder.MapMethod(path, HttpMethods.Get, configure);
+
+        private static IApplicationBuilder MapPost(this IApplicationBuilder builder, PathString path, Action<IApplicationBuilder> configure)
+            => builder.MapMethod(path, HttpMethods.Post, configure);
+
+        private static IApplicationBuilder MapMethod(this IApplicationBuilder builder, PathString path, string method, Action<IApplicationBuilder> configure)
+            => builder
+                .MapWhen(
+                    context => context.Request.Path.Equals(path) && context.Request.Method.Equals(method),
+                    b => configure(b)
+                )
+                .MapWhen(
+                    context => context.Request.Path.Equals(path) && !context.Request.Method.Equals(method),
+                    b => b.Use((context, _) =>
+                    {
+                        context.Response.StatusCode = 405;
+                        return Task.CompletedTask;
+                    })
+                )
             ;
-        }
-
-        public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, string idpId)
-        {
-            var provider = builder.ApplicationServices.GetRequiredService<Saml2pOptionsProvider>();
-            var idp = provider.GetIdentityProviderOptions(idpId);
-            return builder.UseSaml2pIdentityProvider(idp);
-        }
-
-        private static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, Saml2pIdentityProviderOptions idp)
-        {
-            return builder
-                .MapWhen(context => context.CanAcceptSsoAs(idp), b => b.Use((context, _) => context.AcceptSsoAsAsync(idp)))
-                .MapWhen(context => context.CanInitiateSsoAs(idp), b => b.Use((context, _) => context.InitiateSsoAsAsync(idp)))
-                .MapWhen(context => context.CanCompleteSsoAs(idp), b => b.Use((context, _) => context.CompleteSsoAsAsync(idp)))
-            ;
-        }
     }
 }

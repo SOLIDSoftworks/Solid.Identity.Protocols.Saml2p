@@ -11,6 +11,16 @@ namespace Solid.Identity.Protocols.Saml2p.Options
             MaxClockSkew = TimeSpan.FromMinutes(5);
         }
         public Saml2pIdentityProviderEvents Events { get; } = new Saml2pIdentityProviderEvents();
-        public ICollection<PartnerSaml2pServiceProvider> ServiceProviders { get; internal set; } = new List<PartnerSaml2pServiceProvider>();
+
+        public Saml2pIdentityProviderOptions AddPartner(string id, Action<PartnerSaml2pServiceProvider> configureSp)
+        {
+            var sp = new PartnerSaml2pServiceProvider { Id = id };
+            configureSp(sp);
+            ServiceProviders.Add(sp);
+            return this;
+        }
+
+        // TODO: change to dictioanry
+        internal List<PartnerSaml2pServiceProvider> ServiceProviders { get; } = new List<PartnerSaml2pServiceProvider>();
     }
 }
