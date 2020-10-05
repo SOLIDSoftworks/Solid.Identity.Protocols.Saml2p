@@ -65,6 +65,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 };                
                 var token = await partner.IdentityProvider.Events.CreateSecurityTokenAsync(context.RequestServices, createSecurityTokenContext);
                 var response = _responseFactory.Create(partner, authnRequestId: request.Id, token: token);
+
+                var completeSsoContext = new CompleteSsoContext
+                {
+                    PartnerId = partner.Id,
+                    Partner = partner,
+                    Request = request,
+                    Response = response
+                };
+                await partner.IdentityProvider.Events.CompleteSso(context.RequestServices, completeSsoContext);
+
                 var xml = _serializer.SerializeSamlResponse(response);
                 var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
                 var model = new SamlResponseModel
