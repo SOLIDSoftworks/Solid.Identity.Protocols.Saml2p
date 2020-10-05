@@ -101,18 +101,17 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             await partner.ServiceProvider.Events.FinishSsoAsync(_provider, completeContext);
 
             var parameters = _tokenValidationParametersFactory.Create(partner);
-            var subject = _handler.ValidateToken(response.XmlSecurityToken, parameters, out _);
-            var validatedContext = new TokenValidatedContext
+            var validatedContext = new ValidateTokenContext
             {
                 PartnerId = partner.Id,
                 Partner = partner,
-                Request = null,
+                Request = request,
                 Response = response,
-                Subject = subject
+                TokenValidationParameters = parameters,
+                Handler = _handler
             };
-            await partner.ServiceProvider.Events.TokenValidatedAsync(_provider, validatedContext);
-
-            return validatedContext.Subject;
+            var subject = await partner.ServiceProvider.Events.ValidateTokenAsync(_provider, validatedContext);
+            return subject;
         }
     }
 }

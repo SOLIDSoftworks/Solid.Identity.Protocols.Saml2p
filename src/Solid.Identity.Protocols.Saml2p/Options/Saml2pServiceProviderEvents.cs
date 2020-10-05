@@ -11,12 +11,17 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class Saml2pServiceProviderEvents
     {
-        public Func<IServiceProvider, StartSsoContext, Task> OnStartSso { get; set; } = (_, __) => Task.CompletedTask;
-        public Func<IServiceProvider, FinishSsoContext, Task> OnFinishSso { get; set; } = (_, __) => Task.CompletedTask;
-        public Func<IServiceProvider, TokenValidatedContext, Task> OnTokenValidated { get; set; } = (_, __) => Task.CompletedTask;
-
-        internal Task StartSsoAsync(IServiceProvider provider, StartSsoContext context) => OnStartSso(provider, context);
-        internal Task FinishSsoAsync(IServiceProvider provider, FinishSsoContext context) => OnFinishSso(provider, context);
-        internal Task TokenValidatedAsync(IServiceProvider provider, TokenValidatedContext context) => OnTokenValidated(provider, context);
+        public Func<IServiceProvider, StartSsoContext, ValueTask> StartSso { get; set; } = (_, __) => new ValueTask();
+        public Func<IServiceProvider, FinishSsoContext, ValueTask> FinishSso { get; set; } = (_, __) => new ValueTask();
+        public Func<IServiceProvider, ValidateTokenContext, ValueTask<ClaimsPrincipal>> ValidateToken { get; set; } = (provider, context) => DefaultValidateTokenAsync(provider, context);
+        internal ValueTask StartSsoAsync(IServiceProvider provider, StartSsoContext context) => StartSso(provider, context);
+        internal ValueTask FinishSsoAsync(IServiceProvider provider, FinishSsoContext context) => FinishSso(provider, context);
+        internal ValueTask<ClaimsPrincipal> ValidateTokenAsync(IServiceProvider provider, ValidateTokenContext context) => ValidateToken(provider, context);
+               
+        private static ValueTask<ClaimsPrincipal> DefaultValidateTokenAsync(IServiceProvider provider, ValidateTokenContext context)
+        {
+            var subject = context.Handler.ValidateToken(context.Response.XmlSecurityToken, context.TokenValidationParameters, out _);
+            return new ValueTask<ClaimsPrincipal>(subject);
+        }
     }
 }
