@@ -102,6 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pOptionsProvider>();
             services.TryAddSingleton<PathPrefixProvider>();
             services.TryAddSingleton<IRazorPageRenderingService, RazorPageRenderingService>();
+            services.AddSaml2pServiceProviderClaimStore<RequiredClaimsProvider>();
             services.AddSaml2pServiceProviderClaimStore<PassthroughClaimsProvider>();
             services.AddMvcCore().AddRazorViewEngine();
 

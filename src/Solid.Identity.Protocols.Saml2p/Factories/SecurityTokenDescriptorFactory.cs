@@ -42,7 +42,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var claims = new List<Claim>();
             foreach (var provider in _claimsProviders.Where(p => p.CanGenerateClaims(partner.Id)))
                 claims.AddRange(await provider.GetClaimsAsync(identity, partner));
-
+            
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
                 .Where(c => c.Type != ClaimTypes.AuthenticationInstant)
