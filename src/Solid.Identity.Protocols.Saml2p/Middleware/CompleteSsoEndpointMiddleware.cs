@@ -60,10 +60,10 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 {
                     PartnerId = partner.Id,
                     Partner = partner,
-                    TokenDescriptor = descriptor
-                };
-                await partner.IdentityProvider.Events.CreateSecurityTokenAsync(context.RequestServices, createSecurityTokenContext);
-                var token = _handler.CreateToken(descriptor) as Saml2SecurityToken;
+                    TokenDescriptor = descriptor,
+                    Handler = _handler
+                };                
+                var token = await partner.IdentityProvider.Events.CreateSecurityTokenAsync(context.RequestServices, createSecurityTokenContext);
                 var response = _responseFactory.Create(partner, authnRequestId: request.Id, token: token);
                 var xml = _serializer.SerializeSamlResponse(response);
                 var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
