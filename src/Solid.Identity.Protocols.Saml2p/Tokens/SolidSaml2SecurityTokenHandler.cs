@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens.Saml2;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Xml;
@@ -42,9 +43,22 @@ namespace Solid.Identity.Tokens.Saml2
 
                 var authnStatement = CreateAuthenticationStatement(authenticationInformation);
                 token.Assertion.Statements.Add(authnStatement);
-
             }
             return token;
+        }
+
+        protected override Saml2Subject CreateSubject(SecurityTokenDescriptor tokenDescriptor)
+        {
+            var subject = base.CreateSubject(tokenDescriptor);
+            var bearer = subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
+            if (bearer != null)
+            {
+                if (bearer.SubjectConfirmationData == null) 
+                    bearer.SubjectConfirmationData = new Saml2SubjectConfirmationData();
+                bearer.SubjectConfirmationData.NotBefore = tokenDescriptor.NotBefore;
+                bearer.SubjectConfirmationData.NotOnOrAfter = tokenDescriptor.Expires;
+            }
+            return subject;
         }
 
         public override SecurityToken ReadToken(XmlReader reader, TokenValidationParameters validationParameters)

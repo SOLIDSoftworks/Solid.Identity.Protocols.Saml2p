@@ -11,6 +11,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using Microsoft.IdentityModel.Tokens.Saml2;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -42,7 +44,12 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var claims = new List<Claim>();
             foreach (var provider in _claimsProviders.Where(p => p.CanGenerateClaims(partner.Id)))
                 claims.AddRange(await provider.GetClaimsAsync(identity, partner));
-            
+
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
+                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime));
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
+                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"));
+
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
                 .Where(c => c.Type != ClaimTypes.AuthenticationInstant)
@@ -50,6 +57,12 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             ;
             if (!attributes.Any())
                 claims.Add(new Claim("http://schemas.solidsoft.works/ws/2020/08/identity/claims/null", bool.TrueString, ClaimValueTypes.Boolean, partner.IdentityProvider.Id));
+
+            foreach(var attribute in attributes)
+            {
+                if (attribute.Properties.ContainsKey(ClaimProperties.SamlAttributeNameFormat)) continue;
+                attribute.Properties.Add(ClaimProperties.SamlAttributeNameFormat, "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified");
+            }
 
             var descriptor = new SecurityTokenDescriptor
             {

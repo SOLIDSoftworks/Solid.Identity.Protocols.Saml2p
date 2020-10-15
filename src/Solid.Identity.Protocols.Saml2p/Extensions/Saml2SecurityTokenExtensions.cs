@@ -19,7 +19,6 @@ namespace Microsoft.IdentityModel.Tokens.Saml2
             confirmation.SubjectConfirmationData = new Saml2SubjectConfirmationData
             {
                 Recipient = recipient,
-                NotOnOrAfter = token.ValidTo,
                 InResponseTo = inResponseTo
             };
         }

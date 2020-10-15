@@ -20,6 +20,23 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             _output = output;
         }
 
+        [Fact]
+        public void ShouldAddToBearerConfirmationData()
+        {
+            var handler = new SolidSaml2SecurityTokenHandler();
+            var identity = CreateIdentity();
+            var descriptor = CreateDesriptor();
+            descriptor.Subject = identity;
+            var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
+
+            Assert.NotNull(token);
+            var confirmation = token?.Assertion.Subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
+            Assert.NotNull(confirmation?.SubjectConfirmationData);
+
+            Assert.Equal(descriptor.NotBefore, confirmation.SubjectConfirmationData.NotBefore);
+            Assert.Equal(descriptor.Expires, confirmation.SubjectConfirmationData.NotOnOrAfter);
+        }
+
         [Theory]
         [InlineData("2019-07-10T15:35:50.123Z", "urn:auth_method")]
         public void ShouldIncludeAuthenticationStatement(string authenticationInstant, string authenticationMethod)
@@ -40,6 +57,7 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             Assert.Equal(new Uri(authenticationMethod), statement.AuthenticationContext.ClassReference);
             Assert.Equal(token.Assertion.Id.Value, statement.SessionIndex);
         }
+
         [Theory]
         [InlineData("some invalid date", "urn:auth_method")]
         [InlineData("2019-07-10T15:35:50.123Z", "some invalid auth method")]
@@ -60,9 +78,9 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             var descriptor = CreateDesriptor();
             descriptor.Subject = identity;
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
-            OutputToken(handler, token);
 
             Assert.NotNull(token);
+            OutputToken(handler, token);
             var statement = token?.Assertion.Statements.OfType<Saml2AuthenticationStatement>().FirstOrDefault();
             Assert.Null(statement);
         }
@@ -116,7 +134,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
         private Claim CreateSamlAttribute(string name, string value)
         {
             var claim = new Claim(name, value);
-
             return claim;
         }
     }

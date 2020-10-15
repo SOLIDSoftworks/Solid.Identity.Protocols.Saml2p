@@ -20,7 +20,6 @@ namespace Solid.Identity.Tokens.Saml2
             {
                 w.WriteStartElement("AttributeValue", saml2assertion);
 
-
                 var fqtn = attribute.AttributeValueXsiType?.Split('#');
                 if (fqtn?.Length == 2)
                 {

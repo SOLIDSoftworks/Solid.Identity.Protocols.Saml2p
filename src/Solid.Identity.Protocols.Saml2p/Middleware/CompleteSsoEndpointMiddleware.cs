@@ -62,7 +62,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                     Partner = partner,
                     TokenDescriptor = descriptor,
                     Handler = _handler
-                };                
+                };
                 var token = await partner.IdentityProvider.Events.CreateSecurityTokenAsync(context.RequestServices, createSecurityTokenContext);
                 var response = _responseFactory.Create(partner, authnRequestId: request.Id, token: token);
 

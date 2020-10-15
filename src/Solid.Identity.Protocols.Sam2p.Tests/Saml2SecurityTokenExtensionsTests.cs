@@ -13,7 +13,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
         public void ShouldAddSubjectConfirmationData(string recipient)
         {
             var assertion = new Saml2Assertion(new Saml2NameIdentifier("__notused__"));
-            assertion.Conditions = new Saml2Conditions { NotOnOrAfter = DateTime.UtcNow };
             assertion.Subject = new Saml2Subject(new Saml2NameIdentifier("__notused__"));
 
             var recipientUrl = new Uri(recipient);
@@ -26,7 +25,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             Assert.NotNull(data);
             Assert.Equal(recipientUrl, data.Recipient);
             Assert.Null(data.InResponseTo);
-            Assert.Equal(token.Assertion.Conditions.NotOnOrAfter, data.NotOnOrAfter);
         }
 
         [Theory]
@@ -35,7 +33,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
         public void ShouldAddToExistingSubjectConfirmationData(string recipient)
         {
             var assertion = new Saml2Assertion(new Saml2NameIdentifier("__notused__"));
-            assertion.Conditions = new Saml2Conditions { NotOnOrAfter = DateTime.UtcNow };
             assertion.Subject = new Saml2Subject(new Saml2NameIdentifier("__notused__"));
             assertion.Subject.SubjectConfirmations.Add(new Saml2SubjectConfirmation(Saml2Constants.ConfirmationMethods.Bearer));
 
@@ -49,7 +46,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             Assert.NotNull(data);
             Assert.Equal(recipientUrl, data.Recipient);
             Assert.Null(data.InResponseTo);
-            Assert.Equal(token.Assertion.Conditions.NotOnOrAfter, data.NotOnOrAfter);
         }
 
         [Fact]
@@ -57,7 +53,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
         {
             var inResponseTo = $"_{Guid.NewGuid()}";
             var assertion = new Saml2Assertion(new Saml2NameIdentifier("__notused__"));
-            assertion.Conditions = new Saml2Conditions { NotOnOrAfter = DateTime.UtcNow };
             assertion.Subject = new Saml2Subject(new Saml2NameIdentifier("__notused__"));
 
             var recipientUrl = new Uri("https://notused");

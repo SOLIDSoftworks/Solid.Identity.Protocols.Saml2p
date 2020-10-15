@@ -93,7 +93,11 @@ namespace Solid.Identity.Protocols.Saml2p.Serialization
                 if (response.Status != null)
                     WriteStatusElement(writer, response.Status);
                 if (response.SecurityToken != null)
+                {
+                    if (response.Destination != null)
+                        response.SecurityToken.SetRecipient(response.Destination);
                     WriteSecurityToken(writer, response.SecurityToken);
+                }
             }
         }
 
