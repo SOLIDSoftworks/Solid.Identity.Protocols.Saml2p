@@ -92,7 +92,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddDistributedMemoryCache();
             services.AddHttpContextAccessor();
-            services.TryAddTransient<SolidSaml2Serializer>();
+            services.TryAddTransient<Saml2Serializer, SolidSaml2Serializer>();
             services.TryAddTransient<Saml2SecurityTokenHandler, SolidSaml2SecurityTokenHandler>();
             services.TryAddTransient<IXmlWriterFactory, XmlWriterFactory>();
             services.TryAddTransient<IXmlReaderFactory, XmlReaderFactory>();

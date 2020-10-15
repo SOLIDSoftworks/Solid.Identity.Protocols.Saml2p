@@ -11,7 +11,7 @@ namespace Solid.Identity.Tokens.Saml2
 {
     internal class SolidSaml2SecurityTokenHandler : Saml2SecurityTokenHandler
     {
-        public SolidSaml2SecurityTokenHandler() : this(new Saml2Serializer())
+        public SolidSaml2SecurityTokenHandler() : this(new SolidSaml2Serializer())
         {
         }
         public SolidSaml2SecurityTokenHandler(Saml2Serializer serializer)

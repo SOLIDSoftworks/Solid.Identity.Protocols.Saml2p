@@ -28,8 +28,8 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             var descriptor = CreateDesriptor();
             descriptor.Subject = identity;
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
+            OutputToken(handler, token);
 
-            Assert.NotNull(token);
             var confirmation = token?.Assertion.Subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
             Assert.NotNull(confirmation?.SubjectConfirmationData);
 
@@ -50,7 +50,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
             OutputToken(handler, token);
 
-            Assert.NotNull(token);
             var statement = token?.Assertion.Statements.OfType<Saml2AuthenticationStatement>().FirstOrDefault();
             Assert.NotNull(statement);
             Assert.Equal(DateTime.Parse(authenticationInstant), statement.AuthenticationInstant);
@@ -79,7 +78,6 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             descriptor.Subject = identity;
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
 
-            Assert.NotNull(token);
             OutputToken(handler, token);
             var statement = token?.Assertion.Statements.OfType<Saml2AuthenticationStatement>().FirstOrDefault();
             Assert.Null(statement);
@@ -87,6 +85,7 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
 
         private void OutputToken(Saml2SecurityTokenHandler handler, Saml2SecurityToken token)
         {
+            Assert.NotNull(token);
             _output.WriteLine("SAML assertion:");
             if (token == null)
             {
