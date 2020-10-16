@@ -29,6 +29,8 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
             var descriptor = CreateDesriptor();
             descriptor.Subject = identity;
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
+            token.SetNotBefore();
+            token.SetNotOnOrAfter();
             token.SetRecipient(recipient);
             OutputToken(handler, token);
 

@@ -47,20 +47,6 @@ namespace Solid.Identity.Tokens.Saml2
             return token;
         }
 
-        protected override Saml2Subject CreateSubject(SecurityTokenDescriptor tokenDescriptor)
-        {
-            var subject = base.CreateSubject(tokenDescriptor);
-            var bearer = subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
-            if (bearer != null)
-            {
-                if (bearer.SubjectConfirmationData == null) 
-                    bearer.SubjectConfirmationData = new Saml2SubjectConfirmationData();
-                bearer.SubjectConfirmationData.NotBefore = tokenDescriptor.NotBefore;
-                bearer.SubjectConfirmationData.NotOnOrAfter = tokenDescriptor.Expires;
-            }
-            return subject;
-        }
-
         public override SecurityToken ReadToken(XmlReader reader, TokenValidationParameters validationParameters)
         {
             ValidateToken(reader, validationParameters, out var token);

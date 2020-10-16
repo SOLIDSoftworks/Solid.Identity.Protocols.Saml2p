@@ -13,15 +13,45 @@ namespace Microsoft.IdentityModel.Tokens.Saml2
 
         public static void SetRecipient(this Saml2SecurityToken token, Uri recipient, Saml2Id inResponseTo)
         {
+            var data = token.GetBearerSubjectConfirmationData();
+            if (data == null) return;
+
+            data.Recipient = recipient;
+            data.InResponseTo = inResponseTo;
+        }
+
+        public static void SetNotBefore(this Saml2SecurityToken token)
+            => token.SetNotBefore(token.ValidFrom);
+
+        public static void SetNotBefore(this Saml2SecurityToken token, DateTime? notBefore)
+        {
+            var data = token.GetBearerSubjectConfirmationData();
+            if (data == null) return;
+
+            data.NotBefore = notBefore;
+        }
+
+        public static void SetNotOnOrAfter(this Saml2SecurityToken token)
+            => token.SetNotOnOrAfter(token.ValidTo);
+
+        public static void SetNotOnOrAfter(this Saml2SecurityToken token, DateTime? notOnOrAfter)
+        {
+            var data = token.GetBearerSubjectConfirmationData();
+            if (data == null) return;
+
+            data.NotOnOrAfter = notOnOrAfter;
+        }
+
+        public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);
+
+        static Saml2SubjectConfirmationData GetBearerSubjectConfirmationData(this Saml2SecurityToken token)
+        {
             var confirmation = token.Assertion.Subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
             if (confirmation == null)
                 token.Assertion.Subject.SubjectConfirmations.Add(confirmation = new Saml2SubjectConfirmation(Saml2Constants.ConfirmationMethods.Bearer));
             if (confirmation.SubjectConfirmationData == null)
                 confirmation.SubjectConfirmationData = new Saml2SubjectConfirmationData();
-            confirmation.SubjectConfirmationData.Recipient = recipient;
-            confirmation.SubjectConfirmationData.InResponseTo = inResponseTo;
+            return confirmation.SubjectConfirmationData;
         }
-
-        public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);
     }
 }

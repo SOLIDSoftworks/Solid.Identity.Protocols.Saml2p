@@ -12,11 +12,16 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
     {
         public SamlResponse Create(PartnerSaml2pServiceProvider partner, string authnRequestId = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
         {
+            var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
+
+            token.SetRecipient(destination);
+            token.SetNotOnOrAfter();
+
             var response = new SamlResponse
             {
                 Id = $"_{Guid.NewGuid()}", // TODO: create id factory
                 SecurityToken = token, 
-                Destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
+                Destination = destination,
                 IssueInstant = token?.Assertion.IssueInstant,
                 Issuer = partner.IdentityProvider.Id,
                 Status = Convert(status, subStatus),
