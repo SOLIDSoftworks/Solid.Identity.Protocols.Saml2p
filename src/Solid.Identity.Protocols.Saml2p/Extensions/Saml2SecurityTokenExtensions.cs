@@ -16,11 +16,10 @@ namespace Microsoft.IdentityModel.Tokens.Saml2
             var confirmation = token.Assertion.Subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
             if (confirmation == null)
                 token.Assertion.Subject.SubjectConfirmations.Add(confirmation = new Saml2SubjectConfirmation(Saml2Constants.ConfirmationMethods.Bearer));
-            confirmation.SubjectConfirmationData = new Saml2SubjectConfirmationData
-            {
-                Recipient = recipient,
-                InResponseTo = inResponseTo
-            };
+            if (confirmation.SubjectConfirmationData == null)
+                confirmation.SubjectConfirmationData = new Saml2SubjectConfirmationData();
+            confirmation.SubjectConfirmationData.Recipient = recipient;
+            confirmation.SubjectConfirmationData.InResponseTo = inResponseTo;
         }
 
         public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);

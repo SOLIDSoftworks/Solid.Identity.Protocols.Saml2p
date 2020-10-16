@@ -23,16 +23,19 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
         [Fact]
         public void ShouldAddToBearerConfirmationData()
         {
+            var recipient = new Uri("https://recipient");
             var handler = new SolidSaml2SecurityTokenHandler();
             var identity = CreateIdentity();
             var descriptor = CreateDesriptor();
             descriptor.Subject = identity;
             var token = handler.CreateToken(descriptor) as Saml2SecurityToken;
+            token.SetRecipient(recipient);
             OutputToken(handler, token);
 
             var confirmation = token?.Assertion.Subject.SubjectConfirmations.FirstOrDefault(c => c.Method == Saml2Constants.ConfirmationMethods.Bearer);
             Assert.NotNull(confirmation?.SubjectConfirmationData);
 
+            Assert.Equal(recipient, confirmation.SubjectConfirmationData.Recipient);
             Assert.Equal(descriptor.NotBefore, confirmation.SubjectConfirmationData.NotBefore);
             Assert.Equal(descriptor.Expires, confirmation.SubjectConfirmationData.NotOnOrAfter);
         }
