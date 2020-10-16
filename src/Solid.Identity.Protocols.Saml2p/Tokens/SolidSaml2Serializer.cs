@@ -24,7 +24,7 @@ namespace Solid.Identity.Tokens.Saml2
                 if (fqtn?.Length == 2)
                 {
                     if(string.IsNullOrEmpty(w.LookupPrefix("xs")))
-                        w.WriteXmlnsAttribute("xs", fqtn[0]);
+                        w.WriteAttributeString("xmlns", "xs", null, fqtn[0]);
 
                     w.WriteStartAttribute("xsi", "type", xsi);
                     w.WriteQualifiedName(fqtn[1], fqtn[0]);
