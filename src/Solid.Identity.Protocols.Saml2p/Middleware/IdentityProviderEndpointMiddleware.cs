@@ -54,7 +54,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
             else
             {
-                Logger.LogInformation($"Could handle SAML2P request.");
+                Logger.LogInformation($"Could not handle SAML2P request.");
                 context.Response.StatusCode = 400;
                 return;
             }
