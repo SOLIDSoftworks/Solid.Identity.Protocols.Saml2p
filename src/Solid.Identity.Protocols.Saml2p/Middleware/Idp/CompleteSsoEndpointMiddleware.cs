@@ -20,17 +20,19 @@ using Solid.Identity.Protocols.Saml2p.Serialization;
 using Solid.Identity.Protocols.Saml2p.Factories;
 using Solid.Identity.Protocols.Saml2p.Areas.__Saml2p.Pages;
 using Microsoft.Extensions.Primitives;
+using Solid.Identity.Protocols.Saml2p.Services;
+using Solid.Identity.Protocols.Saml2p.Models;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
     internal class CompleteSsoEndpointMiddleware : Saml2pEndpointMiddleware
     {
-        private IRazorPageRenderingService _razor;
+        private RazorPageRenderingService _razor;
         private Saml2SecurityTokenHandler _handler;
         private ISecurityTokenDescriptorFactory _descriptorFactory;
         private SamlResponseFactory _responseFactory;
 
-        public CompleteSsoEndpointMiddleware(IRazorPageRenderingService razor, Saml2SecurityTokenHandler handler, ISecurityTokenDescriptorFactory descriptorFactory, SamlResponseFactory responseFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory loggerFactory, RequestDelegate _)
+        public CompleteSsoEndpointMiddleware(RazorPageRenderingService razor, Saml2SecurityTokenHandler handler, ISecurityTokenDescriptorFactory descriptorFactory, SamlResponseFactory responseFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory loggerFactory, RequestDelegate _)
             : base(serializer, cache, partners, monitor, loggerFactory)
         {
             _razor = razor;
@@ -41,13 +43,17 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
         public override async Task InvokeAsync(HttpContext context)
         {
-            Logger.LogInformation("Completing SAML2P authentication.");
+            Logger.LogInformation("Completing SAML2P authentication (IDP flow).");
             var id = context.Request.Query["id"];
             if(StringValues.IsNullOrEmpty(id))
                 throw new InvalidOperationException($"Missing 'id' query parameter.");
 
             var user = context.User;
             var request = await Cache.FetchRequestAsync(id);
+            if (request == null)
+                throw new SecurityException($"SAMLRequest not found for id: '{id}'");
+
+            Trace("Cached SAMLRequest", request);
             var partnerId = request.Issuer;
             var partner = await Partners.GetServiceProviderAsync(partnerId);
 
@@ -89,10 +95,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 await Options.OnCompleteSso(context.RequestServices, completeSsoContext);
                 await partner.OnCompleteSso(context.RequestServices, completeSsoContext);
 
-                var binding = partner.SupportedBindings.FirstOrDefault();
-                if (binding == null)
+                Trace("Sending SAMLResponse", response);
+                if (!partner.SupportedBindings.Any())
                     throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
 
+                var binding = partner.SupportedBindings.First();
+                Trace($"Sending SAMLResponse using {binding} binding", response);
                 await CompleteSsoAsync(context, response, new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint), binding);
 
                 //var xml = Serializer.SerializeSamlResponse(response);
@@ -116,11 +124,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             }
         }
 
-        private Task CompleteSsoAsync(HttpContext context, SamlResponse response, Uri destination, string binding)
+        private Task CompleteSsoAsync(HttpContext context, SamlResponse response, Uri destination, BindingType binding)
         {
             var base64 = SerializeSamlResponse(response, binding);
-            if (binding == Saml2pConstants.Bindings.Post) return PostAsync(context, base64, destination, response.RelayState);
-            if (binding == Saml2pConstants.Bindings.Redirect) return RedirectAsync(context, base64, destination, response.RelayState);
+            if (binding == BindingType.Post) return PostAsync(context, base64, destination, response.RelayState);
+            if (binding == BindingType.Redirect) return RedirectAsync(context, base64, destination, response.RelayState);
 
             throw new ArgumentException($"Unsupported binding type: '{binding}'");
         }

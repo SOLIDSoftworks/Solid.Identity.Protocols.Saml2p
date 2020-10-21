@@ -29,11 +29,6 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
             _provider = provider;
         }
 
-        protected override Task InitializeHandlerAsync()
-        {
-            return base.InitializeHandlerAsync();
-        }
-
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
             try

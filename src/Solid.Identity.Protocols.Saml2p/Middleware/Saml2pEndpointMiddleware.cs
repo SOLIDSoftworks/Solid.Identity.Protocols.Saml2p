@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Cache;
+using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Providers;
@@ -41,7 +42,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         public abstract Task InvokeAsync(HttpContext context);
 
-        protected string SerializeAuthnRequest(AuthnRequest request, string binding)
+        protected string SerializeAuthnRequest(AuthnRequest request, BindingType binding)
         {
             using (var memory = new MemoryStream())
             {
@@ -54,7 +55,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected string SerializeSamlResponse(SamlResponse response, string binding)
+        protected string SerializeSamlResponse(SamlResponse response, BindingType binding)
         {
             using (var memory = new MemoryStream())
             {
@@ -67,46 +68,46 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out string binding)
+        protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out BindingType? binding)
         {
             const string name = "SAMLRequest";
             var reader = GetXmlReader(context, name, out binding);
-            if (reader == null)
+            if (reader == null || !binding.HasValue)
             {
                 request = null;
                 return false;
             }
 
-            if (!Options.SupportedBindings.Contains(binding))
+            if (!Options.SupportedBindings.Contains(binding.Value))
                 throw new SecurityException($"SAML2P request sent using unsupported binding ({binding}).");
 
             using (reader)
             {
                 Logger.LogDebug($"Reading '{name}' using '{binding}' binding.");
                 request = Serializer.DeserializeAuthnRequest(reader);
-                request.RelayState = GetRelayState(context, binding);
+                request.RelayState = GetRelayState(context, binding.Value);
                 return request != null;
             }
         }
 
-        protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out string binding)
+        protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out BindingType? binding)
         {
             const string name = "SAMLResponse";
             var reader = GetXmlReader(context, name, out binding);
-            if (reader == null)
+            if (reader == null || !binding.HasValue)
             {
                 response = null;
                 return false;
             }
 
-            if (!Options.SupportedBindings.Contains(binding))
+            if (!Options.SupportedBindings.Contains(binding.Value))
                 throw new SecurityException($"SAML2P response sent using unsupported binding ({binding}).");
 
             using (reader)
             {
                 Logger.LogDebug($"Reading '{name}' using '{binding}' binding.");
                 response = Serializer.DeserializeSamlResponse(reader);
-                response.RelayState = GetRelayState(context, binding);
+                response.RelayState = GetRelayState(context, binding.Value);
                 return response != null;
             }
         }
@@ -133,7 +134,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             return $"{request.PathBase}/complete?id={id}";
         }
 
-        private XmlReader GetXmlReader(HttpContext context, string name, out string binding)
+        private XmlReader GetXmlReader(HttpContext context, string name, out BindingType? binding)
         {
             var settings = new XmlReaderSettings
             {
@@ -144,7 +145,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 var field = context.Request.Form[name];
                 if (!StringValues.IsNullOrEmpty(field))
                 {
-                    binding = Saml2pConstants.Bindings.Post;
+                    binding = BindingType.Post;
                     var bytes = Convert.FromBase64String(field.ToString());
                     return XmlReader.Create(new MemoryStream(bytes), settings);
                 }
@@ -153,7 +154,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             var query = context.Request.Query[name];
             if(HttpMethods.IsGet(context.Request.Method) && !StringValues.IsNullOrEmpty(query))
             {
-                binding = Saml2pConstants.Bindings.Redirect;
+                binding = BindingType.Redirect;
                 var bytes = Base64UrlDecode(query.ToString());
                 using(var memory = new MemoryStream(bytes))
                 using(var stream = new DeflateStream(memory, CompressionMode.Decompress))
@@ -170,16 +171,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             return null;
         }
 
-        private string GetRelayState(HttpContext context, string binding)
+        private string GetRelayState(HttpContext context, BindingType binding)
         {
             const string name = "RelayState";
             var value = StringValues.Empty;
             switch (binding)
             {
-                case Saml2pConstants.Bindings.Post:
+                case BindingType.Post:
                     value = context.Request.Form[name];
                     break;
-                case Saml2pConstants.Bindings.Redirect:
+                case BindingType.Redirect:
                     value = context.Request.Query[name];
                     break;
             }
@@ -187,13 +188,13 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             return value.ToString();
         }
 
-        private string Encode(MemoryStream memory, string binding)
+        private string Encode(MemoryStream memory, BindingType binding)
         {
-            if (binding == Saml2pConstants.Bindings.Post)
+            if (binding == BindingType.Post)
             {
                 return Convert.ToBase64String(memory.ToArray());
             }
-            else if (binding == Saml2pConstants.Bindings.Redirect)
+            else if (binding == BindingType.Redirect)
             {
                 using (var stream = new MemoryStream())
                 {
@@ -232,6 +233,36 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
             var bytes = Convert.FromBase64String(base64);
             return bytes;
+        }
+
+        protected void Trace(string prefix, AuthnRequest request)
+        {
+            if (!Logger.IsEnabled(LogLevel.Trace)) return;
+            var format = $"{prefix} | RelayState: '{{relayState}}'" + Environment.NewLine + "{request}";
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true }))
+                {
+                    Serializer.SerializeAuthnRequest(writer, request);
+                }
+                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                Logger.LogTrace(format, request.RelayState, xml);
+            }
+        }
+
+        protected void Trace(string prefix, SamlResponse response)
+        {
+            if (!Logger.IsEnabled(LogLevel.Trace)) return;
+            var format = $"{prefix} | RelayState: '{{relayState}}'" + Environment.NewLine + "{response}";
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true }))
+                {
+                    Serializer.SerializeSamlResponse(writer, response);
+                }
+                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                Logger.LogTrace(format, response.RelayState, xml);
+            }
         }
 
         public void Dispose() => _optionsChangeToken?.Dispose();

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 
 namespace Solid.Identity.Protocols.Saml2p.Models.Context
 {

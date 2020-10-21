@@ -17,6 +17,7 @@ using Solid.Identity.Protocols.Saml2p.Services;
 using Solid.Identity.Tokens.Saml2;
 using System.Collections.Generic;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -107,7 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pPartnerProvider>();
             services.TryAddTransient<Saml2pCache>();
             services.TryAddSingleton<PathPrefixProvider>();
-            services.TryAddSingleton<IRazorPageRenderingService, RazorPageRenderingService>();
+            services.TryAddSingleton<RazorPageRenderingService>();
             services.AddSaml2pServiceProviderClaimStore<RequiredClaimsProvider>();
             services.AddSaml2pServiceProviderClaimStore<PassthroughClaimsProvider>();
 
@@ -123,17 +124,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
         static void PostConfigureSaml2pOptions(Saml2pOptions options)
         {
-            //foreach (var idp in sp.IdentityProviders)
-            //{
-            //    idp.ServiceProvider = sp;
-            //    if (idp.Id == null)
-            //        throw new ArgumentNullException(nameof(idp.Id), $"Partner IDP '{idp.Name}' missing Id.");
-            //}
+            options.SupportedBindings = ((List<BindingType>)options.SupportedBindings).AsReadOnly();
+
             foreach (var sp in options.ServiceProviders.Values.OfType<Saml2pServiceProvider>())
             {
-                sp.SupportedBindings = ((List<string>)sp.SupportedBindings).AsReadOnly();
+                sp.SupportedBindings = ((List<BindingType>)sp.SupportedBindings).AsReadOnly();
                 sp.RequiredClaims = ((List<string>)sp.RequiredClaims).AsReadOnly();
                 sp.OptionalClaims = ((List<string>)sp.OptionalClaims).AsReadOnly();
+            }
+            foreach (var idp in options.IdentityProviders.Values.OfType<Saml2pIdentityProvider>())
+            {
+                idp.SupportedBindings = ((List<BindingType>)idp.SupportedBindings).AsReadOnly();
+                idp.AssertionSigningKeys = ((List<SecurityKey>)idp.AssertionSigningKeys).AsReadOnly();
             }
         }
     }

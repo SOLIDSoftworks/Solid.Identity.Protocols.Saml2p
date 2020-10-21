@@ -26,7 +26,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
         public override async Task InvokeAsync(HttpContext context)
         {
-            Logger.LogInformation("Initiating SAML2P authentication.");
+            Logger.LogInformation("Initiating SAML2P authentication (IDP flow).");
             var id = context.Request.Query[Options.PartnerIdQueryParameter];
             if (StringValues.IsNullOrEmpty(id))
                 throw new InvalidOperationException($"Missing '{Options.PartnerIdQueryParameter}' query parameter.");
@@ -46,6 +46,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 AssertionConsumerServiceUrl = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
                 Issuer = partner.Id
             };
+
+            Trace("Generated SAMLRequest", request);
 
             var key = $"idp_initiated_{Guid.NewGuid().ToString()}";
             await Cache.CacheRequestAsync(key, request);

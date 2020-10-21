@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using System.Threading.Tasks;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -32,7 +33,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 AssertionConsumerServiceUrl = GetAcsUrl(context.Request),
                 IssueInstant = _systemClock.UtcNow.UtcDateTime,
                 Issuer = idp.ExpectedIssuer ?? _options.Issuer,
-                Destination = new Uri(idp.BaseUrl, idp.SsoEndpoint),
+                Destination = new Uri(idp.BaseUrl, idp.AcceptSsoEndpoint),
                 NameIdPolicy = new NameIdPolicy
                 {
                     Format = idp.NameIdPolicyFormat

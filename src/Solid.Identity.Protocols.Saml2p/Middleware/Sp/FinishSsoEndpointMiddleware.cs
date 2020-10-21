@@ -36,14 +36,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
         public override async Task InvokeAsync(HttpContext context)
         {
-            if(!TryGetSamlResponse(context, out var response, out var binding))
+            if (!TryGetSamlResponse(context, out var response, out var binding))
             {
                 context.Response.StatusCode = 400;
                 return;
             }
 
+            Logger.LogInformation("Finishing SAML2P authentication (SP flow).");
+            Trace("Received SAMLResponse", response);
             var partnerId = response.Issuer;
-            var partner = await Partners.GetIdentityProviderAsync(partnerId);            
+            var partner = await Partners.GetIdentityProviderAsync(partnerId);
 
             if (partner == null)
                 throw new SecurityException($"Partner idp '{partnerId}' not found.");
@@ -58,6 +60,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if (request == null && !partner.CanInitiateSso)
                 throw new SecurityException($"Partner idp '{partnerId}' is is not allowed to initiate SSO.");
+            
+            Trace("Cached SAMLRequest", request);
 
             if (request.RelayState != response.RelayState)
                 throw new SecurityException($"Mismatching relay state.");

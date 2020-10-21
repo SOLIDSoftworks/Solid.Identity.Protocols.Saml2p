@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;

@@ -31,13 +31,13 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
         public override async Task InvokeAsync(HttpContext context)
         {
-            Logger.LogInformation("Accepting SAML2P authentication.");
             if(!TryGetAuthnRequest(context, out var request, out var binding))
             {
                 context.Response.StatusCode = 400;
                 return;
             }
             
+            Logger.LogInformation("Accepting SAML2P authentication (IDP flow).");
             var partnerId = request.Issuer;
             var partner = await Partners.GetServiceProviderAsync(partnerId);
 

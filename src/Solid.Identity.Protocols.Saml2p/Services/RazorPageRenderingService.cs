@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Services
 {
-    public class RazorPageRenderingService : IRazorPageRenderingService
+    internal class RazorPageRenderingService
     {
         private IRazorViewEngine _engine;
         private IRazorPageActivator _activator;

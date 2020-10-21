@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Solid.Identity.Protocols.Saml2p.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -92,10 +93,10 @@ namespace Solid.Identity.Protocols.Saml2p
             public const string Redirect = Namespaces.BindingNamespace + ":HTTP-Redirect";
             //public const string Soap = Namespaces.BindingNamespace + ":SOAP";
 
-            public static ICollection<string> All => new List<string>
+            public static ICollection<BindingType> All => new List<BindingType>
             {
-                Redirect,
-                Post
+                BindingType.Redirect,
+                BindingType.Post
             };
         }
     }

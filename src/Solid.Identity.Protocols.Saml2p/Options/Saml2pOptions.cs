@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
+using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public TimeSpan? DefaultMaxClockSkew { get; set; }
         public TimeSpan DefaultTokenLifetime { get; set; } = TimeSpan.FromMinutes(5);
         public string PartnerIdQueryParameter { get; set; } = "partnerId";
-        public ICollection<string> SupportedBindings { get; } = Saml2pConstants.Bindings.All;
+        public ICollection<BindingType> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
         public bool CanInitiateSso { get; set; }
 
         public PathString AcceptPath { get; set; } = PathString.Empty;

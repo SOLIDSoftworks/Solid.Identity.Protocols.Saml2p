@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
+using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public string Name { get; set; }
 
-        public ICollection<string> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
+        public ICollection<BindingType> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
         public ICollection<string> RequiredClaims { get; internal set; } = new List<string>();
         public ICollection<string> OptionalClaims { get; internal set; } = new List<string>();
 
@@ -58,39 +60,5 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatingSecurityToken { get; set; } = (_, __) => new ValueTask();
 
         public Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatedSecurityToken { get; set; } = (_, __) => new ValueTask();
-    }
-
-    public interface ISaml2pServiceProvider : ISaml2pPartner
-    {
-        string ExpectedIssuer { get; }
-        string Id { get; }
-        string Name { get; }
-        bool Enabled { get; }
-        PathString AssertionConsumerServiceEndpoint { get; }
-        SecurityKey AssertionSigningKey { get; }
-        string AssertionSigningAlgorithm { get; }
-        string AssertionSigningDigestAlgorithm { get; }
-        //SecurityKey AssertionEncryptionKey { get; }
-        //string AssertionEncryptionAlgorithm { get; }
-        //string AssertionEncryptionKeyWrapAlgorithm { get; }
-        //SecurityKey ResponseSigningKey { get; }
-        //string ResponseSigningAlgorithm { get; }
-        //string ResponseDigestAlgorithm { get; }
-        TimeSpan? TokenLifeTime { get; }
-        TimeSpan? MaxClockSkew { get; }
-        ICollection<string> RequiredClaims { get; }
-        ICollection<string> OptionalClaims { get; }
-        //bool RequiresEncryptedAssertion { get; }
-        bool AllowsIdpInitiatedSso { get; }
-
-        bool AllowClaimsPassthrough {  get; }
-
-        Func<IServiceProvider, AcceptSsoContext, ValueTask> OnAcceptSso { get; }
-
-        Func<IServiceProvider, InitiateSsoContext, ValueTask> OnInitiateSso { get; }
-
-        Func<IServiceProvider, CompleteSsoContext, ValueTask> OnCompleteSso { get; }
-        Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatingSecurityToken { get; }
-        Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatedSecurityToken { get; }
     }
 }

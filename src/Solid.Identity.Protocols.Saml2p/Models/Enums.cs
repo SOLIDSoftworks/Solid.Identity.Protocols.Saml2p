@@ -7,9 +7,9 @@ namespace Solid.Identity.Protocols.Saml2p.Models
     public enum BindingType
     {
         Post,
-        Artifact,
+        //Artifact,
         Redirect,
-        Soap
+        //Soap
     }
 
     public enum SamlResponseStatus

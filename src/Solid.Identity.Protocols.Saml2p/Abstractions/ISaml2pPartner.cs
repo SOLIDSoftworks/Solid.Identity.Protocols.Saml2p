@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Solid.Identity.Protocols.Saml2p.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Solid.Identity.Protocols.Saml2p.Options
+namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface ISaml2pPartner
     {
@@ -12,6 +13,6 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         Uri BaseUrl { get; }
         bool Enabled { get; }
         bool CanInitiateSso { get; }
-        ICollection<string> SupportedBindings { get; }
+        ICollection<BindingType> SupportedBindings { get; }
     }
 }
