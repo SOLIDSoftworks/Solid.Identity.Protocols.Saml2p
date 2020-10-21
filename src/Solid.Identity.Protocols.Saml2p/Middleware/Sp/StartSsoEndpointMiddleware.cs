@@ -60,7 +60,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             await Options.OnStartSso(context.RequestServices, ssoContext);
             await partner.OnStartSso(context.RequestServices, ssoContext);
 
-
             if (!partner.SupportedBindings.Any())
                 throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
 

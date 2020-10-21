@@ -43,7 +43,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             }
 
             Logger.LogInformation("Finishing SAML2P authentication (SP flow).");
-            Trace("Received SAMLResponse", response);
+            Trace($"Received SAMLResponse using {binding} binding.", response);
             var partnerId = response.Issuer;
             var partner = await Partners.GetIdentityProviderAsync(partnerId);
 
@@ -61,7 +61,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             if (request == null && !partner.CanInitiateSso)
                 throw new SecurityException($"Partner idp '{partnerId}' is is not allowed to initiate SSO.");
             
-            Trace("Cached SAMLRequest", request);
+            Trace("Found cached SAMLRequest.", request);
 
             if (request.RelayState != response.RelayState)
                 throw new SecurityException($"Mismatching relay state.");

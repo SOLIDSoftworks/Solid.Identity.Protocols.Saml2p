@@ -53,7 +53,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             if (request == null)
                 throw new SecurityException($"SAMLRequest not found for id: '{id}'");
 
-            Trace("Cached SAMLRequest", request);
+            Trace("Found cached SAMLRequest.", request);
             var partnerId = request.Issuer;
             var partner = await Partners.GetServiceProviderAsync(partnerId);
 
@@ -95,12 +95,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 await Options.OnCompleteSso(context.RequestServices, completeSsoContext);
                 await partner.OnCompleteSso(context.RequestServices, completeSsoContext);
 
-                Trace("Sending SAMLResponse", response);
                 if (!partner.SupportedBindings.Any())
                     throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
 
                 var binding = partner.SupportedBindings.First();
-                Trace($"Sending SAMLResponse using {binding} binding", response);
+                Trace($"Sending SAMLResponse using {binding} binding.", response);
                 await CompleteSsoAsync(context, response, new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint), binding);
 
                 //var xml = Serializer.SerializeSamlResponse(response);

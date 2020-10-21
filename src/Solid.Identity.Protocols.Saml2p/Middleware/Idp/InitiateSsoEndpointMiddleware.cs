@@ -47,7 +47,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 Issuer = partner.Id
             };
 
-            Trace("Generated SAMLRequest", request);
+            Trace("Generated SAMLRequest.", request);
 
             var key = $"idp_initiated_{Guid.NewGuid().ToString()}";
             await Cache.CacheRequestAsync(key, request);

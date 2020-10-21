@@ -38,6 +38,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             }
             
             Logger.LogInformation("Accepting SAML2P authentication (IDP flow).");
+            Trace($"Received SAMLRequest using {binding} binding.", request);
             var partnerId = request.Issuer;
             var partner = await Partners.GetServiceProviderAsync(partnerId);
 
