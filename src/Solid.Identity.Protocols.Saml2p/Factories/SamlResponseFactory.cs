@@ -5,15 +5,22 @@ using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
     public class SamlResponseFactory
     {
-        public SamlResponse Create(PartnerSaml2pServiceProvider partner, string authnRequestId = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
+        private Saml2pOptions _options;
+
+        public SamlResponseFactory(IOptions<Saml2pOptions> options)
+        {
+            _options = options.Value;
+        }
+
+        public SamlResponse Create(ISaml2pServiceProvider partner, string authnRequestId = null, string relayState = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
         {
             var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
-
             token.SetRecipient(destination);
             token.SetNotOnOrAfter();
 
@@ -23,9 +30,10 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 SecurityToken = token, 
                 Destination = destination,
                 IssueInstant = token?.Assertion.IssueInstant,
-                Issuer = partner.IdentityProvider.Id,
+                Issuer = partner.ExpectedIssuer ?? _options.Issuer,
                 Status = Convert(status, subStatus),
-                InResponseTo = authnRequestId
+                InResponseTo = authnRequestId,
+                RelayState = relayState
             };
 
             return response;

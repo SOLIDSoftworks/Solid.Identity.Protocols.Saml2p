@@ -6,29 +6,32 @@ using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Solid.Identity.Protocols.Saml2p.Models.Context;
+using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
     public class AuthnRequestFactory
     {
         private ISystemClock _systemClock;
+        private Saml2pOptions _options;
 
-        public AuthnRequestFactory(ISystemClock systemClock)
+        public AuthnRequestFactory(ISystemClock systemClock, IOptions<Saml2pOptions> options)
         {
             _systemClock = systemClock;
+            _options = options.Value;
         }
 
-        public AuthnRequest CreateAuthnRequest(HttpContext context, PartnerSaml2pIdentityProvider idp)
+        public async Task<AuthnRequest> CreateAuthnRequestAsync(HttpContext context, ISaml2pIdentityProvider idp)
         {
-            var request = context.Request;
-            var acs = new Uri(GetBaseUrl(request), idp.ServiceProvider.AssertionConsumerServiceEndpoint);
-            return new AuthnRequest
+            var request = new AuthnRequest
             {
                 Id = $"_{Guid.NewGuid()}",
                 ProviderName = idp.Id,
-                AssertionConsumerServiceUrl = acs,
+                AssertionConsumerServiceUrl = GetAcsUrl(context.Request),
                 IssueInstant = _systemClock.UtcNow.UtcDateTime,
-                Issuer = idp.ServiceProvider.Id,
+                Issuer = idp.ExpectedIssuer ?? _options.Issuer,
                 Destination = new Uri(idp.BaseUrl, idp.SsoEndpoint),
                 NameIdPolicy = new NameIdPolicy
                 {
@@ -39,8 +42,29 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                     AuthnContextClassRef = idp.RequestedAuthnContextClassRef
                 }
             };
+            var generateContext = new GenerateRelayStateContext
+            {
+                Partner = idp,
+                PartnerId = idp.Id,
+                Request = request
+            };
+
+            await _options.OnGeneratingRelayState(context.RequestServices, generateContext);
+            await idp.OnGeneratingRelayState(context.RequestServices, generateContext);
+
+            if (request.RelayState == null)
+                request.RelayState = Guid.NewGuid().ToString();
+
+            return request;
         }
 
-        private Uri GetBaseUrl(HttpRequest request) => new Uri($"{request.Scheme}://{request.Host}");
+        private Uri GetAcsUrl(HttpRequest request)
+        {
+            var baseUrl = new Uri($"{request.Scheme}://{request.Host}");
+
+            // TODO: add central utility for creating all paths
+            var path = request.PathBase.Add("/acs");
+            return new Uri(baseUrl, path);
+        }
     }
 }

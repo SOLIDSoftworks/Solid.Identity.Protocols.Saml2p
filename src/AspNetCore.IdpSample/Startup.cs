@@ -39,17 +39,18 @@ namespace AspNetCore.IdpSample
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddSaml2pIdentityProvider("https://localhost:44360/saml", idp =>
-            {
-                idp.WantsAuthnRequestsSigned = false;
-                
-                idp.AddPartner("https://localhost:44340/saml", partner =>
+            services
+                .AddSaml2p(options =>
                 {
-                    partner.BaseUrl = new Uri("https://localhost:44340");
-                    partner.AssertionConsumerServiceEndpoint = "/saml/sso";
-                    partner.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
-                });
-            });
+                    options.Issuer = "https://localhost:5001/saml";
+                    options.AddServiceProvider("https://localhost:5003/saml", sp =>
+                    {
+                        sp.BaseUrl = new Uri("https://localhost:5003");
+                        sp.AssertionConsumerServiceEndpoint = "/sso_finish";
+                        sp.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
+                    });
+                })
+            ;
 
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -81,7 +82,7 @@ namespace AspNetCore.IdpSample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapSaml2pIdentityProvider("/saml/sso", "https://localhost:44360/saml");
+                endpoints.MapSaml2pIdentityProvider("/saml/sso");
                 endpoints.MapRazorPages();
             });
         }

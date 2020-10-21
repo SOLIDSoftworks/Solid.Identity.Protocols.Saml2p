@@ -16,13 +16,13 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.AddRemoteScheme<Saml2pAuthenticationOptions, Saml2pAuthenticationHandler>(schemeName, displayName, options =>
             {
                 options.IdentityProviderId = identityProviderId;
-                options.CallbackPath = "/sso_complete";
+                options.CallbackPath = "/sso_finish";
             });
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, Action<ISaml2pAuthenticationOptions> configure) =>
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, Action<Saml2pAuthenticationOptions> configure) =>
             builder.AddSaml2p(Saml2pAuthenticationDefaults.AuthenticationScheme, configure);
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, Action<ISaml2pAuthenticationOptions> configure) =>
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, Action<Saml2pAuthenticationOptions> configure) =>
             builder.AddSaml2p(schemeName, schemeName, configure);
-        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string displayName, Action<ISaml2pAuthenticationOptions> configure) =>
+        public static AuthenticationBuilder AddSaml2p(this AuthenticationBuilder builder, string schemeName, string displayName, Action<Saml2pAuthenticationOptions> configure) =>
             builder.AddRemoteScheme<Saml2pAuthenticationOptions, Saml2pAuthenticationHandler>(schemeName, displayName, configure);
     }
 }

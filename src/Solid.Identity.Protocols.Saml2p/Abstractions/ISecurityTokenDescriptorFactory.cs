@@ -11,6 +11,6 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface ISecurityTokenDescriptorFactory
     {
-        Task<SecurityTokenDescriptor> CreateSecurityTokenDescriptorAsync(ClaimsIdentity identity, PartnerSaml2pServiceProvider partner);
+        ValueTask<SecurityTokenDescriptor> CreateSecurityTokenDescriptorAsync(ClaimsIdentity identity, ISaml2pServiceProvider partner);
     }
 }

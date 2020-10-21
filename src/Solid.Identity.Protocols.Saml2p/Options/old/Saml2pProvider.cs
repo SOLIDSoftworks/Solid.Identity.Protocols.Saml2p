@@ -9,7 +9,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public string Id { get; internal set; }
         public string Name { get; set; }
         public TimeSpan? MaxClockSkew { get; set; }
-        public string Binding { get; set; } = Saml2pConstants.Bindings.Post;
+        public ICollection<string> Bindings { get; } = new List<string> {Saml2pConstants.Bindings.Post };
         public bool Enabled { get; set; } = true;
         public bool CanInitiateSso { get; set; } = true;
     }

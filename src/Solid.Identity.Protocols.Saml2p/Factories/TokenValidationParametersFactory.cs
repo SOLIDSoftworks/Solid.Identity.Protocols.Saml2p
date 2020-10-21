@@ -1,24 +1,33 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
     public class TokenValidationParametersFactory
     {
-        public TokenValidationParameters Create(PartnerSaml2pIdentityProvider partner)
+        private Saml2pOptions _options;
+
+        public TokenValidationParametersFactory(IOptions<Saml2pOptions> options)
+        {
+            _options = options.Value;
+        }
+
+        public TokenValidationParameters Create(ISaml2pIdentityProvider partner)
         {
             var parameters = new TokenValidationParameters
             {
                 ValidIssuer = partner.Id,
-                ValidAudience = partner.ServiceProvider.Id
+                ValidAudience = partner.ExpectedIssuer ?? _options.Issuer
             };
-            parameters.ValidateIssuerSigningKey = parameters.RequireSignedTokens = partner.AssertionSigningKey != null;
+            parameters.ValidateIssuerSigningKey = parameters.RequireSignedTokens = partner.AssertionSigningKeys.Any();
 
             if (parameters.ValidateIssuerSigningKey)
-                parameters.IssuerSigningKey = partner.AssertionSigningKey;
+                parameters.IssuerSigningKeys = partner.AssertionSigningKeys;
 
             return parameters;
         }

@@ -42,17 +42,18 @@ namespace AspNetCore.SpSample
 
 
             services
-                .AddSaml2pServiceProvider("https://localhost:44340/saml", sp =>
+                .AddSaml2p(options =>
                 {
-                    sp.AssertionConsumerServiceEndpoint = "/saml/sso";
-                    sp.AddPartner("https://localhost:44360/saml", partner =>
+                    options.Issuer = "https://localhost:5003/saml";
+                    options.AddIdentityProvider("https://localhost:5001/saml", idp =>
                     {
-                        partner.BaseUrl = new Uri("https://localhost:44360");
-                        partner.SsoEndpoint = "/saml/sso";
-                        partner.CanInitiateSso = true;
-                        partner.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
+                        idp.BaseUrl = new Uri("https://localhost:5001");
+                        idp.SsoEndpoint = "/saml/sso";
+                        idp.CanInitiateSso = true;
+                        idp.AssertionSigningKeys.Add(new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64))));
                     });
-                });
+                })
+            ;
 
             services
                 .AddAuthentication(options =>
@@ -63,7 +64,7 @@ namespace AspNetCore.SpSample
                     options.DefaultChallengeScheme = Saml2pAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddCookie()
-                .AddSaml2p("https://localhost:44360/saml")
+                .AddSaml2p("https://localhost:5001/saml")
             ;
 
             services.AddMvc();

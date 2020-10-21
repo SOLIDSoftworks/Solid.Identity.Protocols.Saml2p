@@ -4,42 +4,54 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Solid.Identity.Protocols.Saml2p.Providers
 {
     public class Saml2pPartnerProvider
     {
-        //private IdentityProviderContext _idpContext;
-        private IEnumerable<Saml2pServiceProviderOptions> _localServiceProviders;
-        private IEnumerable<Saml2pIdentityProviderOptions> _localIdentityProviders;
+        private Saml2pOptions _options;
+        private ILogger<Saml2pPartnerProvider> _logger;
+        private ISaml2pPartnerStore _store;
 
-        public Saml2pPartnerProvider(
-            //IdentityProviderContext idpContext,
-            IEnumerable<Saml2pServiceProviderOptions> localServiceProviders, 
-            IEnumerable<Saml2pIdentityProviderOptions> localIdentityProviders)
+        public Saml2pPartnerProvider(IOptions<Saml2pOptions> options, ILogger<Saml2pPartnerProvider> logger, ISaml2pPartnerStore store = null)
         {
-            //_idpContext = idpContext;
-            _localServiceProviders = localServiceProviders;
-            _localIdentityProviders = localIdentityProviders;
+            _options = options.Value;
+            _logger = logger;
+            _store = store;
         }
 
-        public PartnerSaml2pIdentityProvider GetPartnerIdentityProvider(string partnerId)
+        public async ValueTask<ISaml2pIdentityProvider> GetIdentityProviderAsync(string id)
         {
-            var idps = _localServiceProviders.SelectMany(sp => sp.IdentityProviders).Where(idp => idp.Id == partnerId);
-            if (idps.Count() > 1)
-                throw new Exception("Too many results"); // better exception or handle this earlier
-            return idps.FirstOrDefault();
+            _logger.LogInformation($"Searching for partner idp: '{id}'.");
+            var idp = null as ISaml2pIdentityProvider;
+            if (_options.IdentityProviders.TryGetValue(id, out idp))
+                _logger.LogDebug("Found partner idp in-memory.");
+            else if (_store != null)
+            {
+                idp = await _store.GetIdentityProviderAsync(id);
+                if (idp != null)
+                    _logger.LogDebug("Found partner idp in store.");
+            }
+            if (idp != null)
+                _logger.LogInformation($"Found partner idp: {idp.Name}.");
+            else
+                _logger.LogInformation("Could not find partner idp.");
+            return idp;
         }
 
-        public PartnerSaml2pServiceProvider GetPartnerServiceProvider(string partnerId)
+        public async ValueTask<ISaml2pServiceProvider> GetServiceProviderAsync(string id)
         {
-            //if (_idpContext.CurrentProvider != null)
-            //    return _idpContext.CurrentProvider.ServiceProviders.FirstOrDefault(sp => sp.Id == partnerId);
 
-            var sps = _localIdentityProviders.SelectMany(idp => idp.ServiceProviders).Where(sp => sp.Id == partnerId);
-            if (sps.Count() > 1)
-                throw new Exception("Too many results"); // better exception or handle this earlier
-            return sps.FirstOrDefault();
+            if (_options.ServiceProviders.TryGetValue(id, out var sp)) return sp;
+            if(_store != null)
+            {
+                return await _store.GetServiceProviderAsync(id);
+            }
+            return null;
         }
     }
 }

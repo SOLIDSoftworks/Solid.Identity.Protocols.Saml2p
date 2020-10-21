@@ -13,24 +13,33 @@ using System.Linq;
 using System.Security;
 using Solid.Identity.Protocols.Saml2p.Cache;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
+using Solid.Identity.Protocols.Saml2p.Providers;
 
-namespace Solid.Identity.Protocols.Saml2p.Middleware
+namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
-    internal class AcceptSsoEndpointMiddleware : IdentityProviderEndpointMiddleware<AuthnRequest>
+    internal class AcceptSsoEndpointMiddleware : Saml2pEndpointMiddleware
     {
-        private Saml2pSerializer _serializer;
-
-        public AcceptSsoEndpointMiddleware(Saml2pSerializer serializer, string idpId, Saml2pCache cache, IOptionsMonitor<Saml2pIdentityProviderOptions> monitor, ILoggerFactory loggerFactory, RequestDelegate next) 
-            : base(idpId, cache, monitor, loggerFactory, next)
+        public AcceptSsoEndpointMiddleware(
+            Saml2pSerializer serializer, 
+            Saml2pCache cache, 
+            Saml2pPartnerProvider partners,
+            IOptionsMonitor<Saml2pOptions> monitor, 
+            ILoggerFactory loggerFactory, 
+            RequestDelegate _) : base(serializer, cache, partners, monitor, loggerFactory)
         {
-            _serializer = serializer;
         }
 
-        protected override async ValueTask HandleRequestAsync(HttpContext context, AuthnRequest request)
+        public override async Task InvokeAsync(HttpContext context)
         {
             Logger.LogInformation("Accepting SAML2P authentication.");
-            var partnerId = request?.Issuer;
-            var partner = IdentityProvider.ServiceProviders.FirstOrDefault(sp => sp.Id == partnerId);
+            if(!TryGetAuthnRequest(context, out var request, out var binding))
+            {
+                context.Response.StatusCode = 400;
+                return;
+            }
+            
+            var partnerId = request.Issuer;
+            var partner = await Partners.GetServiceProviderAsync(partnerId);
 
             if (partner == null)
                 throw new SecurityException($"Partner '{partnerId}' not found.");
@@ -42,7 +51,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 throw new SecurityException($"Partner '{partnerId}' is is not allowed to initiate SSO.");
 
             await Cache.CacheRequestAsync(request.Id, request);
-
             var ssoContext = new AcceptSsoContext
             {
                 PartnerId = partner.Id,
@@ -51,15 +59,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 User = context.User,
                 ReturnUrl = GenerateReturnUrl(context, request.Id)
             };
-            await IdentityProvider.Events.AcceptSsoAsync(context.RequestServices, ssoContext);
-        }
 
-        protected override bool IsValidRequest(HttpContext context, out AuthnRequest request)
-        {   
-            var base64 = context.Request.Form["SAMLRequest"].ToString();
-            var xml = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
-            request = _serializer.DeserializeAuthnRequest(xml);
-            return request != null;
+            await Options.OnAcceptSso(context.RequestServices, ssoContext);
+            await partner.OnAcceptSso(context.RequestServices, ssoContext);
+
+            await ChallengeAsync(context, ssoContext.ReturnUrl);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
     public class StartSsoContext
     {
         public string PartnerId { get; set; }
-        public PartnerSaml2pIdentityProvider Partner { get; set; }
+        public ISaml2pIdentityProvider Partner { get; set; }
         public AuthnRequest AuthnRequest { get; internal set; }
     }
 }

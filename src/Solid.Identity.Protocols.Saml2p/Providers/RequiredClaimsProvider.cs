@@ -23,24 +23,24 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
             new ClaimDescriptor(ClaimTypes.AuthenticationMethod)
         };
 
-        public bool CanGenerateClaims(string partnerId)
+        public async ValueTask<bool> CanGenerateClaimsAsync(string partnerId)
         {
-            var partner = _partnerProvider.GetPartnerServiceProvider(partnerId);
+            var partner = await _partnerProvider.GetServiceProviderAsync(partnerId);
             return !partner.AllowClaimsPassthrough;
         }
 
-        public ValueTask<IEnumerable<Claim>> GetClaimsAsync(ClaimsIdentity identity, PartnerSaml2pServiceProvider _)
+        public ValueTask<IEnumerable<Claim>> GetClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider _, string issuer)
         {
             var claims = new List<Claim>();
             var sub = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(sub))
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, sub));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, sub, null, issuer));
             var instant = identity.FindFirst(ClaimTypes.AuthenticationInstant)?.Value;
             if (!string.IsNullOrEmpty(instant))
-                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, instant));
+                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, instant, null, issuer));
             var method = identity.FindFirst(ClaimTypes.AuthenticationMethod)?.Value;
             if (!string.IsNullOrEmpty(method))
-                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, method));
+                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, method, null, issuer));
             return new ValueTask<IEnumerable<Claim>>(claims);
         }
     }

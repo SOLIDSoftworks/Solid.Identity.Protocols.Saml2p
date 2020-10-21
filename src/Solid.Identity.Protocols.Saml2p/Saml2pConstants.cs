@@ -48,9 +48,13 @@ namespace Solid.Identity.Protocols.Saml2p
              * Unspecified (urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified)
              */
 
-            public const string Unspecified = Namespaces.ClassNamespace + ":unspecified";
-            public const string Password = Namespaces.ClassNamespace + ":" + nameof(Password);
-            public const string Kerberos = Namespaces.ClassNamespace + ":" + nameof(Kerberos);
+            public const string UnspecifiedString = Namespaces.ClassNamespace + ":unspecified";
+            public const string PasswordString = Namespaces.ClassNamespace + ":Password";
+            public const string KerberosString = Namespaces.ClassNamespace + ":Kerberos";
+
+            public static readonly Uri Unspecified = new Uri(UnspecifiedString);
+            public static readonly Uri Password = new Uri(PasswordString);
+            public static readonly Uri Kerberos = new Uri(KerberosString);
         }
 
         public static class Attributes
@@ -85,8 +89,14 @@ namespace Solid.Identity.Protocols.Saml2p
         {
             public const string Post = Namespaces.BindingNamespace + ":HTTP-POST";
             //public const string Artifact = Namespaces.BindingNamespace + ":HTTP-Artifact";
-            //public const string Redirect = Namespaces.BindingNamespace + ":HTTP-Redirect";
+            public const string Redirect = Namespaces.BindingNamespace + ":HTTP-Redirect";
             //public const string Soap = Namespaces.BindingNamespace + ":SOAP";
+
+            public static ICollection<string> All => new List<string>
+            {
+                Redirect,
+                Post
+            };
         }
     }
 }

@@ -10,8 +10,8 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
     public interface IServiceProviderClaimsProvider
     {
-        bool CanGenerateClaims(string partnerId);
+        ValueTask<bool> CanGenerateClaimsAsync(string partnerId);
         IEnumerable<ClaimDescriptor> ClaimTypesOffered { get; }
-        ValueTask<IEnumerable<Claim>> GetClaimsAsync(ClaimsIdentity identity, PartnerSaml2pServiceProvider partner);
+        ValueTask<IEnumerable<Claim>> GetClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider partner, string issuer);
     }
 }

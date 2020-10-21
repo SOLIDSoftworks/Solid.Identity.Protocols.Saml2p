@@ -24,8 +24,8 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
         public string ProviderName { get; set; }
         public Uri Destination { get; set; }
         public string ProtocolBinding { get; set; }
-
         public NameIdPolicy NameIdPolicy { get; set; }
         public RequestedAuthnContext RequestedAuthnContext { get; set; }
+        public string RelayState { get; set; }
     }
 }

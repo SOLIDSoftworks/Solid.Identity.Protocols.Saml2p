@@ -10,8 +10,9 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
     public class CreateSecurityTokenContext
     {
         public string PartnerId { get; internal set; }
-        public PartnerSaml2pServiceProvider Partner { get; internal set; }
+        public ISaml2pServiceProvider Partner { get; internal set; }
         public SecurityTokenDescriptor TokenDescriptor { get; internal set; }
         public Saml2SecurityTokenHandler Handler { get; internal set; }
+        public Saml2SecurityToken SecurityToken { get; set; }
     }
 }

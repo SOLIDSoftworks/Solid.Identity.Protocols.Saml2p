@@ -17,6 +17,7 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
         public string Issuer { get; set; }
         public Status Status { get; set; }
         public Saml2SecurityToken SecurityToken { get; set; }
-        public string XmlSecurityToken { get; internal set; } 
+        public string XmlSecurityToken { get; internal set; }
+        public string RelayState { get; set; }
     }
 }
