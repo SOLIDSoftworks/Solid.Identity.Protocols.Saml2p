@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens.Saml2;
@@ -22,10 +23,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
     {
         private Saml2SecurityTokenHandler _handler;
         private TokenValidationParametersFactory _factory;
+        private ISystemClock _clock;
 
         public FinishSsoEndpointMiddleware(
             Saml2SecurityTokenHandler handler,
             TokenValidationParametersFactory parametersFactory,
+            ISystemClock clock,
             Saml2pSerializer serializer,
             Saml2pCache cache,
             Saml2pPartnerProvider partners,
@@ -33,13 +36,14 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             IOptionsMonitor<Saml2pOptions> monitor,
             ILoggerFactory factory,
             RequestDelegate _)
-            : this(handler, parametersFactory, serializer, cache, partners, encoder, monitor, factory)
+            : this(handler, parametersFactory, clock, serializer, cache, partners, encoder, monitor, factory)
         {
         }
 
         public FinishSsoEndpointMiddleware(
             Saml2SecurityTokenHandler handler,
             TokenValidationParametersFactory parametersFactory,
+            ISystemClock clock,
             Saml2pSerializer serializer,
             Saml2pCache cache,
             Saml2pPartnerProvider partners,
@@ -50,6 +54,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
         {
             _handler = handler;
             _factory = parametersFactory;
+            _clock = clock;
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -112,7 +117,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if(validateContext.Subject == null)
             {
-                var subject = validateContext.Handler.ValidateToken(validateContext.Response.XmlSecurityToken, validateContext.TokenValidationParameters, out _);
+                var subject = validateContext.Handler.ValidateToken(validateContext.Response.XmlSecurityToken, validateContext.TokenValidationParameters, out var token);
+                var saml2 = token as Saml2SecurityToken;
+                var now = _clock.UtcNow.DateTime;
+
+                saml2.ValidateResponseToken(validateContext.Request.Id, now);
+
                 validateContext.Subject = subject;
             }
 

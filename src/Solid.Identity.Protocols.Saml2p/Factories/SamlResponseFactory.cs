@@ -22,7 +22,10 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         public SamlResponse Create(ISaml2pServiceProvider partner, string authnRequestId = null, string relayState = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
         {
             var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
-            token.SetRecipient(destination);
+            if (authnRequestId != null)
+                token.SetRecipient(destination, authnRequestId);
+            else
+                token.SetRecipient(destination);
             token.SetNotOnOrAfter();
 
             var response = new SamlResponse

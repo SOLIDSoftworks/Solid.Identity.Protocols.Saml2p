@@ -1,6 +1,7 @@
 ﻿using Solid.Identity.Tokens.Saml2;
 using System;
 using System.Linq;
+using System.Security;
 using System.Security.Claims;
 
 namespace Microsoft.IdentityModel.Tokens.Saml2
@@ -40,6 +41,27 @@ namespace Microsoft.IdentityModel.Tokens.Saml2
             if (data == null) return;
 
             data.NotOnOrAfter = notOnOrAfter;
+        }
+
+        public static void ValidateResponseToken(this Saml2SecurityToken token, string authnRequestId, DateTime now)
+        {
+            var data = token.GetBearerSubjectConfirmationData();
+            if (data == null)
+                throw new SecurityException("Missing bearer subject confirmation data.");
+
+            if(data.InResponseTo?.Value != authnRequestId)
+                throw new SecurityException($"Invalid InResponseTo. Expected '{authnRequestId}' but got '{data.InResponseTo?.Value}'.");
+
+            if (data.NotBefore != null && now < data.NotBefore)
+                throw new SecurityException($"NotBefore validation failed.");
+            if (data.NotOnOrAfter != null && data.NotOnOrAfter <= now)
+                throw new SecurityException($"NotOnOrAfter validation failed.");
+        }
+
+        public static Saml2Id GetInResponseTo(this Saml2SecurityToken token)
+        {
+            var data = token.GetBearerSubjectConfirmationData();
+            return data?.InResponseTo;
         }
 
         public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);
