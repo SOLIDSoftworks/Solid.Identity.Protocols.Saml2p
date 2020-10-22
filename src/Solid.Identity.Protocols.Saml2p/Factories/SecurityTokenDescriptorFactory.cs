@@ -15,6 +15,7 @@ using System.Xml;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.Extensions.Options;
 using Solid.Identity.Protocols.Saml2p.Logging;
+using System.Security;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -60,6 +61,18 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 }
             }
 
+            var required = (partner.RequiredClaims ?? Enumerable.Empty<string>()).Distinct();
+            var optional = (partner.OptionalClaims ?? Enumerable.Empty<string>()).Distinct();
+            var supported = required.Concat(optional).Distinct();
+
+            Debug("Checking for all required claims. Required claim types:", required);
+            if (required.Except(claims.Select(c => c.Type)).Any())
+                throw new SecurityException("Unable to generate all required claims.");
+
+            Debug("Filtering generated claims. Supported claim types:", supported);
+            claims = claims.Where(c => supported.Contains(c.Type)).ToList();
+            Trace($"Filtered claims.", claims);
+
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
                 claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime));
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
@@ -70,6 +83,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 .Where(c => c.Type != ClaimTypes.AuthenticationInstant)
                 .Where(c => c.Type != ClaimTypes.AuthenticationMethod)
             ;
+
             if (!attributes.Any())
                 claims.Add(new Claim("http://schemas.solidsoft.works/ws/2020/08/identity/claims/null", bool.TrueString, ClaimValueTypes.Boolean, issuer));
 
@@ -132,24 +146,16 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             return credentials;
         }
 
-        private void Trace(string prefix, SigningCredentials credentials)
+        private void Debug(string prefix, object obj)
         {
-            if (!_logger.IsEnabled(LogLevel.Trace)) return;
-            var state = new Dictionary<string, string>
-            {
-                { "securityKeyName", (credentials.Key is X509SecurityKey x509) ? x509.Certificate.Subject : credentials.Key.KeyId },
-                { "securityKeyType", credentials.Key.KeyId },
-                { "algorithm", credentials.Algorithm },
-                { "digest", credentials.Digest }
-            };
-
-            _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(state));
+            if (!_logger.IsEnabled(LogLevel.Debug)) return;
+            _logger.LogDebug(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(obj));
         }
 
-        private void Trace(string prefix, IEnumerable<Claim> generated)
+        private void Trace(string prefix, object obj)
         {
             if (!_logger.IsEnabled(LogLevel.Trace)) return;
-            _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(generated.Select(c => $"{c.Type}: {c.Value}")));
+            _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(obj));
         }
     }
 }
