@@ -139,7 +139,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             var html = await _razor.RenderPageAsync(model, "AuthnRequest", "__Saml2p");
             context.Response.StatusCode = 200;
             context.Response.ContentType = "text/html";
-            var bytes = Encoding.UTF8.GetBytes(html);
+            var bytes = new UTF8Encoding(false).GetBytes(html);
             await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
         }
     }

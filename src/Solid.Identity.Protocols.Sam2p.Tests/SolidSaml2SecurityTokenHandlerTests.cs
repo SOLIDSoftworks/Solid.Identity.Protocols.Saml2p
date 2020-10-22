@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Xml;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
@@ -103,7 +104,8 @@ namespace Solid.Identity.Protocols.Saml2p.Tokens.Saml2.Tests
                 {
                     OmitXmlDeclaration = true,
                     Indent = true,
-                    NewLineOnAttributes = false
+                    NewLineOnAttributes = false,
+                    Encoding = new UTF8Encoding(false)
                 };
                 using (var writer = XmlWriter.Create(inner, settings))
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Xml;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 
@@ -10,7 +11,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         private static readonly XmlWriterSettings _settings = new XmlWriterSettings
         {
             OmitXmlDeclaration = true,
-            Async = true
+            Async = true,
+            Encoding = new UTF8Encoding(false)
         };
 
         public XmlWriter CreateXmlWriter(Stream stream) => XmlWriter.Create(stream, _settings);

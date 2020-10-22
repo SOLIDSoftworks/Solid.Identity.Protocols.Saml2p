@@ -49,7 +49,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
         {
             using (var memory = new MemoryStream())
             {
-                using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false }))
+                using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
                 {
                     Serializer.SerializeAuthnRequest(writer, request);
                 }
@@ -62,7 +62,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
         {
             using (var memory = new MemoryStream())
             {
-                using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false }))
+                using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
                 {
                     Serializer.SerializeSamlResponse(writer, response);
                 }
@@ -222,11 +222,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             var format = $"{prefix} | RelayState: '{{relayState}}'" + Environment.NewLine + "{request}";
             using (var stream = new MemoryStream())
             {
-                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true }))
+                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true, Encoding = new UTF8Encoding(false) }))
                 {
                     Serializer.SerializeAuthnRequest(writer, request);
                 }
-                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                var xml = new UTF8Encoding(false).GetString(stream.ToArray());
                 Logger.LogTrace(format, request.RelayState, xml);
             }
         }
@@ -237,11 +237,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             var format = $"{prefix} | RelayState: '{{relayState}}'" + Environment.NewLine + "{response}";
             using (var stream = new MemoryStream())
             {
-                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true }))
+                using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { OmitXmlDeclaration = true, CloseOutput = false, Indent = true, Encoding = new UTF8Encoding(false) }))
                 {
                     Serializer.SerializeSamlResponse(writer, response);
                 }
-                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                var xml = new UTF8Encoding(false).GetString(stream.ToArray());
                 Logger.LogTrace(format, response.RelayState, xml);
             }
         }

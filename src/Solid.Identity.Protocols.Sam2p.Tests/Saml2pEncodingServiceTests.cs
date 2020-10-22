@@ -17,7 +17,7 @@ namespace Solid.Identity.Protocols.Sam2p.Tests
         [InlineData("<test></test>", "sylJLS6xs9EHUwA=")]
         public void ShouldDeflateAndBase64Encode(string xml, string expected)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+            using (var stream = new MemoryStream(new UTF8Encoding(false).GetBytes(xml)))
             {
                 var encoded = _encoder.Encode(stream, BindingType.Redirect);
                 Assert.Equal(expected, encoded);
@@ -31,7 +31,7 @@ namespace Solid.Identity.Protocols.Sam2p.Tests
         {
             using (var stream = _encoder.Decode(encoded, BindingType.Redirect))
             {
-                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                var xml = new UTF8Encoding(false).GetString(stream.ToArray());
                 Assert.Equal(expected, xml);            
             }
         }
@@ -43,7 +43,7 @@ namespace Solid.Identity.Protocols.Sam2p.Tests
         {
             using (var stream = _encoder.Decode(encoded, BindingType.Post))
             {
-                var xml = Encoding.UTF8.GetString(stream.ToArray());
+                var xml = new UTF8Encoding(false).GetString(stream.ToArray());
                 Assert.Equal(expected, xml);
             }
         }
@@ -53,7 +53,7 @@ namespace Solid.Identity.Protocols.Sam2p.Tests
         [InlineData("<test></test>", "PHRlc3Q+PC90ZXN0Pg==")]
         public void ShouldBase64Encode(string xml, string expected)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+            using (var stream = new MemoryStream(new UTF8Encoding(false).GetBytes(xml)))
             {
                 var encoded = _encoder.Encode(stream, BindingType.Post);
                 Assert.Equal(expected, encoded);
