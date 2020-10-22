@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
+using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
-    public interface ISaml2pServiceProvider : ISaml2pPartner
+    public interface ISaml2pServiceProvider : ISaml2pPartner<Saml2pIdentityProviderEvents>
     {
         PathString AssertionConsumerServiceEndpoint { get; }
         SecurityKey AssertionSigningKey { get; }
@@ -28,13 +29,5 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         bool AllowsIdpInitiatedSso { get; }
 
         bool AllowClaimsPassthrough { get; }
-
-        Func<IServiceProvider, AcceptSsoContext, ValueTask> OnAcceptSso { get; }
-
-        Func<IServiceProvider, InitiateSsoContext, ValueTask> OnInitiateSso { get; }
-
-        Func<IServiceProvider, CompleteSsoContext, ValueTask> OnCompleteSso { get; }
-        Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatingSecurityToken { get; }
-        Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatedSecurityToken { get; }
     }
 }

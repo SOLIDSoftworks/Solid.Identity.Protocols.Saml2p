@@ -50,8 +50,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 Request = request
             };
 
-            await _options.OnGeneratingRelayState(context.RequestServices, generateContext);
-            await idp.OnGeneratingRelayState(context.RequestServices, generateContext);
+            await Events.InvokeAsync(_options, idp, e => e.OnGeneratingRelayState(context.RequestServices, generateContext));
 
             if (request.RelayState == null)
                 request.RelayState = Guid.NewGuid().ToString();

@@ -54,7 +54,11 @@ namespace AspNetCore.IdpSample
 
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(o => o.LoginPath = "/login")
+                .AddCookie(o =>
+                {
+                    o.LoginPath = "/login";
+                    o.Cookie.Name = "Cookie.Idp";
+                })
             ;
 
             services.AddMvc();

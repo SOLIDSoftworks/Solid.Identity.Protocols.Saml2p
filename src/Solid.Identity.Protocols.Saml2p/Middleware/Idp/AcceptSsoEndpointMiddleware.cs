@@ -61,8 +61,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 ReturnUrl = GenerateReturnUrl(context, request.Id)
             };
 
-            await Options.OnAcceptSso(context.RequestServices, ssoContext);
-            await partner.OnAcceptSso(context.RequestServices, ssoContext);
+            await Events.InvokeAsync(Options, partner, e => e.OnAcceptSso(context.RequestServices, ssoContext));
 
             await ChallengeAsync(context, ssoContext.ReturnUrl);
         }

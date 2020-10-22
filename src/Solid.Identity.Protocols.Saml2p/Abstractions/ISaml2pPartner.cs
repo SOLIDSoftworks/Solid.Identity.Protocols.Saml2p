@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
-    public interface ISaml2pPartner
+    public interface ISaml2pPartner<TEvents>
     {
         string Id { get; }
         string ExpectedIssuer { get; }
@@ -14,5 +14,6 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         bool Enabled { get; }
         bool CanInitiateSso { get; }
         ICollection<BindingType> SupportedBindings { get; }
+        TEvents Events { get; }
     }
 }

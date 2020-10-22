@@ -74,8 +74,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 Response = response
             };
 
-            await Options.OnFinishSso(context.RequestServices, ssoContext);
-            await partner.OnFinishSso(context.RequestServices, ssoContext);
+            await Events.InvokeAsync(Options, partner, e => e.OnFinishSso(context.RequestServices, ssoContext));
 
             var parameters = _factory.Create(partner);
             var validateContext = new ValidateTokenContext
@@ -88,8 +87,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 Handler = _handler
             };
 
-            await Options.OnValidatingToken(context.RequestServices, validateContext);
-            await partner.OnValidatingToken(context.RequestServices, validateContext);
+            await Events.InvokeAsync(Options, partner, e => e.OnValidatingToken(context.RequestServices, validateContext));
 
             if(validateContext.Subject == null)
             {
@@ -97,8 +95,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 validateContext.Subject = subject;
             }
 
-            await Options.OnValidatedToken(context.RequestServices, validateContext);
-            await partner.OnValidatedToken(context.RequestServices, validateContext);
+            await Events.InvokeAsync(Options, partner, e => e.OnValidatedToken(context.RequestServices, validateContext));
 
             context.User = validateContext.Subject;
 

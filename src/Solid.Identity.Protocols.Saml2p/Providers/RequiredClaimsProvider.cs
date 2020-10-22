@@ -23,13 +23,9 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
             new ClaimDescriptor(ClaimTypes.AuthenticationMethod)
         };
 
-        public async ValueTask<bool> CanGenerateClaimsAsync(string partnerId)
-        {
-            var partner = await _partnerProvider.GetServiceProviderAsync(partnerId);
-            return !partner.AllowClaimsPassthrough;
-        }
+        public async ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => !partner.AllowClaimsPassthrough;
 
-        public ValueTask<IEnumerable<Claim>> GetClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider _, string issuer)
+        public ValueTask<IEnumerable<Claim>> GenerateClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider _, string issuer)
         {
             var claims = new List<Claim>();
             var sub = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;

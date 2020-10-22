@@ -74,14 +74,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                     Handler = _handler
                 };
 
-                await Options.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext);
-                await partner.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext);
+                await Events.InvokeAsync(Options, partner, e => e.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext));
 
                 if (createSecurityTokenContext.SecurityToken == null)
                     createSecurityTokenContext.SecurityToken = createSecurityTokenContext.Handler.CreateToken(createSecurityTokenContext.TokenDescriptor) as Saml2SecurityToken;
 
-                await Options.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext);
-                await partner.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext);
+                await Events.InvokeAsync(Options, partner, e => e.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext));
 
                 var response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, token: createSecurityTokenContext.SecurityToken);
 
@@ -92,8 +90,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                     Request = request,
                     Response = response
                 };
-                await Options.OnCompleteSso(context.RequestServices, completeSsoContext);
-                await partner.OnCompleteSso(context.RequestServices, completeSsoContext);
+                await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
 
                 if (!partner.SupportedBindings.Any())
                     throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
@@ -101,20 +98,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 var binding = partner.SupportedBindings.First();
                 Trace($"Sending SAMLResponse using {binding} binding.", response);
                 await CompleteSsoAsync(context, response, new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint), binding);
-
-                //var xml = Serializer.SerializeSamlResponse(response);
-                //var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
-                //var model = new SamlResponseModel
-                //{
-                //    Recipient = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint),
-                //    SamlResponse = base64,
-                //    RelayState = completeSsoContext.RelayState
-                //};
-                //var html = await _razor.RenderPageAsync(model, "SamlResponse", "__Saml2p");
-                //context.Response.StatusCode = 200;
-                //context.Response.ContentType = "text/html";
-                //var bytes = Encoding.UTF8.GetBytes(html);
-                //await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             }
             else
             {

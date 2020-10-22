@@ -6,6 +6,7 @@ using Solid.Identity.Protocols.Saml2p.Models.Context;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Options
@@ -33,7 +34,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public string AssertionSigningAlgorithm { get; set; } = SecurityAlgorithms.RsaSha256Signature;
 
-        public string AssertionSigningDigestAlgorithm { get; set; } = SecurityAlgorithms.Sha256;
+        public string AssertionSigningDigestAlgorithm { get; set; } = SecurityAlgorithms.Sha256Digest;
 
         public SecurityKey AssertionEncryptionKey { get; set; }
 
@@ -43,6 +44,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public bool RequiresEncryptedAssertion { get; set; } = false;
 
+
         public bool CanInitiateSso { get; set; } = true;
 
         public bool AllowsIdpInitiatedSso { get; set; } = true;
@@ -51,14 +53,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public bool AllowClaimsPassthrough { get; set; } = false;
 
-        public Func<IServiceProvider, AcceptSsoContext, ValueTask> OnAcceptSso { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, InitiateSsoContext, ValueTask> OnInitiateSso { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, CompleteSsoContext, ValueTask> OnCompleteSso { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatingSecurityToken { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, CreateSecurityTokenContext, ValueTask> OnCreatedSecurityToken { get; set; } = (_, __) => new ValueTask();
+        // You have identity provider events on a service provider becuase you are the identity provider in this scenario.
+        public Saml2pIdentityProviderEvents Events { get; } = new Saml2pIdentityProviderEvents();
     }
 }

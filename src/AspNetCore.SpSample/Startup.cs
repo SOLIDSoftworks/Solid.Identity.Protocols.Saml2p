@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Authentication;
+using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 
@@ -40,7 +41,6 @@ namespace AspNetCore.SpSample
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services
                 .AddSaml2p(options =>
                 {
@@ -51,6 +51,10 @@ namespace AspNetCore.SpSample
                         idp.AcceptSsoEndpoint = "/saml/sso";
                         idp.CanInitiateSso = true;
                         idp.AssertionSigningKeys.Add(new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64))));
+                        //idp.Events.OnGeneratingRelayState = (provider, context) => new ValueTask();
+                        //idp.Events.OnStartSso += (provider, context) => new ValueTask();
+                        //idp.Events.OnValidatingToken = ValidatingToken;
+                        //idp.Events.OnValidatingToken += (provider, context) => new ValueTask();
                     });
                 })
             ;
@@ -63,11 +67,19 @@ namespace AspNetCore.SpSample
 
                     options.DefaultChallengeScheme = Saml2pAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
+                .AddCookie(o =>
+                 {
+                     o.Cookie.Name = "Cookie.Sp";
+                 })
                 .AddSaml2p("https://localhost:5001/saml")
             ;
 
             services.AddMvc();
+        }
+
+        private ValueTask ValidatingToken(IServiceProvider arg1, ValidateTokenContext arg2)
+        {
+            return new ValueTask();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

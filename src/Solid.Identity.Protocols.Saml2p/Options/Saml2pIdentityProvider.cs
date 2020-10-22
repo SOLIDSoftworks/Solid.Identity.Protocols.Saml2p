@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Options
@@ -32,17 +33,11 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         public bool Enabled { get; set; } = true;
 
-        public Func<IServiceProvider, StartSsoContext, ValueTask> OnStartSso { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, FinishSsoContext, ValueTask> OnFinishSso { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, ValidateTokenContext, ValueTask> OnValidatingToken { get; set; } = (_, __) => new ValueTask();
-
-        public Func<IServiceProvider, ValidateTokenContext, ValueTask> OnValidatedToken { get; set; } = (_, __) => new ValueTask();
-        public Func<IServiceProvider, GenerateRelayStateContext, ValueTask> OnGeneratingRelayState { get; set; } = (_, __) => new ValueTask();
-
         public ICollection<BindingType> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
 
         public bool CanInitiateSso { get; set; } = true;
+
+        // You have service provider events on a identity provider becuase you are the service provider in this scenario.
+        public Saml2pServiceProviderEvents Events { get; } = new Saml2pServiceProviderEvents();
     }
 }

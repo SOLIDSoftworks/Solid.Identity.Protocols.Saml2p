@@ -12,5 +12,6 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
         public string PartnerId { get; internal set; }
         public ISaml2pIdentityProvider Partner { get; internal set; }
         public AuthnRequest Request { get; internal set; }
+        public string RelayState { get => Request.RelayState; set => Request.RelayState = value; }
     }
 }

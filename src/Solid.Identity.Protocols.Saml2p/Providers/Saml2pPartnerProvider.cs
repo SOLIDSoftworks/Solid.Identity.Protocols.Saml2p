@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Solid.Identity.Protocols.Saml2p.Logging;
 
 namespace Solid.Identity.Protocols.Saml2p.Providers
 {
@@ -37,21 +38,42 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
                     _logger.LogDebug("Found partner idp in store.");
             }
             if (idp != null)
+            {
                 _logger.LogInformation($"Found partner idp: {idp.Name}.");
+                if (_logger.IsEnabled(LogLevel.Trace))
+                    _logger.LogTrace("Partner idp:" + Environment.NewLine + "{state}", new WrappedLogMessageState(idp));
+            }
             else
+            {
                 _logger.LogInformation("Could not find partner idp.");
+            }
+
             return idp;
         }
 
         public async ValueTask<ISaml2pServiceProvider> GetServiceProviderAsync(string id)
         {
-
-            if (_options.ServiceProviders.TryGetValue(id, out var sp)) return sp;
-            if(_store != null)
+            _logger.LogInformation($"Searching for partner sp: '{id}'.");
+            var sp = null as ISaml2pServiceProvider;
+            if (_options.ServiceProviders.TryGetValue(id, out sp))
+                _logger.LogDebug("Found partner sp in-memory.");
+            if (_store != null)
             {
-                return await _store.GetServiceProviderAsync(id);
+                sp = await _store.GetServiceProviderAsync(id);
+                if (sp != null)
+                    _logger.LogDebug("Found partner sp in store.");
             }
-            return null;
+            if (sp != null)
+            {
+                _logger.LogInformation($"Found partner sp: {sp.Name}.");
+                if (_logger.IsEnabled(LogLevel.Trace))
+                    _logger.LogTrace("Partner sp:" + Environment.NewLine + "{state}", new WrappedLogMessageState(sp));
+            }
+            else
+            {
+                _logger.LogInformation("Could not find partner sp.");
+            }
+            return sp;
         }
     }
 }

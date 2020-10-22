@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.Extensions.Options;
+using Solid.Identity.Protocols.Saml2p.Logging;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -50,15 +51,19 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var claims = new List<Claim>();
             foreach (var provider in _claimsProviders)
             {
-                // TODO: need some caching
-                if (!await provider.CanGenerateClaimsAsync(partner.Id))
-                    claims.AddRange(await provider.GetClaimsAsync(identity, partner, issuer));
+                if (!await provider.CanGenerateClaimsAsync(partner))
+                {
+                    _logger.LogInformation($"Generating claims using {provider.GetType().Name}.");
+                    var generated = await provider.GenerateClaimsAsync(identity, partner, issuer);
+                    Trace($"Generated claims from {provider.GetType().Name}.", generated);
+                    claims.AddRange(generated);
+                }
             }
 
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
                 claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime));
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
-                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"));
+                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString));
 
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
@@ -117,9 +122,34 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             if (string.IsNullOrWhiteSpace(partner.AssertionSigningAlgorithm))
                 throw new ArgumentNullException(nameof(partner.AssertionSigningAlgorithm));
 
+            var credentials = null as SigningCredentials;
             if (string.IsNullOrWhiteSpace(partner.AssertionSigningDigestAlgorithm))
-                return new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm);
-            return new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm, partner.AssertionSigningDigestAlgorithm);
+                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm);
+            else
+                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm, partner.AssertionSigningDigestAlgorithm);
+
+            Trace("Signing credentials created.", credentials);
+            return credentials;
+        }
+
+        private void Trace(string prefix, SigningCredentials credentials)
+        {
+            if (!_logger.IsEnabled(LogLevel.Trace)) return;
+            var state = new Dictionary<string, string>
+            {
+                { "securityKeyName", (credentials.Key is X509SecurityKey x509) ? x509.Certificate.Subject : credentials.Key.KeyId },
+                { "securityKeyType", credentials.Key.KeyId },
+                { "algorithm", credentials.Algorithm },
+                { "digest", credentials.Digest }
+            };
+
+            _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(state));
+        }
+
+        private void Trace(string prefix, IEnumerable<Claim> generated)
+        {
+            if (!_logger.IsEnabled(LogLevel.Trace)) return;
+            _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(generated.Select(c => $"{c.Type}: {c.Value}")));
         }
     }
 }
