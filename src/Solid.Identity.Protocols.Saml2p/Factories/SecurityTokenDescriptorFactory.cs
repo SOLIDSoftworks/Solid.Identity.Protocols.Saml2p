@@ -61,9 +61,10 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 }
             }
 
+            var defaults = new[] { ClaimTypes.NameIdentifier, ClaimTypes.AuthenticationInstant, ClaimTypes.AuthenticationMethod };
             var required = (partner.RequiredClaims ?? Enumerable.Empty<string>()).Distinct();
             var optional = (partner.OptionalClaims ?? Enumerable.Empty<string>()).Distinct();
-            var supported = required.Concat(optional).Distinct();
+            var supported = defaults.Concat(required).Concat(optional).Distinct();
 
             Debug("Checking for all required claims. Required claim types:", required);
             if (required.Except(claims.Select(c => c.Type)).Any())
@@ -73,10 +74,12 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             claims = claims.Where(c => supported.Contains(c.Type)).ToList();
             Trace($"Filtered claims.", claims);
 
+            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, identity.Name, null, issuer));
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
-                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime));
+                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime, null, issuer));
             if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
-                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString));
+                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString, null, issuer));
 
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)

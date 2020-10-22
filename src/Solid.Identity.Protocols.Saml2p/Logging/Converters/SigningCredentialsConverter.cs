@@ -26,8 +26,13 @@ namespace Solid.Identity.Protocols.Saml2p.Logging.Converters
 
             writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(SigningCredentials.Kid)), value.Kid);
 
+            writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName("Key"));
             var keyConverter = options.GetConverter(typeof(SecurityKey)) as JsonConverter<SecurityKey>;
-            keyConverter?.Write(writer, value.Key, options);
+
+            if (keyConverter != null)
+                keyConverter.Write(writer, value.Key, options);
+            else
+                writer.WriteStringValue("<unable to serialize>");
 
             writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(SigningCredentials.Algorithm)), value.Algorithm);
             writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(SigningCredentials.Digest)), value.Digest);

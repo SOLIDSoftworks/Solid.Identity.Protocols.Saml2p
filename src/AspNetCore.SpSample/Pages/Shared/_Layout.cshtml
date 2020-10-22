@@ -41,7 +41,7 @@
                     @if (Context.User.Identity.IsAuthenticated)
                     {
                         <span class="navbar-text">
-                            @Context.User.Identity.Name
+                            @(Context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")
                         </span>
                     }
                 </div>
