@@ -17,7 +17,6 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public TimeSpan DefaultTokenLifetime { get; set; } = TimeSpan.FromMinutes(5);
         public string PartnerIdQueryParameter { get; set; } = "partnerId";
         public ICollection<BindingType> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
-        public bool CanInitiateSso { get; set; }
 
         public PathString AcceptPath { get; set; } = PathString.Empty;
 
