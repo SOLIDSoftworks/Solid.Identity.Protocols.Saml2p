@@ -122,6 +122,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddSaml2pPartnerStore<TStore>(this IServiceCollection services)
+            where TStore : class, ISaml2pPartnerStore
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Transient<ISaml2pPartnerStore, TStore>());
+            return services;
+        }
+
         static void PostConfigureSaml2pOptions(Saml2pOptions options)
         {
             options.SupportedBindings = ((List<BindingType>)options.SupportedBindings).AsReadOnly();
