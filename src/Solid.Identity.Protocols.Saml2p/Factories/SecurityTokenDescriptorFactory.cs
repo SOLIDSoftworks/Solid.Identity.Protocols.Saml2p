@@ -51,7 +51,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var claims = new List<Claim>();
             foreach (var provider in _claimsProviders)
             {
-                if (!await provider.CanGenerateClaimsAsync(partner))
+                if (await provider.CanGenerateClaimsAsync(partner))
                 {
                     _logger.LogInformation($"Generating claims using {provider.GetType().Name}.");
                     var generated = await provider.GenerateClaimsAsync(identity, partner, issuer);
