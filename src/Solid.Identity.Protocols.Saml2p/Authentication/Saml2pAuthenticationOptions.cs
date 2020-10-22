@@ -12,6 +12,10 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
     public class Saml2pAuthenticationOptions : RemoteAuthenticationOptions, ISaml2pAuthenticationOptions
     {
         /// <summary>
+        /// Default constructor for <see cref="Saml2pAuthenticationOptions"/>.
+        /// </summary>
+        public Saml2pAuthenticationOptions() => CallbackPath = "/not_used";
+        /// <summary>
         /// The id of the identity provider where authentication will be performed.
         /// </summary>
         public string IdentityProviderId { get; set; }

@@ -60,11 +60,14 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if (request == null && !partner.CanInitiateSso)
                 throw new SecurityException($"Partner idp '{partnerId}' is is not allowed to initiate SSO.");
-            
-            Trace("Found cached SAMLRequest.", request);
 
-            if (request.RelayState != response.RelayState)
-                throw new SecurityException($"Mismatching relay state.");
+            if (request != null)
+            {
+                Trace("Found cached SAMLRequest.", request);
+
+                if (request.RelayState != response.RelayState)
+                    throw new SecurityException($"Mismatching relay state.");
+            }
 
             var ssoContext = new FinishSsoContext
             {
