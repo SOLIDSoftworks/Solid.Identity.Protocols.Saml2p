@@ -68,46 +68,52 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out BindingType? binding)
+        protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out BindingType binding)
         {
             const string name = "SAMLRequest";
-            var reader = GetXmlReader(context, name, out binding);
-            if (reader == null || !binding.HasValue)
+            var reader = GetXmlReader(context, name, out var b);
+            if (reader == null || !b.HasValue)
             {
                 request = null;
+                binding = default;
                 return false;
             }
 
-            if (!Options.SupportedBindings.Contains(binding.Value))
+            binding = b.Value;
+
+            if (!Options.SupportedBindings.Contains(binding))
                 throw new SecurityException($"SAML2P request sent using unsupported binding ({binding}).");
 
             using (reader)
             {
                 Logger.LogDebug($"Reading '{name}' using '{binding}' binding.");
                 request = Serializer.DeserializeAuthnRequest(reader);
-                request.RelayState = GetRelayState(context, binding.Value);
+                request.RelayState = GetRelayState(context, binding);
                 return request != null;
             }
         }
 
-        protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out BindingType? binding)
+        protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out BindingType binding)
         {
             const string name = "SAMLResponse";
-            var reader = GetXmlReader(context, name, out binding);
-            if (reader == null || !binding.HasValue)
+            var reader = GetXmlReader(context, name, out var b);
+            if (reader == null || !b.HasValue)
             {
                 response = null;
+                binding = default;
                 return false;
             }
 
-            if (!Options.SupportedBindings.Contains(binding.Value))
+            binding = b.Value;
+
+            if (!Options.SupportedBindings.Contains(binding))
                 throw new SecurityException($"SAML2P response sent using unsupported binding ({binding}).");
 
             using (reader)
             {
                 Logger.LogDebug($"Reading '{name}' using '{binding}' binding.");
                 response = Serializer.DeserializeSamlResponse(reader);
-                response.RelayState = GetRelayState(context, binding.Value);
+                response.RelayState = GetRelayState(context, binding);
                 return response != null;
             }
         }
@@ -131,7 +137,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
         {
             var request = httpContext.Request;
             // PathBase is only used because we set the path prefix as pathbase in Startup
-            return $"{request.PathBase}/complete?id={id}";
+            return $"{request.PathBase}{Options.CompletePath}?id={id}";
         }
 
         private XmlReader GetXmlReader(HttpContext context, string name, out BindingType? binding)

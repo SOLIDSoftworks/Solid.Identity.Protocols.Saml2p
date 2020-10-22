@@ -63,6 +63,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             if (!partner.Enabled)
                 throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
+            var response = null as SamlResponse;
+
             if (user.Identity.IsAuthenticated)
             {
                 var descriptor = await _descriptorFactory.CreateSecurityTokenDescriptorAsync(user.Identity as ClaimsIdentity, partner);
@@ -81,29 +83,29 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
                 await Events.InvokeAsync(Options, partner, e => e.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext));
 
-                var response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, token: createSecurityTokenContext.SecurityToken);
-
-                var completeSsoContext = new CompleteSsoContext
-                {
-                    PartnerId = partner.Id,
-                    Partner = partner,
-                    Request = request,
-                    Response = response
-                };
-                await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
-
-                if (!partner.SupportedBindings.Any())
-                    throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
-
-                var binding = partner.SupportedBindings.First();
-                Trace($"Sending SAMLResponse using {binding} binding.", response);
-                await CompleteSsoAsync(context, response, new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint), binding);
+                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, token: createSecurityTokenContext.SecurityToken);
             }
             else
             {
-                // 401?
-                // maybe another event
+                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, status: SamlResponseStatus.AuthnFailed);
             }
+            var completeSsoContext = new CompleteSsoContext
+            {
+                PartnerId = partner.Id,
+                Partner = partner,
+                Request = request,
+                Response = response
+            };
+            await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
+
+            if (!partner.SupportedBindings.Any())
+                throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
+
+            var binding = partner.SupportedBindings.First();
+            Trace($"Sending SAMLResponse using {binding} binding.", response);
+
+            var destination = request.AssertionConsumerServiceUrl ?? new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
+            await CompleteSsoAsync(context, response, destination, binding);
         }
 
         private Task CompleteSsoAsync(HttpContext context, SamlResponse response, Uri destination, BindingType binding)

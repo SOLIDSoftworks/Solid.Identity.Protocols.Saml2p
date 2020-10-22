@@ -11,49 +11,79 @@ using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Options
 {
+    /// <summary>
+    /// The default implementation of <see cref="ISaml2pServiceProvider"/>.
+    /// </summary>
     public class Saml2pServiceProvider : ISaml2pServiceProvider
     {
-        public string ExpectedIssuer { get; set; }
-
+        /// <inheritdoc/>
         public string Id { get; set; }
 
+        /// <inheritdoc/>
+        public string ExpectedIssuer { get; set; }
+
+        /// <inheritdoc/>
         public string Name { get; set; }
 
+        /// <inheritdoc/>
         public ICollection<BindingType> SupportedBindings { get; internal set; } = Saml2pConstants.Bindings.All;
+
+        /// <inheritdoc/>
         public ICollection<string> RequiredClaims { get; internal set; } = new List<string>();
+
+        /// <inheritdoc/>
         public ICollection<string> OptionalClaims { get; internal set; } = new List<string>();
 
+        /// <inheritdoc/>
         public bool Enabled { get; set; } = true;
 
+        /// <inheritdoc/>
         public PathString AssertionConsumerServiceEndpoint { get; set; }
 
+        /// <inheritdoc/>
         public SecurityKey AssertionSigningKey { get; set; }
+
+        /// <inheritdoc/>
         public SecurityKey ResponseSigningKey { get; set; }
+
+        /// <inheritdoc/>
         public TimeSpan? TokenLifeTime { get; set; }
+
+        /// <inheritdoc/>
         public TimeSpan? MaxClockSkew { get; set; }
 
+        /// <inheritdoc/>
         public string AssertionSigningAlgorithm { get; set; } = SecurityAlgorithms.RsaSha256Signature;
 
+        /// <inheritdoc/>
         public string AssertionSigningDigestAlgorithm { get; set; } = SecurityAlgorithms.Sha256Digest;
 
-        public SecurityKey AssertionEncryptionKey { get; set; }
+        ///// <inheritdoc/>
+        //public SecurityKey AssertionEncryptionKey { get; set; }
 
-        public string AssertionEncryptionAlgorithm { get; set; } = SecurityAlgorithms.Aes128Encryption;
+        ///// <inheritdoc/>
+        //public string AssertionEncryptionAlgorithm { get; set; } = SecurityAlgorithms.Aes128Encryption;
 
-        public string AssertionEncryptionKeyWrapAlgorithm { get; set; } = SecurityAlgorithms.RsaOaepKeyWrap;
+        ///// <inheritdoc/>
+        //public string AssertionEncryptionKeyWrapAlgorithm { get; set; } = SecurityAlgorithms.RsaOaepKeyWrap;
 
-        public bool RequiresEncryptedAssertion { get; set; } = false;
-
-
+        ///// <inheritdoc/>
+        //public bool RequiresEncryptedAssertion { get; set; } = false;
+        
+        /// <inheritdoc/>
         public bool CanInitiateSso { get; set; } = true;
 
+        /// <inheritdoc/>
         public bool AllowsIdpInitiatedSso { get; set; } = true;
 
+        /// <inheritdoc/>
         public Uri BaseUrl { get; set; }
 
+        /// <inheritdoc/>
         public bool AllowClaimsPassthrough { get; set; } = false;
 
         // You have identity provider events on a service provider becuase you are the identity provider in this scenario.
+        /// <inheritdoc/>
         public Saml2pIdentityProviderEvents Events { get; } = new Saml2pIdentityProviderEvents();
     }
 }

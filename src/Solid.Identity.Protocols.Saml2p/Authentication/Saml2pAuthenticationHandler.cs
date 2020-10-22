@@ -16,17 +16,26 @@ using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using System.Security.Claims;
+using Solid.Identity.Protocols.Saml2p.Options;
 
 namespace Solid.Identity.Protocols.Saml2p.Authentication
 {
-    public class Saml2pAuthenticationHandler : RemoteAuthenticationHandler<Saml2pAuthenticationOptions>
+    internal class Saml2pAuthenticationHandler : RemoteAuthenticationHandler<Saml2pAuthenticationOptions>, IDisposable
     {
-        private Saml2pPartnerProvider _provider;
+        private Saml2pOptions _saml2p;
+        private IDisposable _optionsChangeToken;
 
-        public Saml2pAuthenticationHandler(Saml2pPartnerProvider provider, IOptionsMonitor<Saml2pAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
-            : base(options, logger, encoder, clock)
+        public Saml2pAuthenticationHandler(IOptionsMonitor<Saml2pOptions> saml2pOptionsMonitor, IOptionsMonitor<Saml2pAuthenticationOptions> monitor, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
+            : base(monitor, logger, encoder, clock)
         {
-            _provider = provider;
+            _saml2p = saml2pOptionsMonitor.CurrentValue;
+            _optionsChangeToken = saml2pOptionsMonitor.OnChange((options, _) => _saml2p = options);
+        }
+
+        protected override Task InitializeHandlerAsync()
+        {
+            Options.CallbackPath = _saml2p.FinishPath;
+            return base.InitializeHandlerAsync();
         }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
@@ -44,5 +53,7 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
         }
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties) => Context.StartSsoAsync(Options.IdentityProviderId);
+
+        public void Dispose() => _optionsChangeToken?.Dispose();
     }
 }

@@ -14,7 +14,9 @@ using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
 
 namespace Microsoft.AspNetCore.Builder
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public static class Solid_Identity_Protocols_Saml2p_ApplicationBuilderExtensions
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path)
         {

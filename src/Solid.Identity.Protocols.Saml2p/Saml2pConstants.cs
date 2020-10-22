@@ -5,10 +5,14 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p
 {
+    /// <summary>
+    /// Constants used for Saml2p.
+    /// </summary>
     public static class Saml2pConstants
     {
         internal const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public static class Namespaces
         {
             public const string ProtocolPrefix = "samlp";
@@ -16,6 +20,57 @@ namespace Solid.Identity.Protocols.Saml2p
             public const string StatusNamespace = "urn:oasis:names:tc:SAML:2.0:status";
             public const string BindingNamespace = "urn:oasis:names:tc:SAML:2.0:bindings";
             public const string ClassNamespace = "urn:oasis:names:tc:SAML:2.0:ac:classes";
+        }
+
+        public static class Statuses
+        {
+            public const string SuccessString = Namespaces.StatusNamespace + ":Success";
+            public const string RequesterString = Namespaces.StatusNamespace + ":Requester";
+            public const string ResponderString = Namespaces.StatusNamespace + ":Responder";
+            public const string VersionMismatchString = Namespaces.StatusNamespace + ":VersionMismatch";
+            public const string AuthnFailedString = Namespaces.StatusNamespace + ":AuthnFailed";
+            public const string InvalidAttrNameOrValueString = Namespaces.StatusNamespace + ":InvalidAttrNameOrValue";
+            public const string InvalidNameIDPolicyString = Namespaces.StatusNamespace + ":InvalidNameIDPolicy";
+            public const string NoAuthnContextString = Namespaces.StatusNamespace + ":NoAuthnContext";
+            public const string NoAvailableIDPString = Namespaces.StatusNamespace + ":NoAvailableIDP";
+            public const string NoPassiveString = Namespaces.StatusNamespace + ":NoPassive";
+            public const string NoSupportedIDPString = Namespaces.StatusNamespace + ":NoSupportedIDP";
+            public const string PartialLogoutString = Namespaces.StatusNamespace + ":PartialLogout";
+            public const string ProxyCountExceededString = Namespaces.StatusNamespace + ":ProxyCountExceeded";
+            public const string RequestDeniedString = Namespaces.StatusNamespace + ":RequestDenied";
+            public const string RequestUnsupportedString = Namespaces.StatusNamespace + ":RequestUnsupported";
+            public const string RequestVersionDeprecatedString = Namespaces.StatusNamespace + ":RequestVersionDeprecated";
+            public const string RequestVersionTooHighString = Namespaces.StatusNamespace + ":RequestVersionTooHigh";
+            public const string RequestVersionTooLowString = Namespaces.StatusNamespace + ":RequestVersionTooLow";
+            public const string ResourceNotRecognizedString = Namespaces.StatusNamespace + ":ResourceNotRecognized";
+            public const string TooManyResponsesString = Namespaces.StatusNamespace + ":TooManyResponses";
+            public const string UnknownAttrProfileString = Namespaces.StatusNamespace + ":UnknownAttrProfile";
+            public const string UnknownPrincipalString = Namespaces.StatusNamespace + ":UnknownPrincipal";
+            public const string UnsupportedBindingString = Namespaces.StatusNamespace + ":UnsupportedBinding";
+
+            public static readonly Uri Success = new Uri(SuccessString);
+            public static readonly Uri Requester = new Uri(SuccessString);
+            public static readonly Uri Responder = new Uri(SuccessString);
+            public static readonly Uri VersionMismatch = new Uri(SuccessString);
+            public static readonly Uri AuthnFailed = new Uri(SuccessString);
+            public static readonly Uri InvalidAttrNameOrValue = new Uri(InvalidAttrNameOrValueString);
+            public static readonly Uri InvalidNameIDPolicy = new Uri(InvalidNameIDPolicyString);
+            public static readonly Uri NoAuthnContext = new Uri(NoAuthnContextString);
+            public static readonly Uri NoAvailableIDP = new Uri(NoAvailableIDPString);
+            public static readonly Uri NoPassive = new Uri(NoPassiveString);
+            public static readonly Uri NoSupportedIDP = new Uri(NoSupportedIDPString);
+            public static readonly Uri PartialLogout = new Uri(PartialLogoutString);
+            public static readonly Uri ProxyCountExceeded = new Uri(ProxyCountExceededString);
+            public static readonly Uri RequestDenied = new Uri(RequestDeniedString);
+            public static readonly Uri RequestUnsupported = new Uri(RequestUnsupportedString);
+            public static readonly Uri RequestVersionDeprecated = new Uri(RequestVersionDeprecatedString);
+            public static readonly Uri RequestVersionTooHigh = new Uri(RequestVersionTooHighString);
+            public static readonly Uri RequestVersionTooLow = new Uri(RequestVersionTooLowString);
+            public static readonly Uri ResourceNotRecognized = new Uri(ResourceNotRecognizedString);
+            public static readonly Uri TooManyResponses = new Uri(TooManyResponsesString);
+            public static readonly Uri UnknownAttrProfile = new Uri(UnknownAttrProfileString);
+            public static readonly Uri UnknownPrincipal = new Uri(UnknownPrincipalString);
+            public static readonly Uri UnsupportedBinding = new Uri(UnsupportedBindingString);
         }
 
         // https://docs.oasis-open.org/security/saml/v2.0/saml-authn-context-2.0-os.pdf
@@ -81,11 +136,6 @@ namespace Solid.Identity.Protocols.Saml2p
             public const string NameIdPolicy = "NameIDPolicy";
         }
 
-        public static class Status
-        {
-            public const string Success = Namespaces.StatusNamespace + ":" + nameof(Success);
-        }
-
         public static class Bindings
         {
             public const string Post = Namespaces.BindingNamespace + ":HTTP-POST";
@@ -99,5 +149,6 @@ namespace Solid.Identity.Protocols.Saml2p
                 BindingType.Post
             };
         }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 }

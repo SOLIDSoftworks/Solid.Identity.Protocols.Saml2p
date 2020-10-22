@@ -33,5 +33,10 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// A collection of <see cref="SecurityKey"/>s that are used to validate the SAML2 security token coming from the IDP partner.
         /// </summary>
         ICollection<SecurityKey> AssertionSigningKeys { get; }
+
+        /// <summary>
+        /// A flag indicating whether the SP can initiate SSO.
+        /// </summary>
+        bool AllowsSpInitiatedSso { get; }
     }
 }

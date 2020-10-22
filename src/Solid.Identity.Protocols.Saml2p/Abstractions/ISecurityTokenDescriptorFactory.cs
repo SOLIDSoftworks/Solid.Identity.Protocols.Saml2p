@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
-    public interface ISecurityTokenDescriptorFactory
+    internal interface ISecurityTokenDescriptorFactory
     {
         ValueTask<SecurityTokenDescriptor> CreateSecurityTokenDescriptorAsync(ClaimsIdentity identity, ISaml2pServiceProvider partner);
     }

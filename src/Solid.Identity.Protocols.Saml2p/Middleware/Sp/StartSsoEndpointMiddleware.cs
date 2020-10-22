@@ -16,6 +16,7 @@ using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
         {
             Logger.LogInformation("Starting SAML2P authentication (SP flow).");
             var partner = await Partners.GetIdentityProviderAsync(partnerId);
+            
+            if (partner == null)
+                throw new SecurityException($"Partner '{partnerId}' not found.");
+
+            if (!partner.Enabled)
+                throw new SecurityException($"Partner '{partnerId}' is disabled.");
+
+            if (!partner.AllowsSpInitiatedSso)
+                throw new SecurityException($"SP initiated SSO is not allowed for partner '{partnerId}'.");
+
             var request = await _authnRequestFactory.CreateAuthnRequestAsync(context, partner);
             await Cache.CacheRequestAsync(request.Id, request);
             var ssoContext = new StartSsoContext

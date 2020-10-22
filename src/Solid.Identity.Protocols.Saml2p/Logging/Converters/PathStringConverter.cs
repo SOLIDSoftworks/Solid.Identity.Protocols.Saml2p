@@ -16,7 +16,7 @@ namespace Solid.Identity.Protocols.Saml2p.Logging.Converters
 
         public override void Write(Utf8JsonWriter writer, PathString value, JsonSerializerOptions options)
         {
-            if (value == PathString.Empty)
+            if (value == null)
                 writer.WriteStringValue(string.Empty);
             else
                 writer.WriteStringValue(value.ToString());

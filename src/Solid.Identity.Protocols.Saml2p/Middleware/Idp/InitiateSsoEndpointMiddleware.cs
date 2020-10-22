@@ -39,7 +39,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 throw new SecurityException($"Partner '{id}' is disabled.");
 
             if (!partner.AllowsIdpInitiatedSso)
-                throw new SecurityException($"IDP initiated SSP is not allowed for partner '{id}'.");
+                throw new SecurityException($"IDP initiated SSO is not allowed for partner '{id}'.");
 
             var request = new AuthnRequest
             {

@@ -63,7 +63,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var baseUrl = new Uri($"{request.Scheme}://{request.Host}");
 
             // TODO: add central utility for creating all paths
-            var path = request.PathBase.Add("/acs");
+            var path = request.PathBase.Add(_options.FinishPath);
             return new Uri(baseUrl, path);
         }
     }

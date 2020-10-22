@@ -57,7 +57,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         { 
             switch(status)
             {
-                case SamlResponseStatus.Success: return new Uri("urn:oasis:names:tc:SAML:2.0:status:Success");
+                case SamlResponseStatus.Success: return Saml2pConstants.Statuses.Success;
+                case SamlResponseStatus.AuthnFailed: return Saml2pConstants.Statuses.AuthnFailed;
             }
             return null;
             //"urn:oasis:names:tc:SAML:2.0:status:Success"

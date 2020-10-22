@@ -49,7 +49,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
             if (!partner.CanInitiateSso)
-                throw new SecurityException($"Partner '{partnerId}' is is not allowed to initiate SSO.");
+                throw new SecurityException($"Partner '{partnerId}' is not allowed to initiate SSO.");
 
             await Cache.CacheRequestAsync(request.Id, request);
             var ssoContext = new AcceptSsoContext

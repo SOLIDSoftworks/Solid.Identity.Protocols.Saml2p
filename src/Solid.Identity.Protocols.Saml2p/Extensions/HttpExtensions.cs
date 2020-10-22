@@ -15,7 +15,9 @@ using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
 
 namespace Microsoft.AspNetCore.Http
 {
-    public static class Solid_Identity_Protocols_Saml2p_HttpContextExtensions
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public static class Solid_Identity_Protocols_Saml2p_HttpExtensions
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         public static Task StartSsoAsync(this HttpContext context, string partnerId)
         {
