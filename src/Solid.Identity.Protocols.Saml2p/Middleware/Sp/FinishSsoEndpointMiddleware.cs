@@ -9,6 +9,7 @@ using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Serialization;
+using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;
 using System.Security;
@@ -22,13 +23,30 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
         private Saml2SecurityTokenHandler _handler;
         private TokenValidationParametersFactory _factory;
 
-        public FinishSsoEndpointMiddleware(Saml2SecurityTokenHandler handler, TokenValidationParametersFactory parametersFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory, RequestDelegate _)
-            : this(handler, parametersFactory, serializer, cache, partners, monitor, factory)
+        public FinishSsoEndpointMiddleware(
+            Saml2SecurityTokenHandler handler,
+            TokenValidationParametersFactory parametersFactory,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory,
+            RequestDelegate _)
+            : this(handler, parametersFactory, serializer, cache, partners, encoder, monitor, factory)
         {
         }
 
-        public FinishSsoEndpointMiddleware(Saml2SecurityTokenHandler handler, TokenValidationParametersFactory parametersFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory)
-            : base(serializer, cache, partners, monitor, factory)
+        public FinishSsoEndpointMiddleware(
+            Saml2SecurityTokenHandler handler,
+            TokenValidationParametersFactory parametersFactory,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory)
+            : base(serializer, cache, partners, encoder, monitor, factory)
         {
             _handler = handler;
             _factory = parametersFactory;

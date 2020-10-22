@@ -16,6 +16,7 @@ using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,12 +28,29 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
         private RazorPageRenderingService _razor;
         private AuthnRequestFactory _authnRequestFactory;
 
-        public StartSsoEndpointMiddleware(RazorPageRenderingService razor, AuthnRequestFactory authnRequestFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory, RequestDelegate _)
-            : this(razor, authnRequestFactory, serializer, cache, partners, monitor, factory)
+        public StartSsoEndpointMiddleware(
+            RazorPageRenderingService razor,
+            AuthnRequestFactory authnRequestFactory,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory,
+            RequestDelegate _)
+            : this(razor, authnRequestFactory, serializer, cache, partners, encoder, monitor, factory)
         {
         }
-        public StartSsoEndpointMiddleware(RazorPageRenderingService razor, AuthnRequestFactory authnRequestFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory)
-            : base(serializer, cache, partners, monitor, factory)
+        public StartSsoEndpointMiddleware(
+            RazorPageRenderingService razor,
+            AuthnRequestFactory authnRequestFactory,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory)
+            : base(serializer, cache, partners, encoder, monitor, factory)
         {
             _razor = razor;
             _authnRequestFactory = authnRequestFactory;
@@ -98,12 +116,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             else
                 queryBuilder.Append("&");
             queryBuilder.Append("SAMLRequest=");
-            queryBuilder.Append(base64);
+            queryBuilder.Append(WebUtility.UrlEncode(base64));
             if (!string.IsNullOrEmpty(relayState))
             {
                 queryBuilder.Append("&");
                 queryBuilder.Append("RelayState=");
-                queryBuilder.Append(relayState);
+                queryBuilder.Append(WebUtility.UrlEncode(relayState));
             }
 
             var url = $"{destination}{queryBuilder.ToString()}";

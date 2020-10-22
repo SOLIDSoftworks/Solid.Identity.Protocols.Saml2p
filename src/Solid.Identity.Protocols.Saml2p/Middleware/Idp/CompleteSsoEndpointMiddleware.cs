@@ -22,6 +22,7 @@ using Solid.Identity.Protocols.Saml2p.Areas.__Saml2p.Pages;
 using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Services;
 using Solid.Identity.Protocols.Saml2p.Models;
+using System.Net;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
@@ -32,8 +33,19 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
         private ISecurityTokenDescriptorFactory _descriptorFactory;
         private SamlResponseFactory _responseFactory;
 
-        public CompleteSsoEndpointMiddleware(RazorPageRenderingService razor, Saml2SecurityTokenHandler handler, ISecurityTokenDescriptorFactory descriptorFactory, SamlResponseFactory responseFactory, Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory loggerFactory, RequestDelegate _)
-            : base(serializer, cache, partners, monitor, loggerFactory)
+        public CompleteSsoEndpointMiddleware(
+            RazorPageRenderingService razor, 
+            Saml2SecurityTokenHandler handler, 
+            ISecurityTokenDescriptorFactory descriptorFactory, 
+            SamlResponseFactory responseFactory, 
+            Saml2pSerializer serializer, 
+            Saml2pCache cache, 
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor, 
+            ILoggerFactory loggerFactory, 
+            RequestDelegate _)
+            : base(serializer, cache, partners, encoder, monitor, loggerFactory)
         {
             _razor = razor;
             _handler = handler;
@@ -125,12 +137,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             else
                 queryBuilder.Append("&");
             queryBuilder.Append("SAMLResponse=");
-            queryBuilder.Append(base64);
+            queryBuilder.Append(WebUtility.UrlEncode(base64));
             if (!string.IsNullOrEmpty(relayState))
             {
                 queryBuilder.Append("&");
                 queryBuilder.Append("RelayState=");
-                queryBuilder.Append(relayState);
+                queryBuilder.Append(WebUtility.UrlEncode(relayState));
             }
 
             var url = $"{destination}{queryBuilder.ToString()}";

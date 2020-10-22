@@ -100,6 +100,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<ISecurityTokenDescriptorFactory, SecurityTokenDescriptorFactory>();
             services.TryAddTransient<TokenValidationParametersFactory>();
             services.TryAddTransient<AuthnRequestFactory>();
+            services.TryAddTransient<Saml2pEncodingService>();
             services.TryAddTransient<Saml2Serializer, SolidSaml2Serializer>();
             services.TryAddTransient<Saml2SecurityTokenHandler, SolidSaml2SecurityTokenHandler>();
             services.TryAddTransient<IXmlWriterFactory, XmlWriterFactory>();

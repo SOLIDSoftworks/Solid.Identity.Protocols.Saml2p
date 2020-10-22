@@ -14,6 +14,7 @@ using System.Security;
 using Solid.Identity.Protocols.Saml2p.Cache;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Providers;
+using Solid.Identity.Protocols.Saml2p.Services;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
@@ -22,10 +23,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
         public AcceptSsoEndpointMiddleware(
             Saml2pSerializer serializer, 
             Saml2pCache cache, 
-            Saml2pPartnerProvider partners,
+            Saml2pPartnerProvider partners, 
+            Saml2pEncodingService encoder,
             IOptionsMonitor<Saml2pOptions> monitor, 
             ILoggerFactory loggerFactory, 
-            RequestDelegate _) : base(serializer, cache, partners, monitor, loggerFactory)
+            RequestDelegate _) : base(serializer, cache, partners, encoder, monitor, loggerFactory)
         {
         }
 

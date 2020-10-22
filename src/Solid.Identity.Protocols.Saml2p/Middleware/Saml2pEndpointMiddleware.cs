@@ -9,6 +9,7 @@ using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Serialization;
+using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,16 +26,18 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
         protected Saml2pSerializer Serializer { get; }
         protected Saml2pCache Cache { get; }
         protected Saml2pPartnerProvider Partners { get; }
+        protected Saml2pEncodingService Encoder { get; }
         protected Saml2pOptions Options { get; private set; }
         protected ILogger Logger { get; }
 
         private IDisposable _optionsChangeToken;
 
-        protected Saml2pEndpointMiddleware(Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory)
+        protected Saml2pEndpointMiddleware(Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, Saml2pEncodingService encoder, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory factory)
         {
             Serializer = serializer;
             Cache = cache;
             Partners = partners;
+            Encoder = encoder;
             Options = monitor.CurrentValue;
             _optionsChangeToken = monitor.OnChange((options, _) => Options = options);
             Logger = factory.CreateLogger(GetType());
@@ -51,7 +54,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                     Serializer.SerializeAuthnRequest(writer, request);
                 }
                 memory.Position = 0;
-                return Encode(memory, binding);
+                return Encoder.Encode(memory, binding);
             }
         }
 
@@ -64,7 +67,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                     Serializer.SerializeSamlResponse(writer, response);
                 }
                 memory.Position = 0;
-                return Encode(memory, binding);
+                return Encoder.Encode(memory, binding);
             }
         }
 
@@ -152,8 +155,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 if (!StringValues.IsNullOrEmpty(field))
                 {
                     binding = BindingType.Post;
-                    var bytes = Convert.FromBase64String(field.ToString());
-                    return XmlReader.Create(new MemoryStream(bytes), settings);
+                    var stream = Encoder.Decode(field, binding.Value);
+                    return XmlReader.Create(stream, settings);
                 }
             }
 
@@ -161,15 +164,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             if(HttpMethods.IsGet(context.Request.Method) && !StringValues.IsNullOrEmpty(query))
             {
                 binding = BindingType.Redirect;
-                var bytes = Base64UrlDecode(query.ToString());
-                using(var memory = new MemoryStream(bytes))
-                using(var stream = new DeflateStream(memory, CompressionMode.Decompress))
-                {
-                    var deflated = new MemoryStream();
-                    stream.CopyTo(deflated);
-                    deflated.Position = 0;
-                    return XmlReader.Create(deflated, settings);
-                }
+                var stream = Encoder.Decode(query, binding.Value); 
+                return XmlReader.Create(stream, settings);
             }
 
             // TODO: Add SOAP and Artifact binding if possible
@@ -192,27 +188,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
             if (StringValues.IsNullOrEmpty(value)) return null;
             return value.ToString();
-        }
-
-        private string Encode(MemoryStream memory, BindingType binding)
-        {
-            if (binding == BindingType.Post)
-            {
-                return Convert.ToBase64String(memory.ToArray());
-            }
-            else if (binding == BindingType.Redirect)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    using (var deflate = new DeflateStream(stream, CompressionMode.Compress, true))
-                    {
-                        memory.CopyTo(deflate);
-                    }
-                    return Base64UrlEncode(stream.ToArray());
-                }
-            }
-
-            throw new ArgumentException("Unsupported binding type.");
         }
 
         private string Base64UrlEncode(byte[] bytes)

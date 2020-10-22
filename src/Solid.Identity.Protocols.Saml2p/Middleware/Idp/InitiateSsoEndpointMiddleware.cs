@@ -15,13 +15,21 @@ using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Serialization;
+using Solid.Identity.Protocols.Saml2p.Services;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
     internal class InitiateSsoEndpointMiddleware : Saml2pEndpointMiddleware
     {
-        public InitiateSsoEndpointMiddleware(Saml2pSerializer serializer, Saml2pCache cache, Saml2pPartnerProvider partners, IOptionsMonitor<Saml2pOptions> monitor, ILoggerFactory loggerFactory, RequestDelegate _)
-            : base(serializer, cache, partners, monitor, loggerFactory)
+        public InitiateSsoEndpointMiddleware(
+            Saml2pSerializer serializer,
+            Saml2pCache cache, 
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor, 
+            ILoggerFactory loggerFactory, 
+            RequestDelegate _)
+            : base(serializer, cache, partners, encoder, monitor, loggerFactory)
         {
         }
 
