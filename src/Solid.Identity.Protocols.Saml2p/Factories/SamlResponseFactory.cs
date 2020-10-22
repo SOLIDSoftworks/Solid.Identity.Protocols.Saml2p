@@ -31,7 +31,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 SecurityToken = token, 
                 Destination = destination,
                 IssueInstant = token?.Assertion.IssueInstant,
-                Issuer = partner.ExpectedIssuer ?? _options.Issuer,
+                Issuer = partner.ExpectedIssuer ?? _options.DefaultIssuer,
                 Status = Convert(status, subStatus),
                 InResponseTo = authnRequestId,
                 RelayState = relayState

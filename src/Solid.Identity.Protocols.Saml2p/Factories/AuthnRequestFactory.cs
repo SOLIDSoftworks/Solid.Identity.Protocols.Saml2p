@@ -32,7 +32,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 ProviderName = idp.Id,
                 AssertionConsumerServiceUrl = GetAcsUrl(context.Request),
                 IssueInstant = _systemClock.UtcNow.UtcDateTime,
-                Issuer = idp.ExpectedIssuer ?? _options.Issuer,
+                Issuer = idp.ExpectedIssuer ?? _options.DefaultIssuer,
                 Destination = new Uri(idp.BaseUrl, idp.AcceptSsoEndpoint),
                 NameIdPolicy = new NameIdPolicy
                 {

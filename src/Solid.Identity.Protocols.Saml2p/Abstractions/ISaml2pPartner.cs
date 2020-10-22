@@ -18,7 +18,7 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         string Id { get; }
 
         /// <summary>
-        /// The issuer id that the partner expects. If it is null, <see cref="Saml2pOptions.Issuer"/> is used.
+        /// The issuer id that the partner expects. If it is null, <see cref="Saml2pOptions.DefaultIssuer"/> is used.
         /// </summary>
         string ExpectedIssuer { get; }
 

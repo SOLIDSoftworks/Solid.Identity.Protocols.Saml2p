@@ -42,7 +42,7 @@ namespace AspNetCore.IdpSample
             services
                 .AddSaml2p(options =>
                 {
-                    options.Issuer = "https://localhost:5001/saml";
+                    options.DefaultIssuer = "https://localhost:5001/saml";
                     options.AddServiceProvider("https://localhost:5003/saml", sp =>
                     {
                         sp.BaseUrl = new Uri("https://localhost:5003");

@@ -23,7 +23,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var parameters = new TokenValidationParameters
             {
                 ValidIssuer = partner.Id,
-                ValidAudience = partner.ExpectedIssuer ?? _options.Issuer
+                ValidAudience = partner.ExpectedIssuer ?? _options.DefaultIssuer
             };
             parameters.ValidateIssuerSigningKey = parameters.RequireSignedTokens = partner.AssertionSigningKeys.Any();
 

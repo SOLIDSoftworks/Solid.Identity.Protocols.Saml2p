@@ -44,7 +44,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             if (instant != null && DateTime.TryParse(instant, out var parsed))
                 issuedAt = parsed;
 
-            var issuer = partner.ExpectedIssuer ?? _options.Issuer;
+            var issuer = partner.ExpectedIssuer ?? _options.DefaultIssuer;
 
             var lifetime = partner.TokenLifeTime ?? _options.DefaultTokenLifetime;
             var tolerence = partner.MaxClockSkew ?? _options.DefaultMaxClockSkew ?? TimeSpan.Zero;

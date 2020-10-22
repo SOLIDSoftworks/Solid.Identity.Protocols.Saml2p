@@ -11,7 +11,8 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 {
     public class Saml2pOptions
     {
-        public string Issuer { get; set; }
+
+        public string DefaultIssuer { get; set; }
         public TimeSpan? DefaultMaxClockSkew { get; set; }
         public TimeSpan DefaultTokenLifetime { get; set; } = TimeSpan.FromMinutes(5);
         public string PartnerIdQueryParameter { get; set; } = "partnerId";
