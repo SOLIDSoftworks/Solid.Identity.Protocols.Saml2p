@@ -29,6 +29,7 @@ namespace Solid.Identity.Protocols.Saml2p.Logging
             _options.Converters.Add(new SigningCredentialsConverter());
             _options.Converters.Add(new Saml2pIdentityProviderEventsConverter());
             _options.Converters.Add(new Saml2pServiceProviderEventsConverter());
+            _options.Converters.Add(new NullableJsonConverter<TimeSpan>());
         }
 
         protected string Serialize<T>(T obj)

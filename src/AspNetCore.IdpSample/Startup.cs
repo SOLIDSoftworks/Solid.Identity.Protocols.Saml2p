@@ -46,6 +46,7 @@ namespace AspNetCore.IdpSample
                     options.AddServiceProvider("https://localhost:5003/saml", sp =>
                     {
                         sp.BaseUrl = new Uri("https://localhost:5003");
+                        sp.MaxClockSkew = TimeSpan.FromMinutes(2);
                         sp.AssertionConsumerServiceEndpoint = "/finish";
                         sp.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
                     });
