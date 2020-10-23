@@ -42,8 +42,13 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
         {
             try
             {
-                var subject = await Context.FinishSsoAsync();
-                var ticket = new AuthenticationTicket(subject, Scheme.Name);
+                var result = await Context.FinishSsoAsync();
+                var properties = new AuthenticationProperties
+                {
+                    IssuedUtc = result.SecurityToken.ValidFrom,
+                    ExpiresUtc = result.SecurityToken.ValidTo
+                };
+                var ticket = new AuthenticationTicket(result.Subject, properties, Scheme.Name);
                 return HandleRequestResult.Success(ticket);
             }
             catch(Exception ex)

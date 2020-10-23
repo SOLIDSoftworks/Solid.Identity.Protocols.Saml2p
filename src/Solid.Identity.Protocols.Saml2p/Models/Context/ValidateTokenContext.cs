@@ -19,5 +19,6 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
         public TokenValidationParameters TokenValidationParameters { get; internal set; }
         public Saml2SecurityTokenHandler Handler { get; internal set; }
         public ClaimsPrincipal Subject { get; set; }
+        public Saml2SecurityToken SecurityToken { get; set; }
     }
 }

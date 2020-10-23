@@ -61,10 +61,10 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             var id = context.Request.Query[Options.PartnerIdQueryParameter];
             if (StringValues.IsNullOrEmpty(id))
                 throw new InvalidOperationException($"Missing '{Options.PartnerIdQueryParameter}' query parameter.");
-            return InvokeAsync(context, id);
+            return StartSsoAsync(context, id);
         }
 
-        internal async Task InvokeAsync(HttpContext context, string partnerId)
+        internal async Task StartSsoAsync(HttpContext context, string partnerId)
         {
             Logger.LogInformation("Starting SAML2P authentication (SP flow).");
             var partner = await Partners.GetIdentityProviderAsync(partnerId);

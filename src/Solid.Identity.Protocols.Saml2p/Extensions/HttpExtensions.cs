@@ -12,6 +12,7 @@ using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
+using Solid.Identity.Protocols.Saml2p.Models.Results;
 
 namespace Microsoft.AspNetCore.Http
 {
@@ -22,14 +23,15 @@ namespace Microsoft.AspNetCore.Http
         public static Task StartSsoAsync(this HttpContext context, string partnerId)
         {
             var middleware = context.RequestServices.GetRequiredService<StartSsoEndpointMiddleware>();
-            return middleware.InvokeAsync(context, partnerId);
+
+            // TODO: possibly return StartSsoResult class
+            return middleware.StartSsoAsync(context, partnerId);
         }
 
-        public static async Task<ClaimsPrincipal> FinishSsoAsync(this HttpContext context)
+        public static async Task<FinishSsoResult> FinishSsoAsync(this HttpContext context)
         {
             var middleware = context.RequestServices.GetRequiredService<FinishSsoEndpointMiddleware>();
-            await middleware.InvokeAsync(context);
-            return context.User;
+            return await middleware.FinishSsoAsync(context);
         }
     }
 }
