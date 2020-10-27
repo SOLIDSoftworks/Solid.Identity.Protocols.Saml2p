@@ -18,6 +18,12 @@ namespace Microsoft.AspNetCore.Builder
     public static class Solid_Identity_Protocols_Saml2p_ApplicationBuilderExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
+        /// <summary>
+        /// Maps the IDP endpoints to <paramref name="path"/>.
+        /// </summary>
+        /// <param name="builder">The <see cref="IApplicationBuilder"/> to map the endpoints to.</param>
+        /// <param name="path">The base path to map the endpoints to.</param>
+        /// <returns>The <see cref="IApplicationBuilder"/> instance so that additional calls can be chained.</returns>
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path)
         {
             var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
@@ -27,14 +33,14 @@ namespace Microsoft.AspNetCore.Builder
                 .Map(path.Add(options.CompletePath), b => b.UseCompleteSsoEndpoint(path))
             ;
         }
-        public static IApplicationBuilder UseSaml2pServiceProvider(this IApplicationBuilder builder, PathString path)
-        {
-            var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
-            return builder
-                .Map(path.Add(options.StartPath), b => b.UseStartSsoEndpoint(path))
-                .Map(path.Add(options.FinishPath), b => b.UseFinishSsoEndpoint(path))
-            ;
-        }
+        //public static IApplicationBuilder UseSaml2pServiceProvider(this IApplicationBuilder builder, PathString path)
+        //{
+        //    var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
+        //    return builder
+        //        .Map(path.Add(options.StartPath), b => b.UseStartSsoEndpoint(path))
+        //        .Map(path.Add(options.FinishPath), b => b.UseFinishSsoEndpoint(path))
+        //    ;
+        //}
 
         internal static IApplicationBuilder UseStartSsoEndpoint(this IApplicationBuilder builder, PathString path)
             => builder.UsePathBase(path).UseMiddleware<StartSsoEndpointMiddleware>();

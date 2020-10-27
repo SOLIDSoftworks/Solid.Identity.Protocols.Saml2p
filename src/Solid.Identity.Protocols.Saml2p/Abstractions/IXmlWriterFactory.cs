@@ -19,7 +19,7 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// <summary>
         /// Creates an <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="reader">The <see cref="TextWriter"/> to write the XML to.</param>
+        /// <param name="writer">The <see cref="TextWriter"/> to write the XML to.</param>
         /// <returns>An <see cref="XmlWriter"/> instance.</returns>
         XmlWriter CreateXmlWriter(TextWriter writer);
     }

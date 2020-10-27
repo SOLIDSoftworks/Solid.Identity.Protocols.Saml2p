@@ -47,7 +47,7 @@ namespace AspNetCore.SpSample
                     options.DefaultIssuer = "https://localhost:5003/saml";
                     options.AddIdentityProvider("https://localhost:5001/saml", idp =>
                     {
-                        idp.BaseUrl = new Uri("https://localhost:5001");
+                        idp.BaseUrl = new Uri("https://localhost:5001");                        
                         idp.AcceptSsoEndpoint = "/saml/sso";
                         idp.CanInitiateSso = true;
                         idp.AssertionSigningKeys.Add(new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64))));

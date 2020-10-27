@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Exceptions
 {
-    public class PlaceholderException : Exception
+    internal class PlaceholderException : Exception
     {
         public PlaceholderException() : base("Replace this exception") { }
     }

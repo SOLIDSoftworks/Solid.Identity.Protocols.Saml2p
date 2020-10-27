@@ -20,14 +20,23 @@ namespace Microsoft.AspNetCore.Http
     public static class Solid_Identity_Protocols_Saml2p_HttpExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
+        /// <summary>
+        /// Requests Saml2p SSO authentication from <paramref name="partnerId"/>.
+        /// </summary>
+        /// <param name="context">The current <see cref="HttpContext"/> instance.</param>
+        /// <param name="partnerId">The id of the partner IDP to request authentication from.</param>
+        /// <returns>An awaitable <see cref="Task"/>.</returns>
         public static Task StartSsoAsync(this HttpContext context, string partnerId)
         {
             var middleware = context.RequestServices.GetRequiredService<StartSsoEndpointMiddleware>();
-
-            // TODO: possibly return StartSsoResult class
             return middleware.StartSsoAsync(context, partnerId);
         }
 
+        /// <summary>
+        /// Finishes Saml2p SSO authentication.
+        /// </summary>
+        /// <param name="context">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>An awaitable <see cref="Task{T}"/> of type <see cref="FinishSsoResult"/>.</returns>
         public static async Task<FinishSsoResult> FinishSsoAsync(this HttpContext context)
         {
             var middleware = context.RequestServices.GetRequiredService<FinishSsoEndpointMiddleware>();

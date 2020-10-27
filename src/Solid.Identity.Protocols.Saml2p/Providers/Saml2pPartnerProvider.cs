@@ -12,7 +12,7 @@ using Solid.Identity.Protocols.Saml2p.Logging;
 
 namespace Solid.Identity.Protocols.Saml2p.Providers
 {
-    public class Saml2pPartnerProvider
+    internal class Saml2pPartnerProvider
     {
         private Saml2pOptions _options;
         private ILogger<Saml2pPartnerProvider> _logger;

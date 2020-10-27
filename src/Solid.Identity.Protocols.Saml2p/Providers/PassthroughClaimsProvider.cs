@@ -18,7 +18,7 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
 
         public IEnumerable<ClaimDescriptor> ClaimTypesOffered => Enumerable.Empty<ClaimDescriptor>();
 
-        public async ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => partner.AllowClaimsPassthrough;
+        public ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => new ValueTask<bool>(partner.AllowClaimsPassthrough);
 
         public ValueTask<IEnumerable<Claim>> GenerateClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider _, string __)
             => new ValueTask<IEnumerable<Claim>>(identity.Claims);

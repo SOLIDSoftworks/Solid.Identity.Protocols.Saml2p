@@ -23,7 +23,7 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
             new ClaimDescriptor(ClaimTypes.AuthenticationMethod)
         };
 
-        public async ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => !partner.AllowClaimsPassthrough;
+        public ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => new ValueTask<bool>(!partner.AllowClaimsPassthrough);
 
         public ValueTask<IEnumerable<Claim>> GenerateClaimsAsync(ClaimsIdentity identity, ISaml2pServiceProvider _, string issuer)
         {

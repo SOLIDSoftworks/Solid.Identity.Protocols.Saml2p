@@ -10,7 +10,7 @@ using Solid.Identity.Protocols.Saml2p.Abstractions;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
-    public class SamlResponseFactory
+    internal class SamlResponseFactory
     {
         private Saml2pOptions _options;
 

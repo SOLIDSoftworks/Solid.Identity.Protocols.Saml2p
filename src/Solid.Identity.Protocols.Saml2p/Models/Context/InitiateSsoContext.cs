@@ -7,12 +7,29 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Models.Context
 {
+    /// <summary>
+    /// A context class used with <see cref="Saml2pIdentityProviderEvents.OnInitiateSso"/>.
+    /// </summary>
     public class InitiateSsoContext
     {
-        public string Id { get; internal set; }
+        /// <summary>
+        /// The partner id.
+        /// </summary>
         public string PartnerId { get; internal set; }
-        public ClaimsPrincipal User { get; internal set; }
+
+        /// <summary>
+        /// The Saml2p SP partner.
+        /// </summary>
         public ISaml2pServiceProvider Partner { get; internal set; }
-        public string ReturnUrl { get; internal set; }
+
+        /// <summary>
+        /// The return URL.
+        /// </summary>
+        public string ReturnUrl { get; set; }
+
+        /// <summary>
+        /// The authentication scheme to be used to authenticate the user.
+        /// </summary>
+        public string AuthenticationScheme { get; set; }
     }
 }

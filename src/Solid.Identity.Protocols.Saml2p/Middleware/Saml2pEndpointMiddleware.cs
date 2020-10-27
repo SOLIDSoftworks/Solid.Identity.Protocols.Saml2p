@@ -121,9 +121,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected async Task ChallengeAsync(HttpContext context, string returnUrl)
+        protected async Task ChallengeAsync(HttpContext context, AuthnRequest request, string returnUrl, string authenticationScheme = null)
         {
-            if (context.User.Identity.IsAuthenticated)
+            if (context.User.Identity.IsAuthenticated && request.ForceAuthn != true)
             {
                 context.Response.Redirect(returnUrl);
                 return;
@@ -133,7 +133,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             {
                 RedirectUri = returnUrl
             };
-            await context.ChallengeAsync(properties);
+            if (request.ProviderName != null)
+                properties.Items.Add(nameof(request.ProviderName), request.ProviderName);
+            if (string.IsNullOrEmpty(authenticationScheme))
+                await context.ChallengeAsync(properties);
+            else
+                await context.ChallengeAsync(authenticationScheme, properties);
         }
 
         protected string GenerateReturnUrl(HttpContext httpContext, string id)
@@ -188,32 +193,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
             if (StringValues.IsNullOrEmpty(value)) return null;
             return value.ToString();
-        }
-
-        private string Base64UrlEncode(byte[] bytes)
-        {
-            var padding = new[] { '=' };
-            var base64 = Convert.ToBase64String(bytes);
-            return base64
-                .TrimEnd(padding)
-                .Replace('+', '-')
-                .Replace('/', '_')
-            ;
-        }
-
-        private byte[] Base64UrlDecode(string base64UrlEncoded)
-        {
-            var base64 = base64UrlEncoded
-                .Replace('_', '/')
-                .Replace('-', '+')
-            ;
-            switch (base64UrlEncoded.Length % 4)
-            {
-                case 2: base64 += "=="; break;
-                case 3: base64 += "="; break;
-            }
-            var bytes = Convert.FromBase64String(base64);
-            return bytes;
         }
 
         protected void Trace(string prefix, AuthnRequest request)

@@ -84,7 +84,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             {
                 PartnerId = partnerId,
                 Partner = partner,
-                AuthnRequest = request
+                Request = request
             };
             await Events.InvokeAsync(Options, partner, e => e.OnStartSso(context.RequestServices, ssoContext));
 
@@ -108,7 +108,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             throw new ArgumentException($"Unsupported binding type: '{binding}'");
         }
 
-        private async Task RedirectAsync(HttpContext context, string base64, Uri destination, string relayState)
+        private Task RedirectAsync(HttpContext context, string base64, Uri destination, string relayState)
         {
             var queryBuilder = new StringBuilder();
             if (string.IsNullOrEmpty(destination.Query))
@@ -127,6 +127,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             var url = $"{destination}{queryBuilder.ToString()}";
 
             context.Response.Redirect(url, false);
+            return Task.CompletedTask;
         }
 
         private async Task PostAsync(HttpContext context, string base64, Uri destination, string relayState)

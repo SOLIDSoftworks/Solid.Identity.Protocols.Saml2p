@@ -4,7 +4,7 @@ using System.Text;
 
 namespace System.Xml
 {
-    public static class XmlDictionaryReaderExtensions
+    internal static class XmlDictionaryReaderExtensions
     {
         public static IEnumerable<XmlDictionaryReader> GetChildElementReaders(this XmlDictionaryReader reader)
         {

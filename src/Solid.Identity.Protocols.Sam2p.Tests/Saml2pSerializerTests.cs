@@ -32,7 +32,7 @@ namespace Solid.Identity.Protocols.Saml2p.Tests
             mockWriterFactory.Setup(f => f.CreateXmlWriter(It.IsAny<TextWriter>())).Returns<TextWriter>(w => XmlWriter.Create(w));
             var mockReaderFactory = new Mock<IXmlReaderFactory>();
             mockReaderFactory.Setup(f => f.CreateXmlReader(It.IsAny<TextReader>())).Returns<TextReader>(r => XmlReader.Create(r));
-            var mockLogger = new Mock<ILogger<Saml2pSerializer>>();
+            var mockLogger = new Mock<ILogger>();
             _serializer = new Saml2pSerializer(_mockHandler.Object, mockReaderFactory.Object, mockWriterFactory.Object, mockLogger.Object);
         }
 

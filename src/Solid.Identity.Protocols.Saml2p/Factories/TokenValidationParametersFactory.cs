@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
-    public class TokenValidationParametersFactory
+    internal class TokenValidationParametersFactory
     {
         private Saml2pOptions _options;
 

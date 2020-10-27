@@ -59,13 +59,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 PartnerId = partner.Id,
                 Partner = partner,
                 Request = request,
-                User = context.User,
                 ReturnUrl = GenerateReturnUrl(context, request.Id)
             };
 
             await Events.InvokeAsync(Options, partner, e => e.OnAcceptSso(context.RequestServices, ssoContext));
 
-            await ChallengeAsync(context, ssoContext.ReturnUrl);
+            await ChallengeAsync(context, request, ssoContext.ReturnUrl);
         }
     }
 }

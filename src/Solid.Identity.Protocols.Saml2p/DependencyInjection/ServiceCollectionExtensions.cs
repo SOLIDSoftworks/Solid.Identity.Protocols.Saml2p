@@ -25,65 +25,12 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class Solid_Identity_Protocols_Saml2p_ServiceCollectionExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
-        ///// <summary>
-        ///// Adds services for a local SAML2P service provider.
-        ///// </summary>
-        ///// <param name="services">The <see cref="IServiceCollection"/> instance to add the services to.</param>
-        ///// <param name="id">
-        ///// The name of the service provider configuration.
-        ///// <para><paramref name="id"/> is used to pre-configure <see cref="Saml2pProvider.Id"/> and <see cref="Saml2pProvider.Name"/>.</para>
-        ///// </param>
-        ///// <param name="configure">An action to configure <see cref="Saml2pServiceProviderOptions"/>.</param>
-        ///// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
-        //public static IServiceCollection AddSaml2pServiceProvider(this IServiceCollection services, string id, Action<Saml2pServiceProviderOptions> configure)
-        //{
-        //    services.TryAddTransient<TokenValidationParametersFactory>();
-        //    services.TryAddTransient<AuthnRequestFactory>();
-        //    services.TryAddTransient<ISaml2pServiceProviderService, Saml2pServiceProviderService>();
-
-        //    return services
-        //        .AddRequiredServices()
-        //        .Configure<Saml2pServiceProviderOptions>(id, sp =>
-        //        {
-        //            sp.Id = id;
-        //            sp.Name = id;
-        //        })
-        //        .Configure(id, configure)
-        //        .PostConfigure<Saml2pServiceProviderOptions>(id, PostConfigureLocalSaml2pServiceProvider)
-        //        .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<Saml2pServiceProviderOptions>>().Get(id))
-        //    ;
-        //}
-
-        ///// <summary>
-        ///// Adds services for a local SAML2P identity provider.
-        ///// </summary>
-        ///// <param name="services">The <see cref="IServiceCollection"/> instance to add the services to.</param>
-        ///// <param name="id">
-        ///// The name of the identity provider configuration.
-        ///// <para><paramref name="id"/> is used to pre-configure <see cref="Saml2pProvider.Id"/> and <see cref="Saml2pProvider.Name"/>.</para>
-        ///// </param>
-        ///// <param name="configure">An action to configure <see cref="Saml2pIdentityProviderOptions"/>.</param>
-        ///// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
-        //public static IServiceCollection AddSaml2pIdentityProvider(this IServiceCollection services, string id, Action<Saml2pIdentityProviderOptions> configure)
-        //{
-        //    //services.TryAddTransient<ISaml2pIdentityProviderService, Saml2pIdentityProviderService>();
-        //    services.TryAddTransient<SamlResponseFactory>();
-        //    services.TryAddTransient<ISecurityTokenDescriptorFactory, SecurityTokenDescriptorFactory>();
-        //    //services.TryAddScoped<IdentityProviderContext>();
-
-        //    return services
-        //        .AddRequiredServices()
-        //        .Configure<Saml2pIdentityProviderOptions>(id, idp =>
-        //        {
-        //            idp.Id = id;
-        //            idp.Name = id;
-        //        })
-        //        .Configure(id, configure)
-        //        .PostConfigure<Saml2pIdentityProviderOptions>(id, PostConfigureLocalSaml2IdentityProvider)
-        //        .AddTransient(p => p.GetRequiredService<IOptionsMonitor<Saml2pIdentityProviderOptions>>().Get(id))
-        //    ;
-        //}
-
+        /// <summary>
+        /// Adds Saml2p to <paramref name="services"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add Saml2p to.</param>
+        /// <param name="configure">An action to configure <see cref="Saml2pOptions"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
         public static IServiceCollection AddSaml2p(this IServiceCollection services, Action<Saml2pOptions> configure)
         {
             services.AddDistributedMemoryCache();
@@ -116,6 +63,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// Adds an implementation of <see cref="IServiceProviderClaimsProvider"/>.
+        /// <para>This service is registered in <see cref="ServiceLifetime.Transient"/> scope.</para>
+        /// </summary>
+        /// <typeparam name="TClaimStore">The type to register.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add service to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
         public static IServiceCollection AddSaml2pServiceProviderClaimStore<TClaimStore>(this IServiceCollection services)
             where TClaimStore : class, IServiceProviderClaimsProvider
         {
@@ -123,6 +77,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+
+        /// <summary>
+        /// Adds an implementation of <see cref="ISaml2pPartnerStore"/>.
+        /// <para>This service is registered in <see cref="ServiceLifetime.Transient"/> scope.</para>
+        /// </summary>
+        /// <typeparam name="TStore">The type to register.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add service to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance so that additional calls can be chained.</returns>
         public static IServiceCollection AddSaml2pPartnerStore<TStore>(this IServiceCollection services)
             where TStore : class, ISaml2pPartnerStore
         {

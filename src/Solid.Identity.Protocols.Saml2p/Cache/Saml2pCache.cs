@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Cache
 {
-    public class Saml2pCache
+    internal class Saml2pCache
     {
         private IDistributedCache _inner;
 

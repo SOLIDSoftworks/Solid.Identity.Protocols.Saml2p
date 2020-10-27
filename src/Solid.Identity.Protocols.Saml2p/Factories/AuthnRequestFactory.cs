@@ -13,17 +13,31 @@ using Solid.Identity.Protocols.Saml2p.Abstractions;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
+    /// <summary>
+    /// A factory for creating <see cref="AuthnRequest"/>s.
+    /// </summary>
     public class AuthnRequestFactory
     {
         private ISystemClock _systemClock;
         private Saml2pOptions _options;
 
+        /// <summary>
+        /// Creates an instance of <see cref="AuthnRequestFactory"/>.
+        /// </summary>
+        /// <param name="systemClock">An interface that abstracts the system clock.</param>
+        /// <param name="options">The current <see cref="Saml2pOptions" />.</param>
         public AuthnRequestFactory(ISystemClock systemClock, IOptions<Saml2pOptions> options)
         {
             _systemClock = systemClock;
             _options = options.Value;
         }
 
+        /// <summary>
+        /// Creates an instance of <see cref="AuthnRequest"/>.
+        /// </summary>
+        /// <param name="context">The current <see cref="HttpContext"/>.</param>
+        /// <param name="idp">The <see cref="ISaml2pIdentityProvider"/> to create the <see cref="AuthnRequest"/> for.</param>
+        /// <returns>An awaitable <see cref="Task{TResult}"/> of type <see cref="AuthnRequest"/>.</returns>
         public async Task<AuthnRequest> CreateAuthnRequestAsync(HttpContext context, ISaml2pIdentityProvider idp)
         {
             var request = new AuthnRequest

@@ -129,7 +129,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             throw new ArgumentException($"Unsupported binding type: '{binding}'");
         }
 
-        private async Task RedirectAsync(HttpContext context, string base64, Uri destination, string relayState)
+        private Task RedirectAsync(HttpContext context, string base64, Uri destination, string relayState)
         {
             var queryBuilder = new StringBuilder();
             if (string.IsNullOrEmpty(destination.Query))
@@ -148,6 +148,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             var url = $"{destination}{queryBuilder.ToString()}";
 
             context.Response.Redirect(url, false);
+            return Task.CompletedTask;
         }
 
         private async Task PostAsync(HttpContext context, string base64, Uri destination, string relayState)

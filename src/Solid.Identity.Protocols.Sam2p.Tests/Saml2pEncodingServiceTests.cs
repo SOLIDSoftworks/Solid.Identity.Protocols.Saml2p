@@ -32,7 +32,7 @@ namespace Solid.Identity.Protocols.Sam2p.Tests
             using (var stream = _encoder.Decode(encoded, BindingType.Redirect))
             {
                 var xml = new UTF8Encoding(false).GetString(stream.ToArray());
-                Assert.Equal(expected, xml);            
+                Assert.Equal(expected, xml);
             }
         }
         

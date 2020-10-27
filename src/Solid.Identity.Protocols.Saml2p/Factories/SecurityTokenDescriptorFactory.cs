@@ -19,7 +19,7 @@ using System.Security;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
-    public class SecurityTokenDescriptorFactory : ISecurityTokenDescriptorFactory
+    internal class SecurityTokenDescriptorFactory : ISecurityTokenDescriptorFactory
     {
         private Saml2pOptions _options;
         private IEnumerable<IServiceProviderClaimsProvider> _claimsProviders;
