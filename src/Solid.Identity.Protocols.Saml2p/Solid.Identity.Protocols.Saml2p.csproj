@@ -6,6 +6,18 @@
     <RootNamespace>Solid.Identity.Protocols.Saml2p</RootNamespace>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>    
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <Authors>gislikonrad</Authors>
+    <Copyright>© SOLID Softworks. All rights reserved.</Copyright>
+    <OutputTypeEx>library</OutputTypeEx>
+    <Product>Solid softworks saml2p for asp.net core.</Product>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p</RepositoryUrl>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
 
   <PropertyGroup>
     <DocumentationFile>Solid.Identity.Protocols.Saml2p.xml</DocumentationFile>
