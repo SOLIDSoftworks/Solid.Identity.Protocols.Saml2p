@@ -70,7 +70,10 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
             await Events.InvokeAsync(Options, partner, e => e.OnInitiateSso(context.RequestServices, ssoContext));
 
-            await ChallengeAsync(context, request, ssoContext.ReturnUrl);
+            if (ssoContext.AuthenticationScheme != null)
+                await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationScheme);
+            else
+                await ChallengeAsync(context, request, ssoContext.ReturnUrl);
         }
     }
 }

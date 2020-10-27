@@ -15,13 +15,13 @@ namespace Solid.Identity.Protocols.Saml2p.Options
     {
         /// <summary>
         /// This is run when an SP sends an <see cref="AuthnRequest"/> to your accept sso endpoint.
-        /// <para>You can manually replace <see cref="AcceptSsoContext.ReturnUrl"/> here.</para>
+        /// <para>You can manually set <see cref="AcceptSsoContext.AuthenticationScheme"/> and/or replace <see cref="AcceptSsoContext.ReturnUrl"/> here.</para>
         /// </summary>
         public Func<IServiceProvider, AcceptSsoContext, ValueTask> OnAcceptSso { get; set; } = (_, __) => new ValueTask();
 
         /// <summary>
         /// This is run before initiate SSO by sending a <see cref="SamlResponse"/> to an SP.
-        /// <para>You can manually replace <see cref="InitiateSsoContext.ReturnUrl"/> here.</para>
+        /// <para>You can manually set <see cref="AcceptSsoContext.AuthenticationScheme"/> and/or replace <see cref="InitiateSsoContext.ReturnUrl"/> here.</para>
         /// </summary>
         public Func<IServiceProvider, InitiateSsoContext, ValueTask> OnInitiateSso { get; set; } = (_, __) => new ValueTask();
 
