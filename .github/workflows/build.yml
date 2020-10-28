@@ -1,8 +1,10 @@
 name: build
 on:
   push:
-    branches:
-      - '!master'
+    branches-ignore:
+      - master
+    #paths:
+    #  - "src/**/*.*"
 env:
   version: 0.2.${{ github.run_number }}
   package_version: 0.2.${{ github.run_number }}-beta  
