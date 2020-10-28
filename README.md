@@ -6,7 +6,7 @@ A simple SAML2p protocol library for aspnetcore.
 ## Features
 - SSO
 - Multiple partner IDPs
-- Multiple parnter SPs
+- Multiple partner SPs
 - Global event handlers
 - Per partner event handlers
 - In-memory partner store
