@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master # Default release branch
+    paths:
+      - "src/**/*.*"
 
 env:
   version: 0.1.${{ github.run_number }}
