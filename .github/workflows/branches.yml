@@ -1,4 +1,4 @@
-name: build
+name: build_branch
 on:
   push:
     branches-ignore:
@@ -7,24 +7,26 @@ on:
     #  - ".workflows/**/*.*" 
     #  - "src/**/*.*"
 jobs:
-  build:
-    name: build
+  build_branch:
+    name: build_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: compute_version
+      - id: compute_package_version
+        name: Compute package version
         uses: craig-day/compute-tag@v10
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           #tag: # A manual tag to compute the next version of. If not specified, it will fetch the most recent tag for the repo.
-          version_type: patch
-      - name: compute_package_version
-        uses: craig-day/compute-tag@v10
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          #tag: # A manual tag to compute the next version of. If not specified, it will fetch the most recent tag for the repo.
-          version_type: patch
+          version_type: prerelease
           prerelease_suffix: beta
+      - id: compute_version
+        name: Compute version
+        uses: MeilCli/regex-match@v1.0.1
+        with:
+          regex_pattern: '\d.*?\.\d.*?\.\d.*?'
+          search_string: ${{ steps.compute_package_version.outputs.next_tag }}
+
       #- name: setup_dotnet
       #  uses: actions/setup-dotnet@v1
       #  with:
