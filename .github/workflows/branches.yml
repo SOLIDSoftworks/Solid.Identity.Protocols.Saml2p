@@ -26,6 +26,8 @@ jobs:
         with:
           regex_pattern: '\d.*?\.\d.*?\.\d.*?'
           search_string: ${{ steps.compute_package_version.outputs.next_tag }}
+      - name: Get version
+        run: echo "The version is ${{ steps.compute_version.outputs.matched_first }}"
 
       #- name: setup_dotnet
       #  uses: actions/setup-dotnet@v1
