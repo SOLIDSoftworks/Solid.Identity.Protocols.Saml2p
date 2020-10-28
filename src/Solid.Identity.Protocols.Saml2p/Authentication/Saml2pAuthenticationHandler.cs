@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using System.Security.Claims;
 using Solid.Identity.Protocols.Saml2p.Options;
+using Solid.Identity.Protocols.Saml2p.Exceptions;
 
 namespace Solid.Identity.Protocols.Saml2p.Authentication
 {
@@ -43,7 +44,8 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
             try
             {
                 var result = await Context.FinishSsoAsync();
-                if(!result.IsSuccessful)
+                if (!result.IsSuccessful)
+                    throw new SamlResponseException(result.PartnerId, result.Status, result.SubStatus);
 
                 var properties = new AuthenticationProperties
                 {

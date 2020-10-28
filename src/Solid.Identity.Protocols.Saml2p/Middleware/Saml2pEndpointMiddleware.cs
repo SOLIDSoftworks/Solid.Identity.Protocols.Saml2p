@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Cache;
+using Solid.Identity.Protocols.Saml2p.Logging;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using Solid.Identity.Protocols.Saml2p.Options;
@@ -193,6 +194,13 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
             if (StringValues.IsNullOrEmpty(value)) return null;
             return value.ToString();
+        }
+
+        protected void Trace(string prefix, string relayState, Status status)
+        {
+            if (!Logger.IsEnabled(LogLevel.Trace)) return;
+            var format = $"{prefix} | RelayState: '{{relayState}}'" + Environment.NewLine + "{request}";
+            Logger.LogTrace(format, relayState, new WrappedLogMessageState(status));
         }
 
         protected void Trace(string prefix, AuthnRequest request)

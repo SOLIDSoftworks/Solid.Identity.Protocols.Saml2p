@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Solid.Identity.Protocols.Saml2p.Models.Protocol;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,23 @@ namespace Solid.Identity.Protocols.Saml2p.Models
             }
 
             throw new ArgumentException($"Unsupported binding type: {bindingType}");
+        }
+
+        public static Status ToStatus(this SamlResponseStatus status, SamlResponseStatus? subStatus = null)
+        {
+            var s = new Status
+            {
+                StatusCode = new StatusCode
+                {
+                    Value = status.ToStatusUri()
+                }
+            };
+            if (subStatus != null)
+                s.StatusCode.SubCode = new StatusCode
+                {
+                    Value = subStatus.Value.ToStatusUri()
+                };
+            return s;
         }
 
         public static Uri ToStatusUri(this SamlResponseStatus status)

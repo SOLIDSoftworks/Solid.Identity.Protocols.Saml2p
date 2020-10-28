@@ -67,7 +67,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             
             if (!IsValid(ssoContext, out var status, out var subStatus) && status.HasValue)
             {
-                await Cache.CacheStatusAsync(request.Id, status.Value, subStatus);
+                Logger.LogWarning($"SAMLRequest failed validation. Resulting error: '{(subStatus ?? status)}'");
+                await Cache.CacheStatusAsync(request.Id, status.Value.ToStatus(subStatus));
                 context.Response.Redirect(ssoContext.ReturnUrl);
             }
             else if (ssoContext.AuthenticationScheme != null)

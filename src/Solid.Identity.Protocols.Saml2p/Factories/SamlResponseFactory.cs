@@ -20,6 +20,9 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         }
 
         public SamlResponse Create(ISaml2pServiceProvider partner, string authnRequestId = null, string relayState = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
+            => Create(partner, status.ToStatus(subStatus), authnRequestId: authnRequestId, relayState: relayState, token: token);
+        
+        public SamlResponse Create(ISaml2pServiceProvider partner, Status status, string authnRequestId = null, string relayState = null, Saml2SecurityToken token = null)
         {
             var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
             if (token != null)
@@ -34,11 +37,11 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var response = new SamlResponse
             {
                 Id = $"_{Guid.NewGuid()}", // TODO: create id factory
-                SecurityToken = token, 
+                SecurityToken = token,
                 Destination = destination,
                 IssueInstant = token?.Assertion.IssueInstant,
                 Issuer = partner.ExpectedIssuer ?? _options.DefaultIssuer,
-                Status = Convert(status, subStatus),
+                Status = status,
                 InResponseTo = authnRequestId,
                 RelayState = relayState
             };
@@ -46,30 +49,30 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             return response;
         }
 
-        private Status Convert(SamlResponseStatus status, SamlResponseStatus? subStatus)
-        {
-            var converted = new Status
-            {
-                StatusCode = new StatusCode
-                {
-                    Value = Convert(status)
-                }
-            };
+        //private Status Convert(SamlResponseStatus status, SamlResponseStatus? subStatus)
+        //{
+        //    var converted = new Status
+        //    {
+        //        StatusCode = new StatusCode
+        //        {
+        //            Value = Convert(status)
+        //        }
+        //    };
 
-            var sub = Convert(subStatus);
-            if (sub != null)
-                converted.StatusCode.SubCode = new StatusCode
-                {
-                    Value = sub
-                };
+        //    var sub = Convert(subStatus);
+        //    if (sub != null)
+        //        converted.StatusCode.SubCode = new StatusCode
+        //        {
+        //            Value = sub
+        //        };
 
-            return converted;
-        }
+        //    return converted;
+        //}
 
-        private Uri Convert(SamlResponseStatus? status)
-        {
-            if (status.HasValue) return status.Value.ToStatusUri();
-            return null;
-        }
+        //private Uri Convert(SamlResponseStatus? status)
+        //{
+        //    if (status.HasValue) return status.Value.ToStatusUri();
+        //    return null;
+        //}
     }
 }

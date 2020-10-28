@@ -62,7 +62,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
             var response = null as SamlResponse;
 
-            var status = await Cache.FetchStatusAsync(id);
             var user = context.User;
             var request = await Cache.FetchRequestAsync(id);
             if (request == null)
@@ -79,10 +78,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             //if (!partner.Enabled)
             //    throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
-            if (status.HasValue)
+            var status = await Cache.FetchStatusAsync(id);
+            if (status != null)
             {
-                var tuple = status.Value;
-                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, status: tuple.Status, subStatus: tuple.SubStatus);
+                Trace("Found cached Status.", request.RelayState, status);
+                response = _responseFactory.Create(partner, status, authnRequestId: request.Id, relayState: request.RelayState);
             }
             else if (user.Identity.IsAuthenticated)
             {
