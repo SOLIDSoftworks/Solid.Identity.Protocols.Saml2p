@@ -22,11 +22,14 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         public SamlResponse Create(ISaml2pServiceProvider partner, string authnRequestId = null, string relayState = null, SamlResponseStatus status = SamlResponseStatus.Success, SamlResponseStatus? subStatus = null, Saml2SecurityToken token = null)
         {
             var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
-            if (authnRequestId != null)
-                token.SetRecipient(destination, authnRequestId);
-            else
-                token.SetRecipient(destination);
-            token.SetNotOnOrAfter();
+            if (token != null)
+            {
+                if (authnRequestId != null)
+                    token.SetRecipient(destination, authnRequestId);
+                else
+                    token.SetRecipient(destination);
+                token.SetNotOnOrAfter();
+            }
 
             var response = new SamlResponse
             {
@@ -53,40 +56,20 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 }
             };
 
+            var sub = Convert(subStatus);
+            if (sub != null)
+                converted.StatusCode.SubCode = new StatusCode
+                {
+                    Value = sub
+                };
+
             return converted;
         }
 
         private Uri Convert(SamlResponseStatus? status)
-        { 
-            switch(status)
-            {
-                case SamlResponseStatus.Success: return Saml2pConstants.Statuses.Success;
-                case SamlResponseStatus.AuthnFailed: return Saml2pConstants.Statuses.AuthnFailed;
-            }
+        {
+            if (status.HasValue) return status.Value.ToStatusUri();
             return null;
-            //"urn:oasis:names:tc:SAML:2.0:status:Success"
-            //"urn:oasis:names:tc:SAML:2.0:status:Requester"
-            //"urn:oasis:names:tc:SAML:2.0:status:Responder"
-            //"urn:oasis:names:tc:SAML:2.0:status:VersionMismatch"
-            //"urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"
-            //"urn:oasis:names:tc:SAML:2.0:status:InvalidAttrNameOrValue"
-            //"urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"
-            //"urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext"
-            //"urn:oasis:names:tc:SAML:2.0:status:NoAvailableIDP"
-            //"urn:oasis:names:tc:SAML:2.0:status:NoPassive"
-            //"urn:oasis:names:tc:SAML:2.0:status:NoSupportedIDP"
-            //"urn:oasis:names:tc:SAML:2.0:status:PartialLogout"
-            //"urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded"
-            //"urn:oasis:names:tc:SAML:2.0:status:RequestDenied"
-            //"urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported"
-            //"urn:oasis:names:tc:SAML:2.0:status:RequestVersionDeprecated"
-            //"urn:oasis:names:tc:SAML:2.0:status:RequestVersionTooHigh"
-            //"urn:oasis:names:tc:SAML:2.0:status:RequestVersionTooLow"
-            //"urn:oasis:names:tc:SAML:2.0:status:ResourceNotRecognized"
-            //"urn:oasis:names:tc:SAML:2.0:status:TooManyResponses"
-            //"urn:oasis:names:tc:SAML:2.0:status:UnknownAttrProfile"
-            //"urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal"
-            //"urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding"
         }
     }
 }

@@ -43,6 +43,8 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
             try
             {
                 var result = await Context.FinishSsoAsync();
+                if(!result.IsSuccessful)
+
                 var properties = new AuthenticationProperties
                 {
                     IssuedUtc = result.SecurityToken.ValidFrom,

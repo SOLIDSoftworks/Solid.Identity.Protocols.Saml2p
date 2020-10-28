@@ -60,24 +60,31 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             if(StringValues.IsNullOrEmpty(id))
                 throw new InvalidOperationException($"Missing 'id' query parameter.");
 
+            var response = null as SamlResponse;
+
+            var status = await Cache.FetchStatusAsync(id);
             var user = context.User;
             var request = await Cache.FetchRequestAsync(id);
             if (request == null)
                 throw new SecurityException($"SAMLRequest not found for id: '{id}'");
+            
+            await Cache.RemoveAsync(id);
 
             Trace("Found cached SAMLRequest.", request);
-            var partnerId = request.Issuer;
-            var partner = await Partners.GetServiceProviderAsync(partnerId);
-
+            var partner = await Partners.GetServiceProviderAsync(request.Issuer);
+            
             if (partner == null)
-                throw new SecurityException($"Partner '{partnerId}' not found.");
+                throw new SecurityException($"Partner '{request.Issuer}' not found.");
 
-            if (!partner.Enabled)
-                throw new SecurityException($"Partner '{partnerId}' is disabled.");
+            //if (!partner.Enabled)
+            //    throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
-            var response = null as SamlResponse;
-
-            if (user.Identity.IsAuthenticated)
+            if (status.HasValue)
+            {
+                var tuple = status.Value;
+                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, status: tuple.Status, subStatus: tuple.SubStatus);
+            }
+            else if (user.Identity.IsAuthenticated)
             {
                 var descriptor = await _descriptorFactory.CreateSecurityTokenDescriptorAsync(user.Identity as ClaimsIdentity, partner);
                 var createSecurityTokenContext = new CreateSecurityTokenContext
@@ -99,25 +106,31 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             }
             else
             {
-                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, status: SamlResponseStatus.AuthnFailed);
+                response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, status: SamlResponseStatus.Responder, subStatus: SamlResponseStatus.AuthnFailed);
             }
+            
             var completeSsoContext = new CompleteSsoContext
             {
-                PartnerId = partner.Id,
+                PartnerId = request.Issuer,
                 Partner = partner,
                 Request = request,
                 Response = response
             };
             await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
-
-            if (!partner.SupportedBindings.Any())
-                throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
-
-            var binding = partner.SupportedBindings.First();
+            
+            var binding = Convert(request.ProtocolBinding) ??  partner.SupportedBindings.First();
             Trace($"Sending SAMLResponse using {binding} binding.", response);
 
             var destination = request.AssertionConsumerServiceUrl ?? new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
             await CompleteSsoAsync(context, response, destination, binding);
+        }
+
+        private BindingType? Convert(string protocolBinding)
+        {
+            if (protocolBinding == Saml2pConstants.Bindings.Post) return BindingType.Post;
+            if (protocolBinding == Saml2pConstants.Bindings.Redirect) return BindingType.Redirect;
+
+            return null;
         }
 
         private Task CompleteSsoAsync(HttpContext context, SamlResponse response, Uri destination, BindingType binding)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,38 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
             return _inner.SetAsync(key, json);
         }
 
+        public Task CacheStatusAsync(string key, SamlResponseStatus status)
+            => CacheStatusAsync(key, status, null);
+
+        public Task CacheStatusAsync(string key, SamlResponseStatus status, SamlResponseStatus? subStatus)
+            => CacheStatusAsync(key, (Status: status, SubStatus: subStatus));
+
+        private Task CacheStatusAsync(string key, (SamlResponseStatus Status, SamlResponseStatus? SubStatus) status)
+        {
+            var json = JsonSerializer.SerializeToUtf8Bytes(status);
+            return _inner.SetAsync($"{key}_status", json);
+        }
+
         public async Task<AuthnRequest> FetchRequestAsync(string key)
         {
             var json = await _inner.GetAsync(key);
             if (json == null) return null;
 
             return JsonSerializer.Deserialize<AuthnRequest>(json);
+        }
+
+        public async Task<(SamlResponseStatus Status, SamlResponseStatus? SubStatus)?> FetchStatusAsync(string key)
+        {
+            var json = await _inner.GetAsync($"{key}_status");
+            if (json == null) return null;
+
+            return JsonSerializer.Deserialize<(SamlResponseStatus Status, SamlResponseStatus? SubStatus)>(json);
+        }
+
+        public async Task RemoveAsync(string key)
+        {
+            await _inner.RemoveAsync(key);
+            await _inner.RemoveAsync($"{key}_status");
         }
     }
 }

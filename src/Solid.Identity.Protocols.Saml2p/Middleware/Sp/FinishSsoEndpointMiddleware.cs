@@ -87,11 +87,14 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if (!partner.Enabled)
                 throw new SecurityException($"Partner idp '{partnerId}' is disabled.");
-
+            
             var request = null as AuthnRequest;
 
             if (response.InResponseTo != null)
+            {
                 request = await Cache.FetchRequestAsync(response.InResponseTo);
+                await Cache.RemoveAsync(response.InResponseTo);
+            }
 
             if (request == null && !partner.CanInitiateSso)
                 throw new SecurityException($"Partner idp '{partnerId}' is is not allowed to initiate SSO.");
@@ -114,6 +117,10 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             await Events.InvokeAsync(Options, partner, e => e.OnFinishSso(context.RequestServices, ssoContext));
 
+            if (response.Status.StatusCode.Value != Saml2pConstants.Statuses.Success)
+            {
+                return FinishSsoResult.Fail(partner.Id, response.Status.StatusCode.Value, response.Status.StatusCode?.SubCode.Value);
+            }
             var parameters = _factory.Create(partner);
             var validateContext = new ValidateTokenContext
             {
@@ -124,7 +131,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 TokenValidationParameters = parameters,
                 Handler = _handler
             };
-
             await Events.InvokeAsync(Options, partner, e => e.OnValidatingToken(context.RequestServices, validateContext));
 
             if (validateContext.Subject != null && validateContext.SecurityToken == null ||
@@ -151,7 +157,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             await Events.InvokeAsync(Options, partner, e => e.OnValidatedToken(context.RequestServices, validateContext));
 
             context.User = validateContext.Subject;
-            return FinishSsoResult.Success(validateContext.SecurityToken, validateContext.Subject);
+
+            return FinishSsoResult.Success(partner.Id, validateContext.SecurityToken, validateContext.Subject);
         }
     }
 }

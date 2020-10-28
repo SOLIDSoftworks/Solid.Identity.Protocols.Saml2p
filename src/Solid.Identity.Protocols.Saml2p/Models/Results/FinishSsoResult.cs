@@ -17,33 +17,53 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// <summary>
         /// Creates a success result.
         /// </summary>
+        /// <param name="partnerId">The id of the Saml2p SSO partner.</param>
         /// <param name="token">The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.</param>
         /// <param name="subject">The <see cref="ClaimsPrincipal"/> that was created from <paramref name="token"/>.</param>
         /// <returns>A success result.</returns>
-        public static FinishSsoResult Success(Saml2SecurityToken token, ClaimsPrincipal subject)
+        public static FinishSsoResult Success(string partnerId, Saml2SecurityToken token, ClaimsPrincipal subject)
         {
             return new FinishSsoResult
             {
+                Status = Saml2pConstants.Statuses.Success,
+                PartnerId = partnerId,
                 SecurityToken = token,
                 Subject = subject
             };
         }
 
+        ///// <summary>
+        ///// Creates a failure result.
+        ///// </summary>
+        ///// <returns>A failure result.</returns>
+        //public static FinishSsoResult Fail()
+        //{
+        //    return new FinishSsoResult
+        //    {
+        //    };
+        //}
+
         /// <summary>
-        /// Creates a failure result.
+        /// Creates a failure result with a status.
         /// </summary>
+        /// <param name="partnerId">The id of the Saml2p SSO partner.</param>
+        /// <param name="status">The status of the SSO result.</param>
+        /// <param name="subStatus">The substatus of the SSO result.</param>
         /// <returns>A failure result.</returns>
-        public static FinishSsoResult Fail()
+        public static FinishSsoResult Fail(string partnerId, Uri status, Uri subStatus)
         {
             return new FinishSsoResult
             {
+                PartnerId = partnerId,
+                Status = status,
+                SubStatus = subStatus
             };
         }
 
         /// <summary>
         /// Indicates whether the result is successful.
         /// </summary>
-        public bool IsSuccessful => SecurityToken != null && Subject != null;
+        public bool IsSuccessful => Status == Saml2pConstants.Statuses.Success;
 
         /// <summary>
         /// The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.
@@ -54,5 +74,20 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// The <see cref="ClaimsPrincipal"/> that was created from <see cref="SecurityToken"/>.
         /// </summary>
         public ClaimsPrincipal Subject { get; private set; }
+
+        /// <summary>
+        /// The status of the SSO response.
+        /// </summary>
+        public Uri Status { get; private set; }
+
+        /// <summary>
+        /// The substatus of the SSO response.
+        /// </summary>
+        public Uri SubStatus { get; private set; }
+
+        /// <summary>
+        /// The id of the Saml2p SSO partner.
+        /// </summary>
+        public string PartnerId { get; private set; }
     }
 }

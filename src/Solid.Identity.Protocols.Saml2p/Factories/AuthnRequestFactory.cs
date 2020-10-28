@@ -43,7 +43,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var request = new AuthnRequest
             {
                 Id = $"_{Guid.NewGuid()}",
-                ProviderName = idp.Id,
+                // TODO: have some sort of providername default
+                ProviderName = idp.ExpectedIssuer ?? _options.DefaultIssuer,
                 AssertionConsumerServiceUrl = GetAcsUrl(context.Request),
                 IssueInstant = _systemClock.UtcNow.UtcDateTime,
                 Issuer = idp.ExpectedIssuer ?? _options.DefaultIssuer,

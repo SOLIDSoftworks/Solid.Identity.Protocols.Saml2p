@@ -53,6 +53,8 @@ namespace AspNetCore.IdpSample
 
                         sp.SupportedBindings.Clear();
                         sp.SupportedBindings.Add(BindingType.Post);
+
+                        sp.Enabled = false;
                     });
                 })
             ;

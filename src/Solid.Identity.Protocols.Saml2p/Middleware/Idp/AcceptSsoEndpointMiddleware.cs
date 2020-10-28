@@ -15,6 +15,8 @@ using Solid.Identity.Protocols.Saml2p.Cache;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Services;
+using Solid.Identity.Protocols.Saml2p.Models;
+using Microsoft.IdentityModel.Tokens.Saml2;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
@@ -41,33 +43,81 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             
             Logger.LogInformation("Accepting SAML2P authentication (IDP flow).");
             Trace($"Received SAMLRequest using {binding} binding.", request);
-            var partnerId = request.Issuer;
-            var partner = await Partners.GetServiceProviderAsync(partnerId);
+            var partner = await Partners.GetServiceProviderAsync(request.Issuer);
 
             if (partner == null)
-                throw new SecurityException($"Partner '{partnerId}' not found.");
+                throw new SecurityException($"Partner '{request.Issuer}' not found.");
 
-            if (!partner.Enabled)
-                throw new SecurityException($"Partner '{partnerId}' is disabled.");
+            //if (!partner.Enabled)
+            //    throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
-            if (!partner.CanInitiateSso)
-                throw new SecurityException($"Partner '{partnerId}' is not allowed to initiate SSO.");
+            //if (!partner.CanInitiateSso)
+            //    throw new SecurityException($"Partner '{partnerId}' is not allowed to initiate SSO.");
 
             await Cache.CacheRequestAsync(request.Id, request);
             var ssoContext = new AcceptSsoContext
             {
-                PartnerId = partner.Id,
+                PartnerId = request.Issuer,
                 Partner = partner,
                 Request = request,
                 ReturnUrl = GenerateReturnUrl(context, request.Id)
             };
 
             await Events.InvokeAsync(Options, partner, e => e.OnAcceptSso(context.RequestServices, ssoContext));
-
-            if(ssoContext.AuthenticationScheme != null)
+            
+            if (!IsValid(ssoContext, out var status, out var subStatus) && status.HasValue)
+            {
+                await Cache.CacheStatusAsync(request.Id, status.Value, subStatus);
+                context.Response.Redirect(ssoContext.ReturnUrl);
+            }
+            else if (ssoContext.AuthenticationScheme != null)
                 await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationScheme);
             else
                 await ChallengeAsync(context, request, ssoContext.ReturnUrl);
+        }
+
+        // TODO: extract this to a validator class and test it
+        private bool IsValid(AcceptSsoContext context, out SamlResponseStatus? status, out SamlResponseStatus? subStatus)
+        {
+            if(context.Request.Version != Saml2Constants.Version)
+            {
+                status = SamlResponseStatus.VersionMismatch;
+                subStatus = null;
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(context.Request.ProtocolBinding) && 
+                Options.SupportedBindings.Select(b => b.ToProtocolBindingString()).Any(b => b == context.Request.ProtocolBinding))
+            {
+                status = SamlResponseStatus.Requester;
+                subStatus = SamlResponseStatus.UnsupportedBinding;
+                return false;
+            }
+
+            if (context.Partner == null)
+            {
+                status = SamlResponseStatus.Requester;
+                subStatus = SamlResponseStatus.RequestDenied;
+                return false;
+            }
+
+            if (!context.Partner.Enabled || !context.Partner.CanInitiateSso)
+            {
+                status = SamlResponseStatus.Requester;
+                subStatus = SamlResponseStatus.RequestDenied;
+                return false;
+            }
+
+            if (!context.Partner.SupportedBindings.Any())
+            {
+                status = SamlResponseStatus.Responder;
+                subStatus = SamlResponseStatus.UnsupportedBinding;
+                return false;
+            }
+
+            status = null;
+            subStatus = null;
+            return true;
         }
     }
 }
