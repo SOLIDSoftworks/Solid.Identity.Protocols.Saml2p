@@ -1,0 +1,30 @@
+name: build and test
+on:
+  push:
+    branches:
+      - !master
+env:
+  version: 0.1.${{ github.run_number }}
+  package_version: 0.1.${{ github.run_number }}-beta  
+
+jobs:
+  publish:
+    name: build, test, pack, & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.200      
+      - name: set dotnet roll forward
+        uses: allenevans/set-env@v1.0.0
+        with:
+          DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
+          
+      - name: Install dependencies
+        run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
+      - name: Build
+        run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ env.version }}
+      - name: Test
+        run: dotnet test ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore --no-build
