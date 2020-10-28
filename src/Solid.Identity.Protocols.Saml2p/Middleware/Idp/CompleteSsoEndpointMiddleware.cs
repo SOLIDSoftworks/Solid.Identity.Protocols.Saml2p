@@ -67,8 +67,6 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             if (request == null)
                 throw new SecurityException($"SAMLRequest not found for id: '{id}'");
             
-            await Cache.RemoveAsync(id);
-
             Trace("Found cached SAMLRequest.", request);
             var partner = await Partners.GetServiceProviderAsync(request.Issuer);
             
@@ -79,6 +77,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             //    throw new SecurityException($"Partner '{partnerId}' is disabled.");
 
             var status = await Cache.FetchStatusAsync(id);
+            await Cache.RemoveAsync(id);
             if (status != null)
             {
                 Trace("Found cached Status.", request.RelayState, status);
