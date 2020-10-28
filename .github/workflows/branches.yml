@@ -15,12 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      # Get latest tag
+      # perform semver coerce
+      # increment patch
+      # create package_version that adds optional prerelease
       - id: compute_version
         name: Compute version
         uses: craig-day/compute-tag@v10
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          #tag: # A manual tag to compute the next version of. If not specified, it will fetch the most recent tag for the repo.
           version_type: patch          
       - id: compute_package_version
         name: Compute package version
