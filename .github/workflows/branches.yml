@@ -24,7 +24,7 @@ jobs:
         name: Compute version
         uses: MeilCli/regex-match@v1.0.1
         with:
-          regex_pattern: '\d.*?\.\d.*?\.\d.*?'
+          regex_pattern: '\d+\.\d+\.\d+'
           search_string: ${{ steps.compute_package_version.outputs.next_tag }}
       - name: Get version
         run: echo "The version is ${{ steps.compute_version.outputs.matched_first }}"
