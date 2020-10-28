@@ -49,10 +49,10 @@ namespace Solid.Identity.Protocols.Saml2p
             public const string UnsupportedBindingString = Namespaces.StatusNamespace + ":UnsupportedBinding";
 
             public static readonly Uri Success = new Uri(SuccessString);
-            public static readonly Uri Requester = new Uri(SuccessString);
-            public static readonly Uri Responder = new Uri(SuccessString);
-            public static readonly Uri VersionMismatch = new Uri(SuccessString);
-            public static readonly Uri AuthnFailed = new Uri(SuccessString);
+            public static readonly Uri Requester = new Uri(RequesterString);
+            public static readonly Uri Responder = new Uri(ResponderString);
+            public static readonly Uri VersionMismatch = new Uri(VersionMismatchString);
+            public static readonly Uri AuthnFailed = new Uri(AuthnFailedString);
             public static readonly Uri InvalidAttrNameOrValue = new Uri(InvalidAttrNameOrValueString);
             public static readonly Uri InvalidNameIDPolicy = new Uri(InvalidNameIDPolicyString);
             public static readonly Uri NoAuthnContext = new Uri(NoAuthnContextString);
