@@ -24,11 +24,11 @@ jobs:
           version_type: patch          
       - id: compute_package_version
         name: Compute package version
-        run: echo '::set-output name=package_version::${{ steps.compute_package_version.outputs.next_tag }}${{ env.prerelease }}'
+        run: echo "::set-output name=package_version::${{ steps.compute_version.outputs.next_tag }}${{ env.prerelease }}"
           
       
       - name: Get version
-        run: echo "The version is ${{ steps.compute_version.outputs.package_version }}"
+        run: echo "The version is ${{ steps.compute_package_version.outputs.package_version }}"
 
       #- name: setup_dotnet
       #  uses: actions/setup-dotnet@v1
