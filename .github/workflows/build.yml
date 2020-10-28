@@ -2,10 +2,10 @@ name: build and test
 on:
   push:
     branches:
-      - !master
+      - '!master'
 env:
-  version: 0.1.${{ github.run_number }}
-  package_version: 0.1.${{ github.run_number }}-beta  
+  version: 0.2.${{ github.run_number }}
+  package_version: 0.2.${{ github.run_number }}-beta  
 
 jobs:
   publish:
@@ -13,6 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Compute Tag
+        uses: craig-day/compute-tag@v10
+        with:
+          github_token: '{{ github.token }}'
+          #tag: # A manual tag to compute the next version of. If not specified, it will fetch the most recent tag for the repo.
+          version_type: prerelease
+          prerelease_suffix: beta
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
