@@ -8,11 +8,12 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Authors>gislikonrad</Authors>
+    <Authors>solidsoftworks,gislikonrad</Authors>
     <Copyright>© SOLID Softworks. All rights reserved.</Copyright>
     <OutputTypeEx>library</OutputTypeEx>
     <Product>Solid softworks saml2p for asp.net core.</Product>
-    <PackageTags>authentication saml2p idp sp identity identityprovider serviceprovider saml2 aspnetcore</PackageTags>
+    <PackageTags>authentication saml2p idp sp identity identityprovider serviceprovider saml2 aspnetcore sso</PackageTags>
+    <Description>A simple SAML2p protocol library for aspnetcore.</Description>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p</RepositoryUrl>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
+using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,11 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// The requested authentication type from the IDP partner.
         /// </summary>
         Uri RequestedAuthnContextClassRef { get; }
+        
+        /// <summary>
+        /// The comparison the IDP partner should use when choosing an authentication type.
+        /// </summary>
+        Comparison RequestedAuthnContextClassRefComparison { get; }
 
         /// <summary>
         /// The endpoint on the IDP partner service that is used when starting SSO.

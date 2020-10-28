@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens.Saml2;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
+using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -32,6 +33,9 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         /// <inheritdoc/>
         public Uri RequestedAuthnContextClassRef { get; set; } = Saml2pConstants.Classes.Unspecified;
+
+        /// <inheritdoc/>
+        public Comparison RequestedAuthnContextClassRefComparison { get; set; } = Comparison.Exact;
 
         /// <inheritdoc/>
         public PathString AcceptSsoEndpoint { get; set; }

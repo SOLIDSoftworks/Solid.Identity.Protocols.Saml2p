@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Solid.Identity.Protocols.Saml2p;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Options;
 
@@ -44,6 +46,15 @@ namespace AspNetCore.IdpSample
                 .AddSaml2p(options =>
                 {
                     options.DefaultIssuer = "https://localhost:5001/saml";
+                    options.IdentityProviderEvents.OnAcceptSso = (services, context) =>
+                    {
+                        if (context.Request.RequestedAuthnContext?.AuthnContextClassRef == Saml2pConstants.Classes.Kerberos)
+                        {
+                            context.AuthenticationScheme = "FauxKerberos";
+                            context.AuthenticationPropertyItems.Add(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.KerberosString);
+                        }
+                        return new ValueTask();
+                    };
                     options.AddServiceProvider("https://localhost:5003/saml", sp =>
                     {
                         sp.BaseUrl = new Uri("https://localhost:5003");
@@ -53,8 +64,6 @@ namespace AspNetCore.IdpSample
 
                         sp.SupportedBindings.Clear();
                         sp.SupportedBindings.Add(BindingType.Post);
-
-                        sp.Enabled = false;
                     });
                 })
             ;
@@ -65,6 +74,10 @@ namespace AspNetCore.IdpSample
                 {
                     o.LoginPath = "/login";
                     o.Cookie.Name = "Cookie.Idp";
+                })
+                .AddCookie("FauxKerberos", o =>
+                {
+                    o.LoginPath = "/fauxkerberos";
                 })
             ;
 

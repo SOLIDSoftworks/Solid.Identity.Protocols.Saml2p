@@ -37,5 +37,10 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
         /// The authentication scheme to be used to authenticate the user.
         /// </summary>
         public string AuthenticationScheme { get; set; }
+
+        /// <summary>
+        /// The authentication property items that can be used during the challenge.
+        /// </summary>
+        public IDictionary<string, string> AuthenticationPropertyItems { get; } = new Dictionary<string, string>();
     }
 }

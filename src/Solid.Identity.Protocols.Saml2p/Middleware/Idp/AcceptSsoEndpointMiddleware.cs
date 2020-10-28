@@ -72,9 +72,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 context.Response.Redirect(ssoContext.ReturnUrl);
             }
             else if (ssoContext.AuthenticationScheme != null)
-                await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationScheme);
+                await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationPropertyItems, ssoContext.AuthenticationScheme);
             else
-                await ChallengeAsync(context, request, ssoContext.ReturnUrl);
+                await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationPropertyItems);
         }
 
         // TODO: extract this to a validator class and test it

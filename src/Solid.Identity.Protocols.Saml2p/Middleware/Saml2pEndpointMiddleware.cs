@@ -122,7 +122,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected async Task ChallengeAsync(HttpContext context, AuthnRequest request, string returnUrl, string authenticationScheme = null)
+        protected async Task ChallengeAsync(HttpContext context, AuthnRequest request, string returnUrl, IDictionary<string, string> items, string authenticationScheme = null)
         {
             if (context.User.Identity.IsAuthenticated && request.ForceAuthn != true)
             {
@@ -130,7 +130,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 return;
             }
 
-            var properties = new AuthenticationProperties
+            var properties = new AuthenticationProperties(items)
             {
                 RedirectUri = returnUrl
             };

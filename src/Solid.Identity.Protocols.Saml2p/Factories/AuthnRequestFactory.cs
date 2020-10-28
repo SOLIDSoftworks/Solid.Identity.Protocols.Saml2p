@@ -55,7 +55,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 },
                 RequestedAuthnContext = new RequestedAuthnContext
                 {
-                    AuthnContextClassRef = idp.RequestedAuthnContextClassRef
+                    AuthnContextClassRef = idp.RequestedAuthnContextClassRef,
+                    Comparison = idp.RequestedAuthnContextClassRefComparison
                 }
             };
             var generateContext = new GenerateRelayStateContext

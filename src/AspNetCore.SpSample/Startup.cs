@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Solid.Identity.Protocols.Saml2p;
 using Solid.Identity.Protocols.Saml2p.Authentication;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Options;
@@ -47,12 +50,12 @@ namespace AspNetCore.SpSample
                     options.DefaultIssuer = "https://localhost:5003/saml";
                     options.AddIdentityProvider("https://localhost:5001/saml", idp =>
                     {
-                        idp.BaseUrl = new Uri("https://localhost:5001");                        
+                        idp.BaseUrl = new Uri("https://localhost:5001");
                         idp.AcceptSsoEndpoint = "/saml/sso";
                         idp.CanInitiateSso = true;
+                        idp.RequestedAuthnContextClassRef = Saml2pConstants.Classes.Kerberos;
                         idp.AssertionSigningKeys.Add(new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64))));
                         //idp.Events.OnGeneratingRelayState = (provider, context) => new ValueTask();
-                        //idp.Events.OnStartSso += (provider, context) => new ValueTask();
                         //idp.Events.OnValidatingToken = ValidatingToken;
                         //idp.Events.OnValidatingToken += (provider, context) => new ValueTask();
                     });
@@ -62,9 +65,7 @@ namespace AspNetCore.SpSample
             services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = Saml2pAuthenticationDefaults.AuthenticationScheme;
                 })
                 .AddCookie(o =>
