@@ -15,25 +15,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Compute Tag
+      - name: compute_tag
         uses: craig-day/compute-tag@v10
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           #tag: # A manual tag to compute the next version of. If not specified, it will fetch the most recent tag for the repo.
           version_type: prerelease
           prerelease_suffix: beta
-      #- name: Setup dotnet
+      #- name: setup_dotnet
       #  uses: actions/setup-dotnet@v1
       #  with:
       #    dotnet-version: 3.1.200      
-      #- name: set dotnet roll forward
+      #- name: set_dotnet_roll_forward
       #  uses: allenevans/set-env@v1.0.0
       #  with:
       #    DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
       #    
-      #- name: Install dependencies
+      #- name: install_dependencies
       #  run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
-      #- name: Build
+      #- name: build
       #  run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ env.version }}
-      #- name: Test
+      #- name: test
       #  run: dotnet test ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore --no-build
