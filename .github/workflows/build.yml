@@ -1,4 +1,4 @@
-name: build and test
+name: build
 on:
   push:
     branches:
@@ -8,8 +8,8 @@ env:
   package_version: 0.2.${{ github.run_number }}-beta  
 
 jobs:
-  publish:
-    name: build, test, pack, & publish
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
