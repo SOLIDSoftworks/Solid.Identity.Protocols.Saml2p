@@ -44,6 +44,9 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public ICollection<SecurityKey> AssertionSigningKeys { get; internal set; } = new List<SecurityKey>();
 
         /// <inheritdoc/>
+        public ICollection<SecurityKey> AssertionDecryptionKeys { get; internal set; } = new List<SecurityKey>();
+
+        /// <inheritdoc/>
         public Uri BaseUrl { get; set; }
 
         /// <inheritdoc/>
