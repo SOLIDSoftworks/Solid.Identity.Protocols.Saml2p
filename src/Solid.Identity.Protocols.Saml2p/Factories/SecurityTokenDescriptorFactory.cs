@@ -110,41 +110,35 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 NotBefore = issuedAt.Subtract(tolerence),
                 Expires = expires,
                 SigningCredentials = GetSigningCredentials(partner),
-                //EncryptingCredentials = GetEncryptingCredentials(partner)
+                EncryptingCredentials = GetEncryptingCredentials(partner)
             };
 
             return descriptor;
         }
 
-        //private EncryptingCredentials GetEncryptingCredentials(ISaml2pServiceProvider partner)
-        //{
-        //    if (!partner.RequiresEncryptedAssertion) return null;
-        //    if (partner.AssertionEncryptionKey == null) 
-        //        throw new ArgumentNullException(nameof(partner.AssertionEncryptionKey));
+        private EncryptingCredentials GetEncryptingCredentials(ISaml2pServiceProvider partner)
+        {
+            if (!partner.RequiresEncryptedAssertion) return null;
 
-        //    if(string.IsNullOrWhiteSpace(partner.AssertionEncryptionKeyWrapAlgorithm))
-        //    {
-        //        if (!(partner.AssertionEncryptionKey is SymmetricSecurityKey symmetric))
-        //            throw new ArgumentException($"{nameof(partner.AssertionEncryptionKey)} must be a {nameof(SymmetricSecurityKey)} if no {nameof(partner.AssertionEncryptionKeyWrapAlgorithm)} is provided.");
-        //        return new EncryptingCredentials(symmetric, partner.AssertionEncryptionAlgorithm);
-        //    }
+            if (partner.AssertionEncryptionKey == null)
+                throw new ArgumentNullException(nameof(partner.AssertionEncryptionKey));
 
-        //    return new EncryptingCredentials(partner.AssertionEncryptionKey, partner.AssertionEncryptionKeyWrapAlgorithm, partner.AssertionEncryptionAlgorithm);
-        //}
+            if (partner.AssertionEncryptionMethod == null)
+                throw new ArgumentNullException(nameof(partner.AssertionEncryptionMethod));
+
+            var credentials = partner.AssertionEncryptionMethod.CreateCredentials(partner.AssertionEncryptionKey);
+            Trace("Encrypting credentials created.", credentials);
+            return credentials;
+        }
 
         private SigningCredentials GetSigningCredentials(ISaml2pServiceProvider partner)
         {
             if (partner.AssertionSigningKey == null)
                 throw new ArgumentNullException(nameof(partner.AssertionSigningKey));
-            if (string.IsNullOrWhiteSpace(partner.AssertionSigningAlgorithm))
-                throw new ArgumentNullException(nameof(partner.AssertionSigningAlgorithm));
+            if(partner.AssertionSigningMethod == null)
+                throw new ArgumentNullException(nameof(partner.AssertionSigningMethod));
 
-            var credentials = null as SigningCredentials;
-            if (string.IsNullOrWhiteSpace(partner.AssertionSigningDigestAlgorithm))
-                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm);
-            else
-                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm, partner.AssertionSigningDigestAlgorithm);
-
+            var credentials = partner.AssertionSigningMethod.CreateCredentials(partner.AssertionSigningKey);
             Trace("Signing credentials created.", credentials);
             return credentials;
         }

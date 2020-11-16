@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Options;
+using Solid.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,14 +26,9 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         SecurityKey AssertionSigningKey { get; }
 
         /// <summary>
-        /// The algorithm used to sign the Saml2 assertion.
+        /// The <see cref="SignatureMethod"/> used to sign the Saml2 assertion.
         /// </summary>
-        string AssertionSigningAlgorithm { get; }
-
-        /// <summary>
-        /// The algorithm used to digest the Saml2 assertion.
-        /// </summary>
-        string AssertionSigningDigestAlgorithm { get; }
+        SignatureMethod AssertionSigningMethod { get; }
 
         /// <summary>
         /// The lifetime of the created Saml2 assertion.
@@ -64,10 +60,21 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// </summary>
         bool AllowClaimsPassthrough { get; }
 
-        //SecurityKey AssertionEncryptionKey { get; }
-        //string AssertionEncryptionAlgorithm { get; }
-        //string AssertionEncryptionKeyWrapAlgorithm { get; }
-        //bool RequiresEncryptedAssertion { get; }
+        /// <summary>
+        /// The <see cref="SecurityKey"/> used to encrypt the Saml2 assertion.
+        /// </summary>
+        SecurityKey AssertionEncryptionKey { get; }
+
+        /// <summary>
+        /// The <see cref="EncryptionMethod"/> used to encrypt the Saml2 assertion.
+        /// </summary>
+        EncryptionMethod AssertionEncryptionMethod { get; }
+
+        /// <summary>
+        /// A flag indicating whether encryption is required.
+        /// </summary>
+        bool RequiresEncryptedAssertion { get; }
+
         //SecurityKey ResponseSigningKey { get; }
         //string ResponseSigningAlgorithm { get; }
         //string ResponseDigestAlgorithm { get; }

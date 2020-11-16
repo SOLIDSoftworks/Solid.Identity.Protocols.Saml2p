@@ -30,6 +30,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             if (parameters.ValidateIssuerSigningKey)
                 parameters.IssuerSigningKeys = partner.AssertionSigningKeys;
 
+            parameters.TokenDecryptionKeys = partner.AssertionDecryptionKeys;
+
             return parameters;
         }
     }

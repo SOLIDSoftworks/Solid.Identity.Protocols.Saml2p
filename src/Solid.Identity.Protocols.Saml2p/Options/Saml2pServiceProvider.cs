@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Models.Context;
+using Solid.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -53,23 +54,17 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public TimeSpan? MaxClockSkew { get; set; }
 
         /// <inheritdoc/>
-        public string AssertionSigningAlgorithm { get; set; } = SecurityAlgorithms.RsaSha256Signature;
+        public SignatureMethod AssertionSigningMethod { get; set; } = SignatureMethod.RsaSha256;
 
         /// <inheritdoc/>
-        public string AssertionSigningDigestAlgorithm { get; set; } = SecurityAlgorithms.Sha256Digest;
+        public SecurityKey AssertionEncryptionKey { get; set; }
 
-        ///// <inheritdoc/>
-        //public SecurityKey AssertionEncryptionKey { get; set; }
+        /// <inheritdoc/>
+        public EncryptionMethod AssertionEncryptionMethod { get; set; }
 
-        ///// <inheritdoc/>
-        //public string AssertionEncryptionAlgorithm { get; set; } = SecurityAlgorithms.Aes128Encryption;
+        /// <inheritdoc/>
+        public bool RequiresEncryptedAssertion { get; set; } = false;
 
-        ///// <inheritdoc/>
-        //public string AssertionEncryptionKeyWrapAlgorithm { get; set; } = SecurityAlgorithms.RsaOaepKeyWrap;
-
-        ///// <inheritdoc/>
-        //public bool RequiresEncryptedAssertion { get; set; } = false;
-        
         /// <inheritdoc/>
         public bool CanInitiateSso { get; set; } = true;
 
