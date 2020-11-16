@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Solid.Identity.Protocols.Saml2p.Middleware;
 using Solid.Identity.Protocols.Saml2p.Middleware.Idp;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -27,6 +28,8 @@ namespace Microsoft.AspNetCore.Builder
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path)
         {
             var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
+            var crypto = builder.ApplicationServices.GetRequiredService<CryptoProviderFactory>();
+            CryptoProviderFactory.Default = crypto;
             return builder
                 .Map(path.Add(options.AcceptPath), b => b.UseAcceptSsoEndpoint(path))
                 .Map(path.Add(options.InitiatePath), b => b.UseInitiateSsoEndpoint(path))

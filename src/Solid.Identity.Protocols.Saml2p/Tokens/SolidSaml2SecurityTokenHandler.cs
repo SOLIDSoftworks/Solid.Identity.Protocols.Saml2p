@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
+using Solid.IdentityModel.Tokens.Saml2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,13 @@ using System.Xml;
 
 namespace Solid.Identity.Tokens.Saml2
 {
-    internal class SolidSaml2SecurityTokenHandler : Saml2SecurityTokenHandler
+    internal class SolidSaml2SecurityTokenHandler : Saml2EncryptedSecurityTokenHandler
     {
-        public SolidSaml2SecurityTokenHandler() : this(new SolidSaml2Serializer())
+        public SolidSaml2SecurityTokenHandler() : base()
         {
         }
-        public SolidSaml2SecurityTokenHandler(Saml2Serializer serializer)
+        public SolidSaml2SecurityTokenHandler(Saml2Serializer serializer) : base()
         {
-            Serializer = serializer;
         }
 
         public override SecurityToken CreateToken(SecurityTokenDescriptor tokenDescriptor)
@@ -45,18 +45,6 @@ namespace Solid.Identity.Tokens.Saml2
                 token.Assertion.Statements.Add(authnStatement);
             }
             return token;
-        }
-
-        public override SecurityToken ReadToken(XmlReader reader, TokenValidationParameters validationParameters)
-        {
-            ValidateToken(reader, validationParameters, out var token);
-            return token;
-        }
-
-        public ClaimsPrincipal CreateClaimsPrincipal(Saml2SecurityToken token, TokenValidationParameters validationParameters)
-        {
-            var identity = CreateClaimsIdentity(token, token.Issuer, validationParameters);
-            return new ClaimsPrincipal(identity);
         }
     }
 }

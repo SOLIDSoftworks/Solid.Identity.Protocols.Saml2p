@@ -64,7 +64,7 @@ namespace Microsoft.IdentityModel.Tokens.Saml2
             return data?.InResponseTo;
         }
 
-        public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);
+        //public static ClaimsPrincipal ToClaimsPrincipal(this Saml2SecurityToken token, TokenValidationParameters parameters) => new SolidSaml2SecurityTokenHandler().CreateClaimsPrincipal(token, parameters);
 
         static Saml2SubjectConfirmationData GetBearerSubjectConfirmationData(this Saml2SecurityToken token)
         {
