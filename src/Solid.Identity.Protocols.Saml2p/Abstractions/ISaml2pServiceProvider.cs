@@ -28,7 +28,7 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// <summary>
         /// The <see cref="SignatureMethod"/> used to sign the Saml2 assertion.
         /// </summary>
-        SignatureMethod AssertionSignatureMethod { get; }
+        SignatureMethod AssertionSigningMethod { get; }
 
         /// <summary>
         /// The lifetime of the created Saml2 assertion.

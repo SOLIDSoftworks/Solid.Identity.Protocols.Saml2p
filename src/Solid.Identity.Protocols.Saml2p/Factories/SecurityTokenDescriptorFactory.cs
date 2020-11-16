@@ -135,10 +135,10 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         {
             if (partner.AssertionSigningKey == null)
                 throw new ArgumentNullException(nameof(partner.AssertionSigningKey));
-            if(partner.AssertionSignatureMethod == null)
-                throw new ArgumentNullException(nameof(partner.AssertionSignatureMethod));
+            if(partner.AssertionSigningMethod == null)
+                throw new ArgumentNullException(nameof(partner.AssertionSigningMethod));
 
-            var credentials = partner.AssertionSignatureMethod.CreateCredentials(partner.AssertionSigningKey);
+            var credentials = partner.AssertionSigningMethod.CreateCredentials(partner.AssertionSigningKey);
             Trace("Signing credentials created.", credentials);
             return credentials;
         }

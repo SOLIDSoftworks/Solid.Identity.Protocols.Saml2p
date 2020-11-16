@@ -54,7 +54,7 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public TimeSpan? MaxClockSkew { get; set; }
 
         /// <inheritdoc/>
-        public SignatureMethod AssertionSignatureMethod { get; set; } = SignatureMethod.RsaSha256;
+        public SignatureMethod AssertionSigningMethod { get; set; } = SignatureMethod.RsaSha256;
 
         /// <inheritdoc/>
         public SecurityKey AssertionEncryptionKey { get; set; }
