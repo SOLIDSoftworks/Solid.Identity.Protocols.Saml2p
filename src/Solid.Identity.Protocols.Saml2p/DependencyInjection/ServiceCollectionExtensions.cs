@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddDistributedMemoryCache();
             services.AddHttpContextAccessor();
-            services.AddSaml2EncryptedSecurityTokenHandler();
+            services.AddSaml2EncryptedSecurityTokenHandler<SolidSaml2SecurityTokenHandler>();
             services.AddCustomCryptoProvider(options => options.AddFullSupport());
             services.AddMvcCore().AddRazorViewEngine();
 
