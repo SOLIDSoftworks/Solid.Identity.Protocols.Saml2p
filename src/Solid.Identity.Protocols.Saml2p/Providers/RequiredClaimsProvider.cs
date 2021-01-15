@@ -12,10 +12,6 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
 {
     internal class RequiredClaimsProvider : IServiceProviderClaimsProvider
     {
-        private Saml2pPartnerProvider _partnerProvider;
-
-        public RequiredClaimsProvider(Saml2pPartnerProvider partnerProvider) => _partnerProvider = partnerProvider;
-
         public IEnumerable<ClaimDescriptor> ClaimTypesOffered => new[]
         {
             new ClaimDescriptor(ClaimTypes.NameIdentifier),

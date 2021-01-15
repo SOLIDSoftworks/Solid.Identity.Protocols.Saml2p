@@ -12,10 +12,6 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
 {
     internal class PassthroughClaimsProvider : IServiceProviderClaimsProvider
     {
-        private Saml2pPartnerProvider _partnerProvider;
-
-        public PassthroughClaimsProvider(Saml2pPartnerProvider partnerProvider) => _partnerProvider = partnerProvider;
-
         public IEnumerable<ClaimDescriptor> ClaimTypesOffered => Enumerable.Empty<ClaimDescriptor>();
 
         public ValueTask<bool> CanGenerateClaimsAsync(ISaml2pServiceProvider partner) => new ValueTask<bool>(partner.AllowClaimsPassthrough);
