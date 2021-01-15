@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.IdpSample", "Asp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.SpSample", "AspNetCore.SpSample\AspNetCore.SpSample.csproj", "{34887DB9-94EF-4BBD-9B16-527D5B469E59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyAspNetCore.IdpSample", "LegacyAspNetCore.IdpSample\LegacyAspNetCore.IdpSample.csproj", "{19C9158E-7E41-4992-B432-CD15BE547DEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacyAspNetCore.IdpSample", "LegacyAspNetCore.IdpSample\LegacyAspNetCore.IdpSample.csproj", "{19C9158E-7E41-4992-B432-CD15BE547DEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
