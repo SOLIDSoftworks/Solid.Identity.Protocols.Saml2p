@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.Extensions.Options;
 using Solid.Identity.Protocols.Saml2p.Logging;
 using System.Security;
+using Solid.Identity.Protocols.Saml2p.Providers;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -50,7 +51,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var lifetime = partner.TokenLifeTime ?? _options.DefaultTokenLifetime;
             var tolerence = partner.MaxClockSkew ?? _options.DefaultMaxClockSkew ?? TimeSpan.Zero;
             var claims = new List<Claim>();
-            foreach (var provider in _claimsProviders)
+            foreach (var provider in _claimsProviders.OrderBy(p => p is RequiredClaimsProvider)) // required claims run last
             {
                 if (await provider.CanGenerateClaimsAsync(partner))
                 {
