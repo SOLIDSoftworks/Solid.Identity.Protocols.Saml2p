@@ -58,7 +58,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pCache>();
             services.TryAddSingleton<PathPrefixProvider>();
             services.TryAddSingleton<RazorPageRenderingService>();
-            services.AddSaml2pServiceProviderClaimStore<RequiredClaimsProvider>();
             services.AddSaml2pServiceProviderClaimStore<PassthroughClaimsProvider>();
 
             return services;

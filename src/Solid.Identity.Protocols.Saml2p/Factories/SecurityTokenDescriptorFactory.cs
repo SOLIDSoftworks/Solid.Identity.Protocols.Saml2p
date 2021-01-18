@@ -51,7 +51,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var lifetime = partner.TokenLifeTime ?? _options.DefaultTokenLifetime;
             var tolerence = partner.MaxClockSkew ?? _options.DefaultMaxClockSkew ?? TimeSpan.Zero;
             var claims = new List<Claim>();
-            foreach (var provider in _claimsProviders.OrderBy(p => p is RequiredClaimsProvider)) // required claims run last
+            foreach (var provider in _claimsProviders)
             {
                 if (await provider.CanGenerateClaimsAsync(partner))
                 {
@@ -75,12 +75,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             claims = claims.Where(c => supported.Contains(c.Type)).ToList();
             Trace($"Filtered claims.", claims);
 
-            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, identity.Name, null, issuer));
-            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
-                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime, null, issuer));
-            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
-                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString, null, issuer));
+            AddRequiredClaims(identity, claims, issuedAt, issuer);
 
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
@@ -105,7 +100,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var descriptor = new SecurityTokenDescriptor
             {
                 Audience = partner.Id,
-                Subject = new ClaimsIdentity(claims,"SSO"),
+                Subject = new ClaimsIdentity(claims, "SSO"),
                 Issuer = issuer,
                 IssuedAt = issuedAt,
                 NotBefore = issuedAt.Subtract(tolerence),
@@ -115,6 +110,28 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             };
 
             return descriptor;
+        }
+
+        private void AddRequiredClaims(ClaimsIdentity identity, List<Claim> claims, DateTime issuedAt, string issuer)
+        {
+            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+            {
+                if (identity.TryFindFirst(ClaimTypes.NameIdentifier, out var nameId))
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, nameId.Value, null, issuer));
+            }
+
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
+            {
+                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime, null, issuer));
+            }
+
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
+            {
+                if (identity.TryFindFirst(ClaimTypes.AuthenticationMethod, out var authenticationMethod))
+                    claims.Add(new Claim(ClaimTypes.AuthenticationMethod, authenticationMethod.Value, null, issuer));
+                else
+                    claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString, null, issuer));
+            }
         }
 
         private EncryptingCredentials GetEncryptingCredentials(ISaml2pServiceProvider partner)
