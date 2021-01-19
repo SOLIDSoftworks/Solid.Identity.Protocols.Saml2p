@@ -27,8 +27,10 @@ namespace Microsoft.AspNetCore.Builder
         /// <returns>The <see cref="IApplicationBuilder"/> instance so that additional calls can be chained.</returns>
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path)
         {
+            // this needs to be first so that the default crypto provider factory gets populated before
+            // options get constructed.
+            var crypto = builder.ApplicationServices.GetRequiredService<CryptoProviderFactory>(); 
             var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
-            var crypto = builder.ApplicationServices.GetRequiredService<CryptoProviderFactory>();
             CryptoProviderFactory.Default = crypto;
             return builder
                 .Map(path.Add(options.AcceptPath), b => b.UseAcceptSsoEndpoint(path))
