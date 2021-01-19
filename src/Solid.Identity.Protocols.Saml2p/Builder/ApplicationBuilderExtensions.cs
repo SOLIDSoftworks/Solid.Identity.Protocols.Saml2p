@@ -27,25 +27,14 @@ namespace Microsoft.AspNetCore.Builder
         /// <returns>The <see cref="IApplicationBuilder"/> instance so that additional calls can be chained.</returns>
         public static IApplicationBuilder UseSaml2pIdentityProvider(this IApplicationBuilder builder, PathString path)
         {
-            // this needs to be first so that the default crypto provider factory gets populated before
-            // options get constructed.
-            var crypto = builder.ApplicationServices.GetRequiredService<CryptoProviderFactory>(); 
             var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
-            CryptoProviderFactory.Default = crypto;
+
             return builder
                 .Map(path.Add(options.AcceptPath), b => b.UseAcceptSsoEndpoint(path))
                 .Map(path.Add(options.InitiatePath), b => b.UseInitiateSsoEndpoint(path))
                 .Map(path.Add(options.CompletePath), b => b.UseCompleteSsoEndpoint(path))
             ;
         }
-        //public static IApplicationBuilder UseSaml2pServiceProvider(this IApplicationBuilder builder, PathString path)
-        //{
-        //    var options = builder.ApplicationServices.GetRequiredService<IOptions<Saml2pOptions>>().Value;
-        //    return builder
-        //        .Map(path.Add(options.StartPath), b => b.UseStartSsoEndpoint(path))
-        //        .Map(path.Add(options.FinishPath), b => b.UseFinishSsoEndpoint(path))
-        //    ;
-        //}
 
         internal static IApplicationBuilder UseStartSsoEndpoint(this IApplicationBuilder builder, PathString path)
             => builder.UsePathBase(path).UseMiddleware<StartSsoEndpointMiddleware>();

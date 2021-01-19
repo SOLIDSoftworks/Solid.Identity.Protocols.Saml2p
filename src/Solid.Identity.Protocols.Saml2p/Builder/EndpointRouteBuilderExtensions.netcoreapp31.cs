@@ -26,8 +26,6 @@ namespace Microsoft.AspNetCore.Builder
         public static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, PathString path)
         {
             var options = builder.ServiceProvider.GetRequiredService<IOptions<Saml2pOptions>>().Value;
-            var crypto = builder.ServiceProvider.GetRequiredService<CryptoProviderFactory>();
-            CryptoProviderFactory.Default = crypto;
 
             builder.Map(path.Add(options.AcceptPath), builder.CreateApplicationBuilder().UseAcceptSsoEndpoint(path).Build()).WithMetadata(new HttpMethodMetadata(new[] { HttpMethods.Get, HttpMethods.Post }));
             builder.Map(path.Add(options.InitiatePath), builder.CreateApplicationBuilder().UseInitiateSsoEndpoint(path).Build()).WithMetadata(new HttpMethodMetadata(new[] { HttpMethods.Get, HttpMethods.Post })); ;

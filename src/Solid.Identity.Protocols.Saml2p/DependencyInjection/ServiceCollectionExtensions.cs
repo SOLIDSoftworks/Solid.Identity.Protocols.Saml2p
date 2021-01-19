@@ -40,6 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddCustomCryptoProvider(options => options.AddFullSupport());
             services.AddMvcCore().AddRazorViewEngine();
 
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<Saml2pOptions>, EnsureCryptoProviderFactory>());
             services.Configure(configure);
             services.PostConfigure<Saml2pOptions>(PostConfigureSaml2pOptions);
 
