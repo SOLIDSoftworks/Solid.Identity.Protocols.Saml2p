@@ -6,6 +6,16 @@ on:
     #paths:
     #  - ".workflows/**/*.*" 
     #  - "src/**/*.*"
+  workflow_dispatch:
+    #inputs:
+    #  name:
+    #    description: 'Person to greet'
+    #    required: true
+    #    default: 'Mona the Octocat'
+    #  home:
+    #    description: 'location'
+    #    required: false
+    #    default: 'The Octoverse'
       
 env:
   prerelease: -beta
