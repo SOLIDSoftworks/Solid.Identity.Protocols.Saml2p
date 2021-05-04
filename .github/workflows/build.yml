@@ -1,8 +1,6 @@
 name: build
 on:
   push:
-    branches-ignore:
-      - master
     paths:
       - ".github/**/*.*" 
       - "src/**/*.*"
