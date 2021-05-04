@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p;
+using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Models;
 using Solid.Identity.Protocols.Saml2p.Options;
 

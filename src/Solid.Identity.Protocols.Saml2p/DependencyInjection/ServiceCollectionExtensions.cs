@@ -18,6 +18,7 @@ using Solid.Identity.Tokens.Saml2;
 using System.Collections.Generic;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
 using Microsoft.IdentityModel.Tokens;
+using Solid.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -35,8 +36,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddDistributedMemoryCache();
             services.AddHttpContextAccessor();
+            services.AddSaml2EncryptedSecurityTokenHandler<SolidSaml2SecurityTokenHandler>();
+            services.AddCustomCryptoProvider(options => options.AddFullSupport());
             services.AddMvcCore().AddRazorViewEngine();
 
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<Saml2pOptions>, EnsureCryptoProviderFactory>());
             services.Configure(configure);
             services.PostConfigure<Saml2pOptions>(PostConfigureSaml2pOptions);
 
@@ -48,8 +52,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<TokenValidationParametersFactory>();
             services.TryAddTransient<AuthnRequestFactory>();
             services.TryAddTransient<Saml2pEncodingService>();
-            services.TryAddTransient<Saml2Serializer, SolidSaml2Serializer>();
-            services.TryAddTransient<Saml2SecurityTokenHandler, SolidSaml2SecurityTokenHandler>();
             services.TryAddTransient<IXmlWriterFactory, XmlWriterFactory>();
             services.TryAddTransient<IXmlReaderFactory, XmlReaderFactory>();
             services.TryAddTransient<Saml2pSerializer>();
@@ -57,7 +59,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<Saml2pCache>();
             services.TryAddSingleton<PathPrefixProvider>();
             services.TryAddSingleton<RazorPageRenderingService>();
-            services.AddSaml2pServiceProviderClaimStore<RequiredClaimsProvider>();
             services.AddSaml2pServiceProviderClaimStore<PassthroughClaimsProvider>();
 
             return services;

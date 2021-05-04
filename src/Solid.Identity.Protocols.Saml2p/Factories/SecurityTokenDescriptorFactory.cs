@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.Extensions.Options;
 using Solid.Identity.Protocols.Saml2p.Logging;
 using System.Security;
+using Solid.Identity.Protocols.Saml2p.Providers;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
 {
@@ -74,12 +75,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             claims = claims.Where(c => supported.Contains(c.Type)).ToList();
             Trace($"Filtered claims.", claims);
 
-            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, identity.Name, null, issuer));
-            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
-                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime, null, issuer));
-            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
-                claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString, null, issuer));
+            AddRequiredClaims(identity, claims, issuedAt, issuer);
 
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
@@ -104,47 +100,63 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             var descriptor = new SecurityTokenDescriptor
             {
                 Audience = partner.Id,
-                Subject = new ClaimsIdentity(claims,"SSO"),
+                Subject = new ClaimsIdentity(claims, "SSO"),
                 Issuer = issuer,
                 IssuedAt = issuedAt,
                 NotBefore = issuedAt.Subtract(tolerence),
                 Expires = expires,
                 SigningCredentials = GetSigningCredentials(partner),
-                //EncryptingCredentials = GetEncryptingCredentials(partner)
+                EncryptingCredentials = GetEncryptingCredentials(partner)
             };
 
             return descriptor;
         }
 
-        //private EncryptingCredentials GetEncryptingCredentials(ISaml2pServiceProvider partner)
-        //{
-        //    if (!partner.RequiresEncryptedAssertion) return null;
-        //    if (partner.AssertionEncryptionKey == null) 
-        //        throw new ArgumentNullException(nameof(partner.AssertionEncryptionKey));
+        private void AddRequiredClaims(ClaimsIdentity identity, List<Claim> claims, DateTime issuedAt, string issuer)
+        {
+            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+            {
+                if (identity.TryFindFirst(ClaimTypes.NameIdentifier, out var nameId))
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, nameId.Value, null, issuer));
+            }
 
-        //    if(string.IsNullOrWhiteSpace(partner.AssertionEncryptionKeyWrapAlgorithm))
-        //    {
-        //        if (!(partner.AssertionEncryptionKey is SymmetricSecurityKey symmetric))
-        //            throw new ArgumentException($"{nameof(partner.AssertionEncryptionKey)} must be a {nameof(SymmetricSecurityKey)} if no {nameof(partner.AssertionEncryptionKeyWrapAlgorithm)} is provided.");
-        //        return new EncryptingCredentials(symmetric, partner.AssertionEncryptionAlgorithm);
-        //    }
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationInstant))
+            {
+                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, XmlConvert.ToString(issuedAt, "yyyy-MM-ddTHH:mm:ss.fffZ"), ClaimValueTypes.DateTime, null, issuer));
+            }
 
-        //    return new EncryptingCredentials(partner.AssertionEncryptionKey, partner.AssertionEncryptionKeyWrapAlgorithm, partner.AssertionEncryptionAlgorithm);
-        //}
+            if (!claims.Any(c => c.Type == ClaimTypes.AuthenticationMethod))
+            {
+                if (identity.TryFindFirst(ClaimTypes.AuthenticationMethod, out var authenticationMethod))
+                    claims.Add(new Claim(ClaimTypes.AuthenticationMethod, authenticationMethod.Value, null, issuer));
+                else
+                    claims.Add(new Claim(ClaimTypes.AuthenticationMethod, Saml2pConstants.Classes.UnspecifiedString, null, issuer));
+            }
+        }
+
+        private EncryptingCredentials GetEncryptingCredentials(ISaml2pServiceProvider partner)
+        {
+            if (!partner.RequiresEncryptedAssertion) return null;
+
+            if (partner.AssertionEncryptionKey == null)
+                throw new ArgumentNullException(nameof(partner.AssertionEncryptionKey));
+
+            if (partner.AssertionEncryptionMethod == null)
+                throw new ArgumentNullException(nameof(partner.AssertionEncryptionMethod));
+
+            var credentials = partner.AssertionEncryptionMethod.CreateCredentials(partner.AssertionEncryptionKey);
+            Trace("Encrypting credentials created.", credentials);
+            return credentials;
+        }
 
         private SigningCredentials GetSigningCredentials(ISaml2pServiceProvider partner)
         {
             if (partner.AssertionSigningKey == null)
                 throw new ArgumentNullException(nameof(partner.AssertionSigningKey));
-            if (string.IsNullOrWhiteSpace(partner.AssertionSigningAlgorithm))
-                throw new ArgumentNullException(nameof(partner.AssertionSigningAlgorithm));
+            if(partner.AssertionSigningMethod == null)
+                throw new ArgumentNullException(nameof(partner.AssertionSigningMethod));
 
-            var credentials = null as SigningCredentials;
-            if (string.IsNullOrWhiteSpace(partner.AssertionSigningDigestAlgorithm))
-                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm);
-            else
-                credentials = new SigningCredentials(partner.AssertionSigningKey, partner.AssertionSigningAlgorithm, partner.AssertionSigningDigestAlgorithm);
-
+            var credentials = partner.AssertionSigningMethod.CreateCredentials(partner.AssertionSigningKey);
             Trace("Signing credentials created.", credentials);
             return credentials;
         }

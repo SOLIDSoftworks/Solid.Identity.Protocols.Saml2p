@@ -9,6 +9,7 @@ using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -25,6 +26,7 @@ namespace Microsoft.AspNetCore.Builder
         public static IEndpointRouteBuilder MapSaml2pIdentityProvider(this IEndpointRouteBuilder builder, PathString path)
         {
             var options = builder.ServiceProvider.GetRequiredService<IOptions<Saml2pOptions>>().Value;
+
             builder.Map(path.Add(options.AcceptPath), builder.CreateApplicationBuilder().UseAcceptSsoEndpoint(path).Build()).WithMetadata(new HttpMethodMetadata(new[] { HttpMethods.Get, HttpMethods.Post }));
             builder.Map(path.Add(options.InitiatePath), builder.CreateApplicationBuilder().UseInitiateSsoEndpoint(path).Build()).WithMetadata(new HttpMethodMetadata(new[] { HttpMethods.Get, HttpMethods.Post })); ;
             builder.Map(path.Add(options.CompletePath), builder.CreateApplicationBuilder().UseCompleteSsoEndpoint(path).Build()).WithMetadata(new HttpMethodMetadata(new[] { HttpMethods.Get, HttpMethods.Post })); ;

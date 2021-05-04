@@ -12,10 +12,10 @@ A simple SAML2p protocol library for aspnetcore.
 - In-memory partner store
 - Optional custom partner store
 - Microsoft.AspNetCore.Authentication integration
+- Encrypted tokens
 
 ### Upcoming features
 - SLO
-- Encrypted tokens
 - Signed requests
 - Signed responses
 - Federation metadata endpoint
@@ -104,7 +104,8 @@ public class Startup
                     sp.MaxClockSkew = TimeSpan.FromMinutes(2);
                     sp.AssertionConsumerServiceEndpoint = "/finish";
                     sp.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
-    
+                    sp.AssertionSigningMethod = SignatureMethod.RsaSha512;
+
                     sp.SupportedBindings.Clear();
                     sp.SupportedBindings.Add(BindingType.Post);
                 });
