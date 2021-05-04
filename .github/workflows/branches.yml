@@ -7,51 +7,29 @@ on:
     #  - ".workflows/**/*.*" 
     #  - "src/**/*.*"
   workflow_dispatch:
-    #inputs:
-    #  name:
-    #    description: 'Person to greet'
-    #    required: true
-    #    default: 'Mona the Octocat'
-    #  home:
-    #    description: 'location'
-    #    required: false
-    #    default: 'The Octoverse'
+    inputs:
+      incremented-version:
+        description: 'The part of the version number to increment.'
+        required: true
+        default: 'patch'
       
 env:
-  prerelease: -beta
+  incremented-version: patch
 jobs:
   build_branch:
     name: build_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@master"
-        
-      - name: Parse semver string
-        id: semver_parser 
-        uses: booxmedialtd/ws-action-parse-semver@v1
-        with:
-          input_string: ${{ steps.previoustag.outputs.tag }}
-      # Get latest tag
-      # perform semver coerce
-      # increment patch
-      # create package_version that adds optional prerelease
-      - id: compute_version
-        name: Compute version
-        uses: craig-day/compute-tag@v10
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "${{ steps.semver_parser.outputs.major }}.${{ steps.semver_parser.outputs.minor }}.${{ steps.semver_parser.outputs.patch }}" 
-          version_type: patch          
-      - id: compute_package_version
-        name: Compute package version
-        run: echo "::set-output name=package_version::${{ steps.compute_version.outputs.next_tag }}${{ env.prerelease }}"
-          
       
-      - name: Get version
-        run: echo "The version is ${{ steps.compute_package_version.outputs.package_version }}"
+      - name: Semver tags
+        id: semver
+        uses: SOLIDSoftworks/semver-tags@1.0.2
+        with:
+          # The github token.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          incremented-value: ${{ env.incremented-version }}   
+          dry-run: true
 
       #- name: setup_dotnet
       #  uses: actions/setup-dotnet@v1
