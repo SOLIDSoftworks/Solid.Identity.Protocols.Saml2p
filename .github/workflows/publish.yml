@@ -1,0 +1,54 @@
+name: publish
+on:
+  workflow_dispatch:
+   inputs:
+     incremented-version:
+       description: 'The part of the version number to increment.'
+       required: true
+       default: 'patch'    
+     prerelease:
+       description: 'The prerelease part of the version number.'
+       required: false
+       default: ''    
+     metadata:
+       description: 'The metadata part of the version number.'
+       required: false
+       default: ''      
+env:
+  DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
+jobs:
+  build_branch:
+    name: build_branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Semver tags
+        id: semver
+        uses: SOLIDSoftworks/semver-tags@1.0.2
+        with:
+          # The github token.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          incremented-version: ${{ github.event.inputs.incremented-version }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          metadata: ${{ github.event.inputs.metadata }}
+
+      - name: setup_dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.200 
+          
+      - name: install_dependencies
+        run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
+        
+      - name: build
+        run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ steps.semver.outputs.core-version }}
+        
+      - name: test
+        run: dotnet test ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore --no-build
+        
+      - name: package
+        run: dotnet pack ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-build -p:Version=${{ steps.semver.outputs.semantic-version }} -o ./ 
+        
+      - name: push
+        run: dotnet nuget push Solid.Identity.Protocols.Saml2p.${{ steps.semver.outputs.semantic-version }}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
