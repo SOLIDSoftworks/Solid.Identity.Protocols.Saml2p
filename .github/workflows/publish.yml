@@ -2,7 +2,7 @@ name: publish
 on:
   workflow_dispatch:
    inputs:
-     incremented-version:
+     incremented-value:
        description: 'The part of the version number to increment.'
        required: true
        default: 'patch'    
@@ -29,7 +29,7 @@ jobs:
         with:
           # The github token.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          incremented-version: ${{ github.event.inputs.incremented-version }}
+          incremented-value: ${{ github.event.inputs.incremented-value }}
           prerelease: ${{ github.event.inputs.prerelease }}
           metadata: ${{ github.event.inputs.metadata }}
 
