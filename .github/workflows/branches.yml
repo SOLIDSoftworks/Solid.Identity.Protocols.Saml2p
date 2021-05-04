@@ -1,4 +1,4 @@
-name: build_branch
+name: build
 on:
   push:
     branches-ignore:
