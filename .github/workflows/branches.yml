@@ -13,7 +13,8 @@ on:
   #      required: true
   #      default: 'patch'      
 env:
-  incremented-version: patch
+  incremented-version: 'patch'
+  DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
 jobs:
   build_branch:
     name: build_branch
@@ -33,11 +34,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.200 
-          
-      - name: set_dotnet_roll_forward
-        uses: allenevans/set-env@v1.0.0
-        with:
-          DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
           
       - name: install_dependencies
         run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
