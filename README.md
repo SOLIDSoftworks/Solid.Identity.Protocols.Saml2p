@@ -1,5 +1,5 @@
 # Solid.Identity.Protocols.Saml2p
-![badge](https://action-badges.now.sh/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p)
+[![build](https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p/actions/workflows/build.yml)
 
 A simple SAML2p protocol library for aspnetcore.
 
