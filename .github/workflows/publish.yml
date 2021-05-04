@@ -1,32 +1,54 @@
-name: publish 0.1.x to nuget
+name: publish
 on:
-  push:
-    branches:
-      - master # Default release branch
-
+  workflow_dispatch:
+   inputs:
+     incremented-version:
+       description: 'The part of the version number to increment.'
+       required: true
+       default: 'patch'    
+     prerelease:
+       description: 'The prerelease part of the version number.'
+       required: false
+       default: ''    
+     metadata:
+       description: 'The metadata part of the version number.'
+       required: false
+       default: ''      
 env:
-  version: 0.1.${{ github.run_number }}
-  package_version: 0.1.${{ github.run_number }}-beta  
-  DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: 2  
-
+  DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
 jobs:
-  publish:
-    name: build, test, pack, & publish
+  build_branch:
+    name: build_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup dotnet
+      
+      - name: Semver tags
+        id: semver
+        uses: SOLIDSoftworks/semver-tags@1.0.2
+        with:
+          # The github token.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          incremented-version: ${{ github.event.inputs.incremented-version }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          metadata: ${{ github.event.inputs.metadata }}
+
+      - name: setup_dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.200     
-
-      - name: Install dependencies
+          dotnet-version: 3.1.200 
+          
+      - name: install_dependencies
         run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
-      - name: Build
-        run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ env.version }}
-      - name: Test
+        
+      - name: build
+        run: dotnet build ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore -p:VersionPrefix=${{ steps.semver.outputs.core-version }}
+        
+      - name: test
         run: dotnet test ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-restore --no-build
-      - name: Package
-        run: dotnet pack ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-build -p:Version=${{ env.package_version }} -o ./ 
-      - name: Push
-        run: dotnet nuget push Solid.Identity.Protocols.Saml2p.${{env.package_version}}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+        
+      - name: package
+        run: dotnet pack ./src/Solid.Identity.Protocols.Saml2p.sln --configuration Release --no-build -p:Version=${{ steps.semver.outputs.semantic-version }} -o ./ 
+        
+      - name: push
+        run: dotnet nuget push Solid.Identity.Protocols.Saml2p.${{ steps.semver.outputs.semantic-version }}.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
