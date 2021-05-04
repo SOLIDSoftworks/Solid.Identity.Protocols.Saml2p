@@ -17,8 +17,8 @@ on:
 env:
   DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
 jobs:
-  build_branch:
-    name: build_branch
+  publish:
+    name: publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
