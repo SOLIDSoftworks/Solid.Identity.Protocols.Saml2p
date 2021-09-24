@@ -25,7 +25,7 @@ jobs:
       
       - name: Semver tags
         id: semver
-        uses: SOLIDSoftworks/semver-tags@1.0.2
+        uses: SOLIDSoftworks/semver-tags@1.0.3
         with:
           # The github token.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
