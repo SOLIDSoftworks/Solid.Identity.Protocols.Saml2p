@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP3_1_OR_GREATER
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
@@ -34,4 +33,3 @@ namespace Microsoft.AspNetCore.Builder
         }
     }
 }
-#endif
