@@ -138,7 +138,7 @@ public class Startup
 }
 ```
 #### Responding to RequestedAuthnContext
-According to the spec, if a specific authentication context is requested, it's at the chosen at the discretion of the responder. This can be done with more authentication handlers on the IDP side and 
+According to the spec, if a preferred authentication context is requested, it's chosen at the discretion of the responder. This can be done with more authentication handlers on the IDP side and 
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
