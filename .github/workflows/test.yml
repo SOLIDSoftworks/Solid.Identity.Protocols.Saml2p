@@ -6,12 +6,6 @@ on:
       - "src/**/*.*"
   pull_request:
     types: [assigned, opened, synchronize, reopened]
-  #workflow_dispatch:
-  #  inputs:
-  #    incremented-version:
-  #      description: 'The part of the version number to increment.'
-  #      required: true
-  #      default: 'patch'      
 env:
   DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX: '2'
 jobs:
@@ -24,7 +18,7 @@ jobs:
       - name: setup_dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.200 
+          dotnet-version: '5.0.x'
           
       - name: install_dependencies
         run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
