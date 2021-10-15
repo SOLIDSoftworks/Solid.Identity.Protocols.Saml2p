@@ -14,7 +14,6 @@ using Solid.Identity.Protocols.Saml2p.Models.Context;
 using Solid.Identity.Protocols.Saml2p.Providers;
 using Solid.Identity.Protocols.Saml2p.Serialization;
 using Solid.Identity.Protocols.Saml2p.Services;
-using Solid.Identity.Tokens.Saml2;
 using System.Collections.Generic;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
 using Microsoft.IdentityModel.Tokens;
@@ -36,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddDistributedMemoryCache();
             services.AddHttpContextAccessor();
-            services.AddSaml2EncryptedSecurityTokenHandler<SolidSaml2SecurityTokenHandler>();
+            services.AddSaml2EncryptedSecurityTokenHandler();
             services.AddCustomCryptoProvider(options => options.AddFullSupport());
             services.AddMvcCore().AddRazorViewEngine();
 

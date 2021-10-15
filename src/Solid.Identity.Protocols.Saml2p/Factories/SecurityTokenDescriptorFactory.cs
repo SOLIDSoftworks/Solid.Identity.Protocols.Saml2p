@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Models;
-using Solid.Identity.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;

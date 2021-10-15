@@ -34,6 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Solid.IdentityModel.Tokens.Saml" Version="0.1.12-beta" />
+    <PackageReference Include="Solid.IdentityModel.Tokens.Saml" Version="1.0.6" />
   </ItemGroup>
 </Project>
