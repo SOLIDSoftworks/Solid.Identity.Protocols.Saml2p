@@ -65,11 +65,11 @@ namespace Microsoft.AspNetCore.Builder
                 )
                 .MapWhen(
                     context => context.Request.Path.Equals(path) && !methods.Contains(context.Request.Method),
-                    b => b.Use((context, _) =>
+                    b => b.Use(new Func<HttpContext, Func<Task>, Task>((context, _) =>
                     {
                         context.Response.StatusCode = 405;
                         return Task.CompletedTask;
-                    })
+                    }))
                 )
             ;
     }
