@@ -24,6 +24,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.IdpSample", "Asp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.SpSample", "AspNetCore.SpSample\AspNetCore.SpSample.csproj", "{34887DB9-94EF-4BBD-9B16-527D5B469E59}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{4E9081CB-AA59-4CE2-93B3-21EA9ABF9509}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
+		..\.github\workflows\test.yml = ..\.github\workflows\test.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +60,7 @@ Global
 		{45A2A69F-BEB2-437B-BFCD-55A1AAC16663} = {561378E3-C944-4A4B-B217-55A56811A1F0}
 		{AA8F25F8-A175-4A4B-8173-2AEBAECE7F28} = {D09EB7D6-4898-4769-A70C-BA17332B9392}
 		{34887DB9-94EF-4BBD-9B16-527D5B469E59} = {D09EB7D6-4898-4769-A70C-BA17332B9392}
+		{4E9081CB-AA59-4CE2-93B3-21EA9ABF9509} = {2E49A8E8-BB38-440E-923E-F64C5B5BE12E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {33722D1E-2E86-41A4-9D48-B7D1D787D678}
