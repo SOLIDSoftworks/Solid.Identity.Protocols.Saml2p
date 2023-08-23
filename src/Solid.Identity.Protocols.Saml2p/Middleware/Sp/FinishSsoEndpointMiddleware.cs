@@ -158,7 +158,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             context.User = validateContext.Subject;
 
-            return FinishSsoResult.Success(partner.Id, validateContext.SecurityToken, validateContext.Subject);
+            return FinishSsoResult.Success(partner.Id, validateContext.Response.XmlSecurityToken, validateContext.SecurityToken, validateContext.Subject);
         }
     }
 }

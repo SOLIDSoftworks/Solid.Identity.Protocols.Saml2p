@@ -18,16 +18,18 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// Creates a success result.
         /// </summary>
         /// <param name="partnerId">The id of the Saml2p SSO partner.</param>
-        /// <param name="token">The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.</param>
-        /// <param name="subject">The <see cref="ClaimsPrincipal"/> that was created from <paramref name="token"/>.</param>
+        /// <param name="token">The XML representation of the received Saml2 token.</param>
+        /// <param name="securityToken">The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.</param>
+        /// <param name="subject">The <see cref="ClaimsPrincipal"/> that was created from <paramref name="securityToken"/>.</param>
         /// <returns>A success result.</returns>
-        public static FinishSsoResult Success(string partnerId, Saml2SecurityToken token, ClaimsPrincipal subject)
+        public static FinishSsoResult Success(string partnerId, string token, Saml2SecurityToken securityToken, ClaimsPrincipal subject)
         {
             return new FinishSsoResult
             {
                 Status = Saml2pConstants.Statuses.Success,
                 PartnerId = partnerId,
-                SecurityToken = token,
+                Token = token,
+                SecurityToken = securityToken,
                 Subject = subject
             };
         }
@@ -69,6 +71,11 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.
         /// </summary>
         public Saml2SecurityToken SecurityToken { get; private set; }
+        
+        /// <summary>
+        /// The XML representation of the received Saml2 token.
+        /// </summary>
+        public string Token { get; private set; }
 
         /// <summary>
         /// The <see cref="ClaimsPrincipal"/> that was created from <see cref="SecurityToken"/>.

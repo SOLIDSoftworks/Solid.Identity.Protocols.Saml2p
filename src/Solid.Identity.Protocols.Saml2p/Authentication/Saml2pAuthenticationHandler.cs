@@ -52,6 +52,12 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
                     IssuedUtc = result.SecurityToken.ValidFrom,
                     ExpiresUtc = result.SecurityToken.ValidTo
                 };
+                var token = new AuthenticationToken
+                {
+                    Name = "saml2",
+                    Value = result.Token
+                };
+                properties.StoreTokens(new []{ token });
                 var ticket = new AuthenticationTicket(result.Subject, properties, Scheme.Name);
                 return HandleRequestResult.Success(ticket);
             }
