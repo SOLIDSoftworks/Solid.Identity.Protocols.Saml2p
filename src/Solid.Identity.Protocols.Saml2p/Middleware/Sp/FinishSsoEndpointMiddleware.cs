@@ -62,7 +62,15 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
         {
             try
             {
-                _ = await FinishSsoAsync(context);
+                var result = await FinishSsoAsync(context);
+                if (!result.IsSuccessful)
+                {
+                    context.Response.StatusCode = 401;
+                    return;
+                }
+
+                await context.SignInAsync(result.Subject, result.Properties);
+                context.Response.Redirect(Options.DefaultRedirectPath);
             }
             catch(InvalidOperationException)
             {
@@ -158,7 +166,21 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             context.User = validateContext.Subject;
 
-            return FinishSsoResult.Success(partner.Id, validateContext.Response.XmlSecurityToken, validateContext.SecurityToken, validateContext.Subject);
+            var properties = new AuthenticationProperties();
+            if (validateContext.Subject != null)
+            {
+                properties.IssuedUtc = validateContext.SecurityToken!.ValidFrom;
+                properties.ExpiresUtc = validateContext.SecurityToken!.ValidTo;
+                
+                var authn = new AuthenticationToken
+                {
+                    Name = "saml2",
+                    Value = validateContext.Response.XmlSecurityToken
+                };
+                properties.StoreTokens(new[] { authn });
+            }
+
+            return FinishSsoResult.Success(partner.Id, validateContext.Response.XmlSecurityToken, validateContext.SecurityToken, validateContext.Subject, properties);
         }
     }
 }

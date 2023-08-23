@@ -66,6 +66,11 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public PathString FinishPath { get; set; } = "/finish";
 
         /// <summary>
+        /// The relative path used by default after SSO has finished (SP flow).
+        /// </summary>
+        public PathString DefaultRedirectPath { get; set; } = "/";
+
+        /// <summary>
         /// Events object that contains delegates to be run during SSO (IDP flow).
         /// </summary>
         public Saml2pIdentityProviderEvents IdentityProviderEvents { get; } = new Saml2pIdentityProviderEvents();

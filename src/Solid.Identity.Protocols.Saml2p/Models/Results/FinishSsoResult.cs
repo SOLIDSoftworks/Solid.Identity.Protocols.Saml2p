@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Solid.Identity.Protocols.Saml2p.Models.Results
 {
@@ -21,8 +22,9 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// <param name="token">The XML representation of the received Saml2 token.</param>
         /// <param name="securityToken">The <see cref="Saml2SecurityToken"/> from a <see cref="SamlResponse"/>.</param>
         /// <param name="subject">The <see cref="ClaimsPrincipal"/> that was created from <paramref name="securityToken"/>.</param>
+        /// <param name="properties">The <see cref="AuthenticationProperties"/> instance used when signing in.</param>
         /// <returns>A success result.</returns>
-        public static FinishSsoResult Success(string partnerId, string token, Saml2SecurityToken securityToken, ClaimsPrincipal subject)
+        public static FinishSsoResult Success(string partnerId, string token, Saml2SecurityToken securityToken, ClaimsPrincipal subject, AuthenticationProperties properties)
         {
             return new FinishSsoResult
             {
@@ -30,7 +32,8 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
                 PartnerId = partnerId,
                 Token = token,
                 SecurityToken = securityToken,
-                Subject = subject
+                Subject = subject,
+                Properties = properties
             };
         }
 
@@ -81,6 +84,11 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Results
         /// The <see cref="ClaimsPrincipal"/> that was created from <see cref="SecurityToken"/>.
         /// </summary>
         public ClaimsPrincipal Subject { get; private set; }
+        
+        /// <summary>
+        /// The <see cref="AuthenticationProperties"/> instance used when signing in.
+        /// </summary>
+        public AuthenticationProperties Properties { get; private set; }
 
         /// <summary>
         /// The status of the SSO response.

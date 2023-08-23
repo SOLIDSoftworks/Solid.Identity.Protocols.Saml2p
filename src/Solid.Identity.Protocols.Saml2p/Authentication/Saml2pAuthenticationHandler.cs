@@ -47,18 +47,7 @@ namespace Solid.Identity.Protocols.Saml2p.Authentication
                 if (!result.IsSuccessful)
                     throw new SamlResponseException(result.PartnerId, result.Status, result.SubStatus);
 
-                var properties = new AuthenticationProperties
-                {
-                    IssuedUtc = result.SecurityToken.ValidFrom,
-                    ExpiresUtc = result.SecurityToken.ValidTo
-                };
-                var token = new AuthenticationToken
-                {
-                    Name = "saml2",
-                    Value = result.Token
-                };
-                properties.StoreTokens(new []{ token });
-                var ticket = new AuthenticationTicket(result.Subject, properties, Scheme.Name);
+                var ticket = new AuthenticationTicket(result.Subject, result.Properties, Scheme.Name);
                 return HandleRequestResult.Success(ticket);
             }
             catch(Exception ex)

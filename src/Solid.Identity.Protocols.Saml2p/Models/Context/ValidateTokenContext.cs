@@ -41,7 +41,7 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Context
         public TokenValidationParameters TokenValidationParameters { get; internal set; }
 
         /// <summary>
-        /// The <see cref="Saml2SecurityTokenHandler"/> used to validatethe incoming security token.
+        /// The <see cref="Saml2SecurityTokenHandler"/> used to validate the incoming security token.
         /// </summary>
         public Saml2SecurityTokenHandler Handler { get; internal set; }
 
