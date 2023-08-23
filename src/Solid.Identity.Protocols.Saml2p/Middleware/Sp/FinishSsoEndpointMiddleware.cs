@@ -174,7 +174,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 
                 var authn = new AuthenticationToken
                 {
-                    Name = "saml2",
+                    Name = Saml2pConstants.TokenName,
                     Value = validateContext.Response.XmlSecurityToken
                 };
                 properties.StoreTokens(new[] { authn });

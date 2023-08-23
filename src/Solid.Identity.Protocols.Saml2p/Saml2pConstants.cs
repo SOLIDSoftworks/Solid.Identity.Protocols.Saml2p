@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Solid.Identity.Protocols.Saml2p
 {
@@ -10,6 +11,11 @@ namespace Solid.Identity.Protocols.Saml2p
     /// </summary>
     public static class Saml2pConstants
     {
+        /// <summary>
+        /// The name of the token that is stored in <see cref="AuthenticationProperties"/>.
+        /// </summary>
+        public const string TokenName = "saml2";
+        
         internal const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
