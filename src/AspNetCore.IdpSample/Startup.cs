@@ -66,7 +66,7 @@ namespace AspNetCore.IdpSample
                     {
                         sp.BaseUrl = new Uri("https://localhost:5003");
                         sp.MaxClockSkew = TimeSpan.FromMinutes(2);
-                        sp.AssertionConsumerServiceEndpoint = "/finish";
+                        sp.AssertionConsumerServiceEndpoint = "/saml2p/finish";
                         sp.AssertionSigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64)));
 
                         sp.SupportedBindings.Clear();

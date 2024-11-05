@@ -18,9 +18,9 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
     /// </summary>
     public class AuthnRequestFactory
     {
-        private ISystemClock _systemClock;
-        private Saml2pOptions _options;
-
+        private readonly Saml2pOptions _options;
+#if NET6_0
+        private readonly ISystemClock _systemClock;
         /// <summary>
         /// Creates an instance of <see cref="AuthnRequestFactory"/>.
         /// </summary>
@@ -31,6 +31,19 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             _systemClock = systemClock;
             _options = options.Value;
         }
+#else
+        private readonly TimeProvider _time;
+        /// <summary>
+        /// Creates an instance of <see cref="AuthnRequestFactory"/>.
+        /// </summary>
+        /// <param name="time">The provider of the current time.</param>
+        /// <param name="options">The current <see cref="Saml2pOptions" />.</param>
+        public AuthnRequestFactory(TimeProvider time, IOptions<Saml2pOptions> options)
+        {
+            _time = time;
+            _options = options.Value;
+        }
+#endif
 
         /// <summary>
         /// Creates an instance of <see cref="AuthnRequest"/>.
@@ -46,7 +59,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 // TODO: have some sort of providername default
                 ProviderName = idp.ExpectedIssuer ?? _options.DefaultIssuer,
                 AssertionConsumerServiceUrl = GetAcsUrl(context.Request),
-                IssueInstant = _systemClock.UtcNow.UtcDateTime,
+                IssueInstant = GetUtcNow(),
                 Issuer = idp.ExpectedIssuer ?? _options.DefaultIssuer,
                 Destination = new Uri(idp.BaseUrl, idp.AcceptSsoEndpoint),
                 NameIdPolicy = new NameIdPolicy
@@ -81,6 +94,15 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             // TODO: add central utility for creating all paths
             var path = request.PathBase.Add(_options.FinishPath);
             return new Uri(baseUrl, path);
+        }
+
+        private DateTime GetUtcNow()
+        {
+#if NET6_0
+            return _systemClock.UtcNow.UtcDateTime;
+#else
+            return _time.GetUtcNow().UtcDateTime;
+#endif
         }
     }
 }

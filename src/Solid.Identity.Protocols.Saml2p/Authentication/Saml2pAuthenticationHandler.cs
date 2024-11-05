@@ -18,20 +18,32 @@ using Solid.Identity.Protocols.Saml2p.Providers;
 using System.Security.Claims;
 using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Exceptions;
+// ReSharper disable InconsistentNaming
 
 namespace Solid.Identity.Protocols.Saml2p.Authentication
 {
     internal class Saml2pAuthenticationHandler : RemoteAuthenticationHandler<Saml2pAuthenticationOptions>, IDisposable
     {
         private Saml2pOptions _saml2p;
-        private IDisposable _optionsChangeToken;
+        private readonly IDisposable _optionsChangeToken;
 
+#if NET6_0
         public Saml2pAuthenticationHandler(IOptionsMonitor<Saml2pOptions> saml2pOptionsMonitor, IOptionsMonitor<Saml2pAuthenticationOptions> monitor, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
             : base(monitor, logger, encoder, clock)
         {
             _saml2p = saml2pOptionsMonitor.CurrentValue;
             _optionsChangeToken = saml2pOptionsMonitor.OnChange((options, _) => _saml2p = options);
         }
+#else
+        public Saml2pAuthenticationHandler(IOptionsMonitor<Saml2pOptions> saml2pOptionsMonitor, IOptionsMonitor<Saml2pAuthenticationOptions> monitor, ILoggerFactory logger, UrlEncoder encoder) 
+            : base(monitor, logger, encoder)
+        {
+            _saml2p = saml2pOptionsMonitor.CurrentValue;
+            _optionsChangeToken = saml2pOptionsMonitor.OnChange((options, _) => _saml2p = options);
+        }
+#endif
+        
+        
 
         protected override Task InitializeHandlerAsync()
         {

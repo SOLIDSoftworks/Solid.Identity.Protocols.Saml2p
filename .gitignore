@@ -353,3 +353,4 @@ MigrationBackup/
 .ionide/
 
 Solid.**.xml
+.idea

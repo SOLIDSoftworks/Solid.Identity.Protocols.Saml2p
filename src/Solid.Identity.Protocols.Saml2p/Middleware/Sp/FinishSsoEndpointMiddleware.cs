@@ -22,9 +22,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 {
     internal class FinishSsoEndpointMiddleware : Saml2pEndpointMiddleware
     {
-        private Saml2SecurityTokenHandler _handler;
-        private TokenValidationParametersFactory _factory;
-        private ISystemClock _clock;
+        private readonly Saml2SecurityTokenHandler _handler;
+        private readonly TokenValidationParametersFactory _factory;
+        
+#if NET6_0
+        private readonly ISystemClock _clock;
 
         public FinishSsoEndpointMiddleware(
             Saml2SecurityTokenHandler handler,
@@ -57,6 +59,42 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             _factory = parametersFactory;
             _clock = clock;
         }
+#else
+        private readonly TimeProvider _time;
+
+        public FinishSsoEndpointMiddleware(
+            Saml2SecurityTokenHandler handler,
+            TokenValidationParametersFactory parametersFactory,
+            TimeProvider time,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory,
+            RequestDelegate _)
+            : this(handler, parametersFactory, time, serializer, cache, partners, encoder, monitor, factory)
+        {
+        }
+
+        public FinishSsoEndpointMiddleware(
+            Saml2SecurityTokenHandler handler,
+            TokenValidationParametersFactory parametersFactory,
+            TimeProvider time,
+            Saml2pSerializer serializer,
+            Saml2pCache cache,
+            Saml2pPartnerProvider partners,
+            Saml2pEncodingService encoder,
+            IOptionsMonitor<Saml2pOptions> monitor,
+            ILoggerFactory factory)
+            : base(serializer, cache, partners, encoder, monitor, factory)
+        {
+            _handler = handler;
+            _factory = parametersFactory;
+            _time = time;
+        }
+        
+#endif
 
         public override async Task InvokeAsync(HttpContext context)
         {
@@ -154,9 +192,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 Logger.LogInformation("Validating incoming token.");
                 var subject = validateContext.Handler.ValidateToken(validateContext.Response.XmlSecurityToken, validateContext.TokenValidationParameters, out var token);
                 var saml2 = token as Saml2SecurityToken;
-                var now = _clock.UtcNow.DateTime;
+                var now = GetUtcNow();
 
-                saml2.ValidateResponseToken(validateContext.Request.Id, now);
+                saml2.ValidateResponseToken(validateContext.Request?.Id, now);
 
                 validateContext.Subject = subject;
                 validateContext.SecurityToken = saml2;
@@ -181,6 +219,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
             }
 
             return FinishSsoResult.Success(partner.Id, validateContext.Response.XmlSecurityToken, validateContext.SecurityToken, validateContext.Subject, properties);
+        }
+        
+
+        private DateTime GetUtcNow()
+        {
+#if NET6_0
+            return _clock.UtcNow.UtcDateTime;
+#else
+            return _time.GetUtcNow().UtcDateTime;
+#endif
         }
     }
 }
