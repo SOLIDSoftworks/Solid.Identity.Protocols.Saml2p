@@ -43,6 +43,7 @@
                         <span class="navbar-text">
                             @(Context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")
                         </span>
+                        <a class="nav-link text-dark" asp-area="" asp-page="/Logout">Logout</a>
                     }
                 </div>
             </div>
