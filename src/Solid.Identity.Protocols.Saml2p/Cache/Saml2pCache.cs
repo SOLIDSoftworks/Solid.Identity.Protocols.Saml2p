@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
 namespace Solid.Identity.Protocols.Saml2p.Cache
@@ -22,13 +23,13 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
         public Task CacheRequestAsync(string key, AuthnRequest request)
         {
             var json = JsonSerializer.SerializeToUtf8Bytes(request);
-            return _inner.SetAsync(key, json);
+            return _inner.SetAsync(key, json, CreateOptions());
         }
 
         public Task CacheStatusAsync(string key, Status status)
         {
             var json = JsonSerializer.SerializeToUtf8Bytes(status);
-            return _inner.SetAsync($"{key}_status", json);
+            return _inner.SetAsync($"{key}_status", json, CreateOptions());
         }
 
         public async Task<AuthnRequest> FetchRequestAsync(string key)
@@ -52,5 +53,14 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
             await _inner.RemoveAsync(key);
             await _inner.RemoveAsync($"{key}_status");
         }
+
+        private DistributedCacheEntryOptions CreateOptions()
+        {
+            return new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
+        }
+        
     }
 }
