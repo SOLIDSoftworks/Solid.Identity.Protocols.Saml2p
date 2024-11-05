@@ -23,6 +23,7 @@ using Microsoft.Extensions.Primitives;
 using Solid.Identity.Protocols.Saml2p.Services;
 using Solid.Identity.Protocols.Saml2p.Models;
 using System.Net;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 {
@@ -62,7 +63,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
             var response = null as SamlResponse;
 
-            var user = context.User;
+            var authentication = await context.AuthenticateAsync();
             var request = await Cache.FetchRequestAsync(id);
             if (request == null)
                 throw new SecurityException($"SAMLRequest not found for id: '{id}'");
@@ -83,9 +84,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 Trace("Found cached Status.", request.RelayState, status);
                 response = _responseFactory.Create(partner, status, authnRequestId: request.Id, relayState: request.RelayState);
             }
-            else if (user.Identity.IsAuthenticated)
+            else if (authentication.Succeeded && authentication.Principal?.Identity is ClaimsIdentity identity)
             {
-                var descriptor = await _descriptorFactory.CreateSecurityTokenDescriptorAsync(user.Identity as ClaimsIdentity, partner);
+                var descriptor = await _descriptorFactory.CreateSecurityTokenDescriptorAsync(identity, partner);
                 var createSecurityTokenContext = new CreateSecurityTokenContext
                 {
                     PartnerId = partner.Id,
@@ -96,8 +97,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
                 await Events.InvokeAsync(Options, partner, e => e.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext));
 
-                if (createSecurityTokenContext.SecurityToken == null)
-                    createSecurityTokenContext.SecurityToken = createSecurityTokenContext.Handler.CreateToken(createSecurityTokenContext.TokenDescriptor) as Saml2SecurityToken;
+                createSecurityTokenContext.SecurityToken ??=
+                    createSecurityTokenContext.Handler.CreateToken(createSecurityTokenContext.TokenDescriptor) as Saml2SecurityToken;
 
                 await Events.InvokeAsync(Options, partner, e => e.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext));
 

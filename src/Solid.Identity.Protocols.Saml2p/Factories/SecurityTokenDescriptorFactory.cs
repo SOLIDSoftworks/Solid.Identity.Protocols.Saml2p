@@ -21,9 +21,11 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
 {
     internal class SecurityTokenDescriptorFactory : ISecurityTokenDescriptorFactory
     {
-        private Saml2pOptions _options;
-        private IEnumerable<IServiceProviderClaimsProvider> _claimsProviders;
-        private ILogger<SecurityTokenDescriptorFactory> _logger;
+        private readonly Saml2pOptions _options;
+        private readonly IEnumerable<IServiceProviderClaimsProvider> _claimsProviders;
+        private readonly ILogger<SecurityTokenDescriptorFactory> _logger;
+
+#if NET6_0
         private ISystemClock _systemClock;
 
         public SecurityTokenDescriptorFactory(
@@ -37,18 +39,36 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             _logger = logger;
             _systemClock = systemClock;
         }
+#else
+        private readonly TimeProvider _time;
+
+        public SecurityTokenDescriptorFactory(
+            IOptions<Saml2pOptions> options,
+            IEnumerable<IServiceProviderClaimsProvider> claimsProviders,
+            ILogger<SecurityTokenDescriptorFactory> logger,
+            TimeProvider time)
+        {
+            _options = options.Value;
+            _claimsProviders = claimsProviders;
+            _logger = logger;
+            _time = time;
+        }
+#endif
 
         public async ValueTask<SecurityTokenDescriptor> CreateSecurityTokenDescriptorAsync(ClaimsIdentity identity, ISaml2pServiceProvider partner)
         {
-            var instant = identity.FindFirst(ClaimTypes.AuthenticationInstant)?.Value;
-            var issuedAt = _systemClock.UtcNow.DateTime;
-            if (instant != null && DateTime.TryParse(instant, out var parsed))
-                issuedAt = parsed;
-
-            var issuer = partner.ExpectedIssuer ?? _options.DefaultIssuer;
+            var issuedAt = GetUtcNow();
+            var instant = issuedAt;
+            if (identity.TryParseAuthenticationInstant(out var parsed))
+                instant = parsed!.Value;
 
             var lifetime = partner.TokenLifeTime ?? _options.DefaultTokenLifetime;
-            var tolerence = partner.MaxClockSkew ?? _options.DefaultMaxClockSkew ?? TimeSpan.Zero;
+            var tolerance = partner.MaxClockSkew ?? _options.DefaultMaxClockSkew ?? TimeSpan.Zero;
+            var expires = issuedAt
+                .Add(lifetime)
+                .Add(tolerance)
+            ;
+            var issuer = partner.ExpectedIssuer ?? _options.DefaultIssuer;
             var claims = new List<Claim>();
             foreach (var provider in _claimsProviders)
             {
@@ -74,7 +94,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             claims = claims.Where(c => supported.Contains(c.Type)).ToList();
             Trace($"Filtered claims.", claims);
 
-            AddRequiredClaims(identity, claims, issuedAt, issuer);
+            AddRequiredClaims(identity, claims, instant, issuer);
 
             var attributes = claims
                 .Where(c => c.Type != ClaimTypes.NameIdentifier)
@@ -91,18 +111,13 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 attribute.Properties.Add(ClaimProperties.SamlAttributeNameFormat, "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified");
             }
 
-            var expires = issuedAt
-                .Add(lifetime)
-                .Add(tolerence)
-            ;
-
             var descriptor = new SecurityTokenDescriptor
             {
                 Audience = partner.Id,
                 Subject = new ClaimsIdentity(claims, "SSO"),
                 Issuer = issuer,
                 IssuedAt = issuedAt,
-                NotBefore = issuedAt.Subtract(tolerence),
+                NotBefore = issuedAt.Subtract(tolerance),
                 Expires = expires,
                 SigningCredentials = GetSigningCredentials(partner),
                 EncryptingCredentials = GetEncryptingCredentials(partner)
@@ -170,6 +185,15 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         {
             if (!_logger.IsEnabled(LogLevel.Trace)) return;
             _logger.LogTrace(prefix + Environment.NewLine + "{state}", new WrappedLogMessageState(obj));
+        }
+
+        private DateTime GetUtcNow()
+        {
+#if NET6_0
+            return _systemClock.UtcNow.UtcDateTime;
+#else
+            return _time.GetUtcNow().UtcDateTime;
+#endif
         }
     }
 }

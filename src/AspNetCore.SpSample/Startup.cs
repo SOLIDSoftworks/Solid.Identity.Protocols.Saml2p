@@ -62,9 +62,6 @@ namespace AspNetCore.SpSample
                         idp.CanInitiateSso = true;
                         idp.RequestedAuthnContextClassRef = Saml2pConstants.Classes.Kerberos;
                         idp.AssertionSigningKeys.Add(new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(SigningCertificateBase64))));
-                        //idp.Events.OnGeneratingRelayState = (provider, context) => new ValueTask();
-                        //idp.Events.OnValidatingToken = ValidatingToken;
-                        //idp.Events.OnValidatingToken += (provider, context) => new ValueTask();
                     });
                 })
             ;
