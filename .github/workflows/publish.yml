@@ -38,7 +38,7 @@ jobs:
         with:
           dotnet-version: |
             6.0.x
-            7.0.x
+            8.0.x
           
       - name: install_dependencies
         run: dotnet restore ./src/Solid.Identity.Protocols.Saml2p.sln
