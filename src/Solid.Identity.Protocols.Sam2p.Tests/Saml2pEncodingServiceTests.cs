@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 
-namespace Solid.Identity.Protocols.Sam2p.Tests
+namespace Solid.Identity.Protocols.Saml2p.Tests
 {
     public class Saml2pEncodingServiceTests
     {
