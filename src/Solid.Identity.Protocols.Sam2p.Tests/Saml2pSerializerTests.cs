@@ -241,7 +241,7 @@ namespace Solid.Identity.Protocols.Saml2p.Tests
         }
 
         [Fact]
-        public void ShouldWriterSamlResponseAssertionElement()
+        public void ShouldWriteSamlResponseAssertionElement()
         {
             var issuer = new Saml2NameIdentifier("issuer");
             var assertion = new Saml2Assertion(issuer)
