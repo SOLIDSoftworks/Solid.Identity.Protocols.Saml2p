@@ -1,6 +1,7 @@
 ﻿using Solid.Identity.Protocols.Saml2p.Providers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,13 +12,14 @@ using Solid.Identity.Protocols.Saml2p.Options;
 using Solid.Identity.Protocols.Saml2p.Models.Protocol;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
+using Solid.Identity.Protocols.Saml2p;
 using Solid.Identity.Protocols.Saml2p.Middleware.Sp;
 using Solid.Identity.Protocols.Saml2p.Models.Results;
 
 namespace Microsoft.AspNetCore.Http
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public static class Solid_Identity_Protocols_Saml2p_HttpExtensions
+    public static class HttpContextExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         /// <summary>
@@ -28,6 +30,7 @@ namespace Microsoft.AspNetCore.Http
         /// <returns>An awaitable <see cref="Task"/>.</returns>
         public static Task StartSsoAsync(this HttpContext context, string partnerId)
         {
+            using var activity = Saml2pConstants.Tracing.Saml2p.CreateActivity(nameof(StartSsoAsync), ActivityKind.Server);
             var middleware = context.RequestServices.GetRequiredService<StartSsoEndpointMiddleware>();
             return middleware.StartSsoAsync(context, partnerId);
         }
@@ -39,6 +42,7 @@ namespace Microsoft.AspNetCore.Http
         /// <returns>An awaitable <see cref="Task{T}"/> of type <see cref="FinishSsoResult"/>.</returns>
         public static async Task<FinishSsoResult> FinishSsoAsync(this HttpContext context)
         {
+            using var activity = Saml2pConstants.Tracing.Saml2p.CreateActivity(nameof(FinishSsoAsync), ActivityKind.Server);
             var middleware = context.RequestServices.GetRequiredService<FinishSsoEndpointMiddleware>();
             return await middleware.FinishSsoAsync(context);
         }

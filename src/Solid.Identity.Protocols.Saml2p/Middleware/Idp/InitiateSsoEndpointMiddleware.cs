@@ -33,8 +33,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
         {
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override Task InvokeAsync(HttpContext context)
+            => InnitiateSsoAsync(context);
+        private async Task InnitiateSsoAsync(HttpContext context)
         {
+            using var activity = CreateActivity(nameof(InnitiateSsoAsync));
             Logger.LogInformation("Initiating SAML2P authentication (IDP flow).");
             var id = context.Request.Query[Options.PartnerIdQueryParameter];
             if (StringValues.IsNullOrEmpty(id))

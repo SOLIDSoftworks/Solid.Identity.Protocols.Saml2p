@@ -13,6 +13,7 @@ using Solid.Identity.Protocols.Saml2p.Serialization;
 using Solid.Identity.Protocols.Saml2p.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Security;
@@ -48,6 +49,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected string SerializeAuthnRequest(AuthnRequest request, BindingType binding)
         {
+            using var activity = CreateActivity(nameof(SerializeAuthnRequest));
+            
             using (var memory = new MemoryStream())
             {
                 using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
@@ -61,6 +64,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected string SerializeSamlResponse(SamlResponse response, BindingType binding)
         {
+            using var activity = CreateActivity(nameof(SerializeSamlResponse));
             using (var memory = new MemoryStream())
             {
                 using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
@@ -74,6 +78,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out BindingType binding)
         {
+            using var activity = CreateActivity(nameof(TryGetAuthnRequest));
             const string name = "SAMLRequest";
             var reader = GetXmlReader(context, name, out var b);
             if (reader == null || !b.HasValue)
@@ -99,6 +104,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out BindingType binding)
         {
+            using var activity = CreateActivity(nameof(TryGetSamlResponse));
             const string name = "SAMLResponse";
             var reader = GetXmlReader(context, name, out var b);
             if (reader == null || !b.HasValue)
@@ -124,6 +130,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected async Task ChallengeAsync(HttpContext context, AuthnRequest request, string returnUrl, IDictionary<string, string> items, string authenticationScheme = null)
         {
+            using var activity = CreateActivity(nameof(ChallengeAsync));
+            
             if (context.User.Identity.IsAuthenticated && request.ForceAuthn != true)
             {
                 context.Response.Redirect(returnUrl);
@@ -231,6 +239,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
                 var xml = new UTF8Encoding(false).GetString(stream.ToArray());
                 Logger.LogTrace(format, response.RelayState, xml);
             }
+        }
+
+        protected IDisposable CreateActivity(string name)
+        {
+            var type = GetType();
+            return Saml2pConstants.Tracing.Saml2p.CreateActivity($"{type.Name}.{name}", ActivityKind.Server);
         }
 
         public void Dispose() => _optionsChangeToken?.Dispose();

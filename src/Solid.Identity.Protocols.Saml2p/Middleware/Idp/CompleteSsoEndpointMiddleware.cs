@@ -54,8 +54,11 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
             _responseFactory = responseFactory;
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override Task InvokeAsync(HttpContext context)
+            => CompleteSsoAsync(context);
+        private async Task CompleteSsoAsync(HttpContext context)
         {
+            using var activity = CreateActivity(nameof(CompleteSsoAsync));
             Logger.LogInformation("Completing SAML2P authentication (IDP flow).");
             var id = context.Request.Query["id"];
             if(StringValues.IsNullOrEmpty(id))

@@ -1,6 +1,7 @@
 ﻿using Solid.Identity.Protocols.Saml2p.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
 
@@ -154,6 +155,28 @@ namespace Solid.Identity.Protocols.Saml2p
                 BindingType.Redirect,
                 BindingType.Post
             };
+        }
+
+        public static class Tracing
+        {
+            private static readonly string AssemblyVersion = GenerateAssemblyVersion();
+            public static ActivitySource Saml2p { get; } = new (Names.Saml2p, AssemblyVersion);
+            public static ActivitySource Cache { get; } = new (Names.Cache, AssemblyVersion);
+            public static ActivitySource Providers { get; } = new (Names.Providers, AssemblyVersion);
+            public static ActivitySource Validation { get; } = new (Names.Validation, AssemblyVersion);
+            public static class Names
+            {
+                public const string Saml2p = "Solid.Identity.Protocols.Saml2p";
+                public const string Cache = Saml2p + ".Cache";
+                public const string Providers = Saml2p + ".Providers";
+                public const string Validation = Saml2p + ".Validation";
+            }
+
+            private static string GenerateAssemblyVersion()
+            {
+                var version = typeof(Saml2pConstants).Assembly.GetName().Version;
+                return version == null ? "0.0.0" : $"{version.Major}.{version.Minor}.{version.Build}";
+            }
         }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }

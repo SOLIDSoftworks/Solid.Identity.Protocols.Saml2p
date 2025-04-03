@@ -66,6 +66,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
         internal async Task StartSsoAsync(HttpContext context, string partnerId)
         {
+            using var activity = CreateActivity(nameof(StartSsoAsync));
             Logger.LogInformation("Starting SAML2P authentication (SP flow).");
             var partner = await Partners.GetIdentityProviderAsync(partnerId);
             

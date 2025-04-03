@@ -33,8 +33,12 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
         {
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override Task InvokeAsync(HttpContext context)
+            => AcceptSsoAsync(context);
+
+        private async Task AcceptSsoAsync(HttpContext context)
         {
+            using var activity = CreateActivity(nameof(AcceptSsoAsync));
             if(!TryGetAuthnRequest(context, out var request, out var binding))
             {
                 context.Response.StatusCode = 400;

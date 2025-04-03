@@ -2,6 +2,7 @@
 using Solid.Identity.Protocols.Saml2p.Models.Context;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,8 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
 
         public async ValueTask<ISaml2pIdentityProvider> GetIdentityProviderAsync(string id)
         {
+            using var activity = Saml2pConstants.Tracing.Providers.CreateActivity($"{nameof(Saml2pPartnerProvider)}.{nameof(GetIdentityProviderAsync)}", ActivityKind.Server);
+            
             _logger.LogInformation($"Searching for partner idp: '{id}'.");
             var idp = null as ISaml2pIdentityProvider;
             if (_options.IdentityProviders.TryGetValue(id, out idp))
@@ -53,6 +56,7 @@ namespace Solid.Identity.Protocols.Saml2p.Providers
 
         public async ValueTask<ISaml2pServiceProvider> GetServiceProviderAsync(string id)
         {
+            using var activity = Saml2pConstants.Tracing.Providers.CreateActivity($"{nameof(Saml2pPartnerProvider)}.{nameof(GetServiceProviderAsync)}", ActivityKind.Server);
             _logger.LogInformation($"Searching for partner sp: '{id}'.");
             var sp = null as ISaml2pServiceProvider;
             if (_options.ServiceProviders.TryGetValue(id, out sp))

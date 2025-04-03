@@ -4,6 +4,7 @@ using Solid.Identity.Protocols.Saml2p.Abstractions;
 using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -20,6 +21,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
 
         public TokenValidationParameters Create(ISaml2pIdentityProvider partner)
         {
+            using var activity = Saml2pConstants.Tracing.Validation.CreateActivity(
+                $"{nameof(TokenValidationParametersFactory)}.{nameof(Create)}", ActivityKind.Server);
             var parameters = new TokenValidationParameters
             {
                 ValidIssuer = partner.Id,

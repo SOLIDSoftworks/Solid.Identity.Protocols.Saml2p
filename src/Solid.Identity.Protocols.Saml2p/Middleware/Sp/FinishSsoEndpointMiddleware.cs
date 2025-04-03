@@ -118,6 +118,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
         public async Task<FinishSsoResult> FinishSsoAsync(HttpContext context)
         {
+            using var activity = CreateActivity(nameof(FinishSsoAsync));
             if (!TryGetSamlResponse(context, out var response, out var binding))
             {
                 throw new InvalidOperationException("Bad request.");
