@@ -50,19 +50,17 @@ namespace Solid.Identity.Protocols.Saml2p.Services
             if (page == null)
                 throw new ArgumentException($"Unable to find page {path}");
             var view = CreateView(page);
-            using (var writer = new StringWriter())
+            await using var writer = new StringWriter();
+            var viewContext = CreateViewContext(actionContext, view, model, writer);
+            page.PageContext = new PageContext
             {
-                var viewContext = CreateViewContext(actionContext, view, model, writer);
-                page.PageContext = new PageContext
-                {
-                    ViewData = viewContext.ViewData
-                };
-                page.ViewContext = viewContext;
-                _activator.Activate(page, viewContext);
-                await page.ExecuteAsync();
-                var rendered = writer.ToString();
-                return rendered;
-            }
+                ViewData = viewContext.ViewData
+            };
+            page.ViewContext = viewContext;
+            _activator.Activate(page, viewContext);
+            await page.ExecuteAsync();
+            var rendered = writer.ToString();
+            return rendered;
         }
 
         private ActionContext CreateActionContext(string path, string area)
