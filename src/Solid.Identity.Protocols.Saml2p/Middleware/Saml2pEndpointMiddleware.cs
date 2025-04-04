@@ -49,7 +49,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected string SerializeAuthnRequest(AuthnRequest request, BindingType binding)
         {
-            using var activity = CreateActivity(nameof(SerializeAuthnRequest));
+            using var activity = StartActivity(nameof(SerializeAuthnRequest));
             
             using (var memory = new MemoryStream())
             {
@@ -64,7 +64,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected string SerializeSamlResponse(SamlResponse response, BindingType binding)
         {
-            using var activity = CreateActivity(nameof(SerializeSamlResponse));
+            using var activity = StartActivity(nameof(SerializeSamlResponse));
             using (var memory = new MemoryStream())
             {
                 using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
@@ -76,7 +76,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected bool TryGetAuthnRequest(HttpContext context, out AuthnRequest request, out BindingType binding)
         {
-            using var activity = CreateActivity(nameof(TryGetAuthnRequest));
+            using var activity = StartActivity(nameof(TryGetAuthnRequest));
             const string name = "SAMLRequest";
             var reader = GetXmlReader(context, name, out var b);
             if (reader == null || !b.HasValue)
@@ -102,7 +102,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected bool TryGetSamlResponse(HttpContext context, out SamlResponse response, out BindingType binding)
         {
-            using var activity = CreateActivity(nameof(TryGetSamlResponse));
+            using var activity = StartActivity(nameof(TryGetSamlResponse));
             const string name = "SAMLResponse";
             var reader = GetXmlReader(context, name, out var b);
             if (reader == null || !b.HasValue)
@@ -128,7 +128,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
 
         protected async Task ChallengeAsync(HttpContext context, AuthnRequest request, string returnUrl, IDictionary<string, string> items, string authenticationScheme = null)
         {
-            using var activity = CreateActivity(nameof(ChallengeAsync));
+            using var activity = StartActivity(nameof(ChallengeAsync));
             
             if (context.User.Identity.IsAuthenticated && request.ForceAuthn != true)
             {
@@ -239,10 +239,10 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             }
         }
 
-        protected IDisposable CreateActivity(string name)
+        protected IDisposable StartActivity(string name)
         {
             var type = GetType();
-            return Saml2pConstants.Tracing.Saml2p.CreateActivity($"{type.Name}.{name}", ActivityKind.Server);
+            return Saml2pConstants.Tracing.Saml2p.StartActivity($"{type.Name}.{name}");
         }
 
         public void Dispose() => _optionsChangeToken?.Dispose();

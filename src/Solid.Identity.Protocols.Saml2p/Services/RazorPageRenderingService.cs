@@ -43,8 +43,8 @@ namespace Solid.Identity.Protocols.Saml2p.Services
 
         public async Task<string> RenderPageAsync<T>(T model, string path, string area = null)
         {
-            using var activity = Saml2pConstants.Tracing.Saml2p.CreateActivity(
-                $"{nameof(RazorPageRenderingService)}.{nameof(RenderPageAsync)}", ActivityKind.Server);
+            using var activity = Saml2pConstants.Tracing.Saml2p.StartActivity(
+                $"{nameof(RazorPageRenderingService)}.{nameof(RenderPageAsync)}");
             var actionContext = CreateActionContext(path, area ?? string.Empty);
             var page = _engine.FindPage(actionContext, path).Page as Page;
             if (page == null)

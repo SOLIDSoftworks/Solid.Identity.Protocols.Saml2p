@@ -23,21 +23,21 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
 
         public Task CacheRequestAsync(string key, AuthnRequest request)
         {
-            using var activity = CreateActivity(nameof(CacheRequestAsync));
+            using var activity = StartActivity(nameof(CacheRequestAsync));
             var json = JsonSerializer.SerializeToUtf8Bytes(request);
             return _inner.SetAsync(key, json, CreateOptions());
         }
 
         public Task CacheStatusAsync(string key, Status status)
         {
-            using var activity = CreateActivity(nameof(CacheStatusAsync));
+            using var activity = StartActivity(nameof(CacheStatusAsync));
             var json = JsonSerializer.SerializeToUtf8Bytes(status);
             return _inner.SetAsync($"{key}_status", json, CreateOptions());
         }
 
         public async Task<AuthnRequest> FetchRequestAsync(string key)
         {
-            using var activity = CreateActivity(nameof(FetchRequestAsync));
+            using var activity = StartActivity(nameof(FetchRequestAsync));
             var json = await _inner.GetAsync(key);
             if (json == null) return null;
 
@@ -46,7 +46,7 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
 
         public async Task<Status> FetchStatusAsync(string key)
         {
-            using var activity = CreateActivity(nameof(FetchStatusAsync));
+            using var activity = StartActivity(nameof(FetchStatusAsync));
             var json = await _inner.GetAsync($"{key}_status");
             if (json == null) return null;
 
@@ -55,7 +55,7 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
 
         public async Task RemoveAsync(string key)
         {
-            using var activity = CreateActivity(nameof(RemoveAsync));
+            using var activity = StartActivity(nameof(RemoveAsync));
             await _inner.RemoveAsync(key);
             await _inner.RemoveAsync($"{key}_status");
         }
@@ -68,7 +68,7 @@ namespace Solid.Identity.Protocols.Saml2p.Cache
             };
         }
 
-        private IDisposable CreateActivity(string name)
-            => Saml2pConstants.Tracing.Cache.CreateActivity($"{nameof(Saml2pCache)}.{name}", ActivityKind.Server);
+        private IDisposable StartActivity(string name)
+            => Saml2pConstants.Tracing.Cache.StartActivity($"{nameof(Saml2pCache)}.{name}");
     }
 }

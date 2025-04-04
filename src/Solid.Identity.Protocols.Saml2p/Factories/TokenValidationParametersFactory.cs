@@ -21,8 +21,8 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
 
         public TokenValidationParameters Create(ISaml2pIdentityProvider partner)
         {
-            using var activity = Saml2pConstants.Tracing.Validation.CreateActivity(
-                $"{nameof(TokenValidationParametersFactory)}.{nameof(Create)}", ActivityKind.Server);
+            using var activity = Saml2pConstants.Tracing.Validation.StartActivity(
+                $"{nameof(TokenValidationParametersFactory)}.{nameof(Create)}");
             var parameters = new TokenValidationParameters
             {
                 ValidIssuer = partner.Id,

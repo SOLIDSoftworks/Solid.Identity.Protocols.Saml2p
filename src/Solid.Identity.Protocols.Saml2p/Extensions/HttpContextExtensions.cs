@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.Http
         /// <returns>An awaitable <see cref="Task"/>.</returns>
         public static Task StartSsoAsync(this HttpContext context, string partnerId)
         {
-            using var activity = Saml2pConstants.Tracing.Saml2p.CreateActivity(nameof(StartSsoAsync), ActivityKind.Server);
+            using var activity = Saml2pConstants.Tracing.Saml2p.StartActivity(nameof(StartSsoAsync));
             var middleware = context.RequestServices.GetRequiredService<StartSsoEndpointMiddleware>();
             return middleware.StartSsoAsync(context, partnerId);
         }
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.Http
         /// <returns>An awaitable <see cref="Task{T}"/> of type <see cref="FinishSsoResult"/>.</returns>
         public static async Task<FinishSsoResult> FinishSsoAsync(this HttpContext context)
         {
-            using var activity = Saml2pConstants.Tracing.Saml2p.CreateActivity(nameof(FinishSsoAsync), ActivityKind.Server);
+            using var activity = Saml2pConstants.Tracing.Saml2p.StartActivity(nameof(FinishSsoAsync));
             var middleware = context.RequestServices.GetRequiredService<FinishSsoEndpointMiddleware>();
             return await middleware.FinishSsoAsync(context);
         }
