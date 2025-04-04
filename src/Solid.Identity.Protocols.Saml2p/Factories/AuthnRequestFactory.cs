@@ -53,6 +53,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         /// <returns>An awaitable <see cref="Task{TResult}"/> of type <see cref="AuthnRequest"/>.</returns>
         public async Task<AuthnRequest> CreateAuthnRequestAsync(HttpContext context, ISaml2pIdentityProvider idp)
         {
+            using var activity = Saml2pConstants.Tracing.Factories.StartActivity($"{nameof(AuthnRequestFactory)}.{nameof(CreateAuthnRequestAsync)}"); 
             var request = new AuthnRequest
             {
                 Id = $"_{Guid.NewGuid()}",

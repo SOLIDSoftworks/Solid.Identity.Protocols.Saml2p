@@ -57,6 +57,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
 
         public async ValueTask<SecurityTokenDescriptor> CreateSecurityTokenDescriptorAsync(ClaimsIdentity identity, ISaml2pServiceProvider partner)
         {
+            using var activity = Saml2pConstants.Tracing.Factories.StartActivity($"{nameof(SecurityTokenDescriptorFactory)}.{nameof(CreateSecurityTokenDescriptorAsync)}");
             var issuedAt = GetUtcNow();
             var instant = issuedAt;
             if (identity.TryParseAuthenticationInstant(out var parsed))

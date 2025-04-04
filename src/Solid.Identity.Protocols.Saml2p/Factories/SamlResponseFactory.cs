@@ -25,6 +25,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
         
         public SamlResponse Create(ISaml2pServiceProvider partner, Status status, string authnRequestId = null, string relayState = null, Saml2SecurityToken token = null)
         {
+            using var activity = Saml2pConstants.Tracing.Factories.StartActivity($"{nameof(SamlResponseFactory)}.{nameof(Create)}");
             var destination = new Uri(partner.BaseUrl, partner.AssertionConsumerServiceEndpoint);
             if (token != null)
             {
