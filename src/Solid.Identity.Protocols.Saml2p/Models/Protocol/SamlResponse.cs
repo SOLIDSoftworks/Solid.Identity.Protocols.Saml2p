@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.IdentityModel.Xml;
 
 namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
 {
@@ -62,5 +63,15 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
         /// The relay state used to correlate requests and responses.
         /// </summary>
         public string RelayState { get; set; }
+
+        /// <summary>
+        /// The signature of the SAMLResponse
+        /// </summary>
+        public Signature Signature { get; internal set; }
+
+        /// <summary>
+        /// Signing credentials used to sign the SAMLResponse
+        /// </summary>
+        public SigningCredentials SigningCredentials { get; set; }
     }
 }

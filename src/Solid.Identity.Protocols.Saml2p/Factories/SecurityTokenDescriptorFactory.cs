@@ -119,7 +119,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 IssuedAt = issuedAt,
                 NotBefore = issuedAt.Subtract(tolerance),
                 Expires = expires,
-                SigningCredentials = GetSigningCredentials(partner),
+                SigningCredentials = GetAssertionSigningCredentials(partner),
                 EncryptingCredentials = GetEncryptingCredentials(partner)
             };
 
@@ -163,7 +163,7 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
             return credentials;
         }
 
-        private SigningCredentials GetSigningCredentials(ISaml2pServiceProvider partner)
+        private SigningCredentials GetAssertionSigningCredentials(ISaml2pServiceProvider partner)
         {
             if (partner.AssertionSigningKey == null)
                 throw new ArgumentNullException(nameof(partner.AssertionSigningKey));

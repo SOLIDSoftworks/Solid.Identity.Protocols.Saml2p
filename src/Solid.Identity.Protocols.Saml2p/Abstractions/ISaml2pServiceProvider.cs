@@ -75,8 +75,14 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// </summary>
         bool RequiresEncryptedAssertion { get; }
 
-        //SecurityKey ResponseSigningKey { get; }
-        //string ResponseSigningAlgorithm { get; }
-        //string ResponseDigestAlgorithm { get; }
+        /// <summary>
+        /// A flag indicating whether signing SAMLResponse is required.
+        /// </summary>
+        bool RequiresSignedSamlResponse { get; }
+        
+        /// <summary>
+        /// The <see cref="SignatureMethod"/> used to sign the SAMLResponse.
+        /// </summary>
+        SignatureMethod SamlResponseSigningMethod { get; }
     }
 }

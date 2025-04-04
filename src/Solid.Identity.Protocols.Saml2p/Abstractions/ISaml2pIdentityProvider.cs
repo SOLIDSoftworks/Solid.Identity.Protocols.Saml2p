@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Solid.IdentityModel.Tokens;
 
 namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
@@ -49,5 +50,15 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// A flag indicating whether the SP can initiate SSO.
         /// </summary>
         bool AllowsSpInitiatedSso { get; }
+        
+        /// <summary>
+        /// A flag indicating whether signing AuthnRequest is required.
+        /// </summary>
+        bool RequiresSignedAuthnRequest { get; }
+        
+        /// <summary>
+        /// The <see cref="SignatureMethod"/> used to sign the AuthnRequest.
+        /// </summary>
+        SignatureMethod AuthnRequestSigningMethod { get; }
     }
 }

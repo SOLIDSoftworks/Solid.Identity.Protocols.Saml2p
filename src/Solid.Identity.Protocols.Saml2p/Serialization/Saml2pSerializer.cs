@@ -7,8 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
+using Microsoft.IdentityModel.Xml;
+using XmlException = System.Xml.XmlException;
 
 namespace Solid.Identity.Protocols.Saml2p.Serialization
 {
@@ -158,6 +162,9 @@ namespace Solid.Identity.Protocols.Saml2p.Serialization
         /// <param name="response">The <see cref="SamlResponse"/> to serialize.</param>
         public virtual void SerializeSamlResponse(XmlDictionaryWriter writer, SamlResponse response)
         {
+            if (response.SigningCredentials != null)
+                writer = new EnvelopedSignatureWriter(writer, response.SigningCredentials, response.Id);
+            
             using (writer.WriteElement(Saml2pConstants.Namespaces.ProtocolPrefix, Saml2pConstants.Elements.Response, Saml2pConstants.Namespaces.ProtocolNamespace))
             {
                 writer.WriteXmlnsAttribute(Saml2Constants.Prefix, Saml2Constants.Namespace);
@@ -268,6 +275,9 @@ namespace Solid.Identity.Protocols.Saml2p.Serialization
         /// <param name="request">The <see cref="AuthnRequest"/> to serialize.</param>
         public virtual void SerializeAuthnRequest(XmlDictionaryWriter writer, AuthnRequest request)
         {
+            if (request.SigningCredentials != null)
+                writer = new EnvelopedSignatureWriter(writer, request.SigningCredentials, request.Id);
+            
             using (writer.WriteElement(Saml2pConstants.Namespaces.ProtocolPrefix, Saml2pConstants.Elements.AuthnRequest, Saml2pConstants.Namespaces.ProtocolNamespace))
             {
                 writer.WriteXmlnsAttribute(Saml2Constants.Prefix, Saml2Constants.Namespace);
@@ -301,18 +311,21 @@ namespace Solid.Identity.Protocols.Saml2p.Serialization
                 return false;
             }
             var r = new SamlResponse();
-            if (reader.MoveToFirstAttribute())
+            using var enveloped = new EnvelopedSignatureReader(reader);
+            if (enveloped.MoveToFirstAttribute())
             {
                 do
                 {
-                    if (!TryReadSamlResponseAttribute(reader, r))
-                        LogUnreadableAttribute(Saml2pConstants.Elements.Response, reader);
-                } while (reader.MoveToNextAttribute());
+                    if (!TryReadSamlResponseAttribute(enveloped, r))
+                        LogUnreadableAttribute(Saml2pConstants.Elements.Response, enveloped);
+                } while (enveloped.MoveToNextAttribute());
             }
 
-            ReadSamlResponseChildElements(reader, r);
-
+            ReadSamlResponseChildElements(enveloped, r);
+            
             response = r;
+            response.Signature = enveloped.Signature;
+            
             return true;
         }
 
@@ -390,19 +403,21 @@ namespace Solid.Identity.Protocols.Saml2p.Serialization
                 return false;
             }
 
+            using var enveloped = new EnvelopedSignatureReader(reader);
             var r = new AuthnRequest();
-            if (reader.MoveToFirstAttribute())
+            if (enveloped.MoveToFirstAttribute())
             {
                 do
                 {
-                    if (!TryReadAuthnRequestAttribute(reader, r))
-                        LogUnreadableAttribute(Saml2pConstants.Elements.AuthnRequest, reader);
-                } while (reader.MoveToNextAttribute());
+                    if (!TryReadAuthnRequestAttribute(enveloped, r))
+                        LogUnreadableAttribute(Saml2pConstants.Elements.AuthnRequest, enveloped);
+                } while (enveloped.MoveToNextAttribute());
             }
 
-            ReadAuthnRequestChildElements(reader, r);
+            ReadAuthnRequestChildElements(enveloped, r);
 
             request = r;
+            request.Signature = enveloped.Signature;
             return true;
         }
 

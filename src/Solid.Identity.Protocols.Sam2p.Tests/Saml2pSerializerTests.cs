@@ -6,6 +6,9 @@ using Solid.Identity.Protocols.Saml2p.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -13,6 +16,7 @@ using Xunit;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 
 namespace Solid.Identity.Protocols.Saml2p.Tests
 {
@@ -26,6 +30,8 @@ namespace Solid.Identity.Protocols.Saml2p.Tests
 
         public Saml2pSerializerTests()
         {
+            IdentityModelEventSource.ShowPII = true;
+            
             _mockHandler = new Mock<Saml2SecurityTokenHandler>();
             _mockHandler.CallBase = true;
             var mockWriterFactory = new Mock<IXmlWriterFactory>();
@@ -282,6 +288,22 @@ namespace Solid.Identity.Protocols.Saml2p.Tests
 
             var request = _serializer.DeserializeSamlResponse(xml);
             Assert.NotNull(request);
+        }
+        
+
+        [Fact]
+        public void ShouldReadSamlResponseSignature()
+        {
+            using var key = RSA.Create(2048);
+            var xml = $"<samlp:Response xmlns:samlp=\"{_protocolNamespace}\" Version=\"2.0\"></samlp:Response>";
+            var document = new XmlDocument();
+            document.LoadXml(xml);
+            document.SignXml(key);
+
+            var signed = document.OuterXml;
+
+            var request = _serializer.DeserializeSamlResponse(signed);
+            Assert.NotNull(request.Signature);
         }
 
         [Fact]
@@ -830,6 +852,21 @@ namespace Solid.Identity.Protocols.Saml2p.Tests
 
             var request = _serializer.DeserializeAuthnRequest(xml);
             Assert.NotNull(request);
+        }
+
+        [Fact]
+        public void ShouldReadAuthnRequestSignature()
+        {
+            using var key = RSA.Create(2048);
+            var xml = $"<samlp:AuthnRequest xmlns:samlp=\"{_protocolNamespace}\"></samlp:AuthnRequest>";
+            var document = new XmlDocument();
+            document.LoadXml(xml);
+            document.SignXml(key);
+
+            var signed = document.OuterXml;
+
+            var request = _serializer.DeserializeAuthnRequest(signed);
+            Assert.NotNull(request.Signature);
         }
 
         [Theory]

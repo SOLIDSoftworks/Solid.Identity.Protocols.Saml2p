@@ -101,6 +101,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
             if (context.Partner == null)
             {
+                Logger.LogInformation("No partner found for requesting id");
                 status = SamlResponseStatus.Requester;
                 subStatus = SamlResponseStatus.RequestDenied;
                 return false;
@@ -108,6 +109,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
 
             if (!context.Partner.Enabled || !context.Partner.CanInitiateSso)
             {
+                Logger.LogInformation("Requesting partner is disabled or is not authorized to initiate sso");
                 status = SamlResponseStatus.Requester;
                 subStatus = SamlResponseStatus.RequestDenied;
                 return false;
@@ -119,6 +121,28 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 subStatus = SamlResponseStatus.UnsupportedBinding;
                 return false;
             }
+
+            if (context.Partner.AuthnRequestSigningKey != null)
+            {
+                if(context.Request.Signature == null)
+                {
+                    Logger.LogInformation("Signature is missing in AuthnRequest");
+                    status = SamlResponseStatus.Requester;
+                    subStatus = SamlResponseStatus.RequestDenied;
+                    return false;
+                }
+
+                if (context.Request.Signature.KeyInfo.KeyName != context.Partner.AuthnRequestSigningKey.KeyId)
+                {
+                    Logger.LogInformation("AuthnRequest is signed by unexpected key");
+                    status = SamlResponseStatus.Requester;
+                    subStatus = SamlResponseStatus.RequestDenied;
+                    return false;
+                }
+            }
+
+
+
 
             status = null;
             subStatus = null;

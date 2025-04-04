@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Solid.IdentityModel.Tokens;
 
 namespace Solid.Identity.Protocols.Saml2p.Options
 {
@@ -60,9 +61,21 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         /// <inheritdoc/>
         public bool AllowsSpInitiatedSso { get; set; } = true;
+        
+        /// <inheritdoc/>
+        public bool RequiresSignedAuthnRequest { get; set; }
+        
+        /// <inheritdoc/>
+        public SignatureMethod AuthnRequestSigningMethod { get; set; }
 
         // You have service provider events on a identity provider becuase you are the service provider in this scenario.
         /// <inheritdoc/>
         public Saml2pServiceProviderEvents Events { get; } = new Saml2pServiceProviderEvents();
+        
+        /// <inheritdoc/>
+        public SecurityKey SamlResponseSigningKey { get; set; }
+        
+        /// <inheritdoc/>
+        public SecurityKey AuthnRequestSigningKey { get; set; }
     }
 }

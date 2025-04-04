@@ -45,9 +45,6 @@ namespace Solid.Identity.Protocols.Saml2p.Options
         public SecurityKey AssertionSigningKey { get; set; }
 
         /// <inheritdoc/>
-        public SecurityKey ResponseSigningKey { get; set; }
-
-        /// <inheritdoc/>
         public TimeSpan? TokenLifeTime { get; set; }
 
         /// <inheritdoc/>
@@ -64,6 +61,18 @@ namespace Solid.Identity.Protocols.Saml2p.Options
 
         /// <inheritdoc/>
         public bool RequiresEncryptedAssertion { get; set; } = false;
+
+        /// <inheritdoc/>
+        public bool RequiresSignedSamlResponse { get; set; }
+        
+        /// <inheritdoc/>
+        public SecurityKey SamlResponseSigningKey { get; set; }
+        
+        /// <inheritdoc/>
+        public SignatureMethod SamlResponseSigningMethod { get; set; }
+
+        /// <inheritdoc/>
+        public SecurityKey AuthnRequestSigningKey { get; set; }
 
         /// <inheritdoc/>
         public bool CanInitiateSso { get; set; } = true;

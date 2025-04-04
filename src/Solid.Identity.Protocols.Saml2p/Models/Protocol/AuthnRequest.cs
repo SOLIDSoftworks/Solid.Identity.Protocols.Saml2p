@@ -2,6 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Xml;
 
 namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
 {
@@ -87,5 +91,15 @@ namespace Solid.Identity.Protocols.Saml2p.Models.Protocol
         /// The relay state used to correlate requests and responses.
         /// </summary>
         public string RelayState { get; set; }
+
+        /// <summary>
+        /// The signature of the AuthnRequest
+        /// </summary>
+        public Signature Signature { get; internal set; }
+
+        /// <summary>
+        /// Signing credentials used to sign the AuthnRequest
+        /// </summary>
+        public SigningCredentials SigningCredentials { get; set; }
     }
 }

@@ -134,6 +134,14 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if (!partner.Enabled)
                 throw new SecurityException($"Partner idp '{partnerId}' is disabled.");
+
+            if (partner.SamlResponseSigningKey != null)
+            {
+                if(response.Signature == null)
+                    throw new SecurityException($"Partner idp '{partnerId}' is expected to sign the SAMLResponse, but no signature was found.");
+                if(response.Signature.KeyInfo.KeyName != partner.SamlResponseSigningKey.KeyId)
+                    throw new SecurityException($"SAMLResponse fro partner idp '{partnerId}' signed by unexpected key.");
+            }
             
             var request = null as AuthnRequest;
 

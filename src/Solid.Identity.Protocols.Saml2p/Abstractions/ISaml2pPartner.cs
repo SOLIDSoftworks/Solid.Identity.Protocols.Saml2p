@@ -3,6 +3,7 @@ using Solid.Identity.Protocols.Saml2p.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Solid.Identity.Protocols.Saml2p.Abstractions
 {
@@ -51,5 +52,15 @@ namespace Solid.Identity.Protocols.Saml2p.Abstractions
         /// The events object.
         /// </summary>
         TEvents Events { get; }
+        
+        /// <summary>
+        /// Signing key used to sign and validate SAMLResponse
+        /// </summary>
+        SecurityKey SamlResponseSigningKey { get; }
+        
+        /// <summary>
+        /// Signing key used to sign and validate AuthnRequest
+        /// </summary>
+        SecurityKey AuthnRequestSigningKey { get; }
     }
 }

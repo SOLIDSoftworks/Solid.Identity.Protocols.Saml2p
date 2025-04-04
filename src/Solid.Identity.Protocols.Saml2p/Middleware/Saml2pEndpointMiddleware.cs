@@ -68,9 +68,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware
             using (var memory = new MemoryStream())
             {
                 using (var writer = XmlWriter.Create(memory, new XmlWriterSettings { OmitXmlDeclaration = true, Indent = false, CloseOutput = false, Encoding = new UTF8Encoding(false) }))
-                {
                     Serializer.SerializeSamlResponse(writer, response);
-                }
                 memory.Position = 0;
                 return Encoder.Encode(memory, binding);
             }

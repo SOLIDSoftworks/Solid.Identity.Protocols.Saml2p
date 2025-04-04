@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Solid.Identity.Protocols.Saml2p.Abstractions;
 
 namespace Solid.Identity.Protocols.Saml2p.Factories
@@ -45,6 +46,14 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                 InResponseTo = authnRequestId,
                 RelayState = relayState
             };
+
+            if (partner.RequiresSignedSamlResponse)
+            {
+                if (partner is { SamlResponseSigningKey: not null, SamlResponseSigningMethod: not null })
+                    response.SigningCredentials = partner.SamlResponseSigningMethod.CreateCredentials(partner.SamlResponseSigningKey);
+                else
+                    throw new InvalidOperationException($"Partner '{partner.Id}' requires a signed SAMLResponse, but has misconfigured signing credentials.");
+            }
 
             return response;
         }

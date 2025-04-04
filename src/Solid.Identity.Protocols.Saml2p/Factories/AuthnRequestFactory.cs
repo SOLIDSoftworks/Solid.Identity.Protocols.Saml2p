@@ -72,6 +72,15 @@ namespace Solid.Identity.Protocols.Saml2p.Factories
                     Comparison = idp.RequestedAuthnContextClassRefComparison
                 }
             };
+
+            if (idp.RequiresSignedAuthnRequest)
+            {
+                if(idp is { AuthnRequestSigningKey: not null, AuthnRequestSigningMethod: not null })
+                    request.SigningCredentials = idp.AuthnRequestSigningMethod.CreateCredentials(idp.AuthnRequestSigningKey);
+                else
+                    throw new InvalidOperationException($"Partner '{idp.Id}' requires a signed AuthnRequest, but has misconfigured signing credentials.");
+            }
+            
             var generateContext = new GenerateRelayStateContext
             {
                 Partner = idp,
