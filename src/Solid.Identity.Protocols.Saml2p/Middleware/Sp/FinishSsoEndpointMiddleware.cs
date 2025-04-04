@@ -170,7 +170,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 Response = response
             };
 
-            await Events.InvokeAsync(Options, partner, e => e.OnFinishSso(context.RequestServices, ssoContext));
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pServiceProviderEvents)}.{nameof(Saml2pServiceProviderEvents.OnFinishSso)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnFinishSso(context.RequestServices, ssoContext));
 
             if (response.Status.StatusCode.Value != Saml2pConstants.Statuses.Success)
             {
@@ -186,7 +187,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 TokenValidationParameters = parameters,
                 Handler = _handler
             };
-            await Events.InvokeAsync(Options, partner, e => e.OnValidatingToken(context.RequestServices, validateContext));
+            
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pServiceProviderEvents)}.{nameof(Saml2pServiceProviderEvents.OnValidatingToken)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnValidatingToken(context.RequestServices, validateContext));
 
             if (validateContext.Subject != null && validateContext.SecurityToken == null ||
                 validateContext.Subject == null && validateContext.SecurityToken != null)
@@ -198,18 +201,23 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
             if (validateContext.Subject == null)
             {
-                Logger.LogInformation("Validating incoming token.");
-                var subject = validateContext.Handler.ValidateToken(validateContext.Response.XmlSecurityToken, validateContext.TokenValidationParameters, out var token);
-                var saml2 = token as Saml2SecurityToken;
-                var now = GetUtcNow();
+                using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2SecurityTokenHandler)}.{nameof(Saml2SecurityTokenHandler.ValidateToken)}"))
+                {
+                    Logger.LogInformation("Validating incoming token.");
+                    var subject = validateContext.Handler.ValidateToken(validateContext.Response.XmlSecurityToken,
+                        validateContext.TokenValidationParameters, out var token);
+                    var saml2 = token as Saml2SecurityToken;
+                    var now = GetUtcNow();
 
-                saml2.ValidateResponseToken(validateContext.Request?.Id, now);
+                    saml2.ValidateResponseToken(validateContext.Request?.Id, now);
 
-                validateContext.Subject = subject;
-                validateContext.SecurityToken = saml2;
+                    validateContext.Subject = subject;
+                    validateContext.SecurityToken = saml2;
+                }
             }
 
-            await Events.InvokeAsync(Options, partner, e => e.OnValidatedToken(context.RequestServices, validateContext));
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pServiceProviderEvents)}.{nameof(Saml2pServiceProviderEvents.OnValidatedToken)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnValidatedToken(context.RequestServices, validateContext));
 
             context.User = validateContext.Subject;
 

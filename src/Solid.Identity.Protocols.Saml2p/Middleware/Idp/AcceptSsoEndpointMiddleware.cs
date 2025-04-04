@@ -67,7 +67,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 ReturnUrl = GenerateReturnUrl(context, request.Id)
             };
 
-            await Events.InvokeAsync(Options, partner, e => e.OnAcceptSso(context.RequestServices, ssoContext));
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pIdentityProviderEvents)}.{nameof(Saml2pIdentityProviderEvents.OnAcceptSso)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnAcceptSso(context.RequestServices, ssoContext));
             
             if (!IsValid(ssoContext, out var status, out var subStatus) && status.HasValue)
             {
@@ -84,6 +85,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
         // TODO: extract this to a validator class and test it
         private bool IsValid(AcceptSsoContext context, out SamlResponseStatus? status, out SamlResponseStatus? subStatus)
         {
+            using var activity = StartActivity(nameof(IsValid));
             if(context.Request.Version != Saml2Constants.Version)
             {
                 status = SamlResponseStatus.VersionMismatch;

@@ -87,7 +87,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
                 Partner = partner,
                 Request = request
             };
-            await Events.InvokeAsync(Options, partner, e => e.OnStartSso(context.RequestServices, ssoContext));
+            
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pServiceProviderEvents)}.{nameof(Saml2pServiceProviderEvents.OnStartSso)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnStartSso(context.RequestServices, ssoContext));
 
             if (!partner.SupportedBindings.Any())
                 throw new InvalidOperationException($"Partner '{partner.Id}' has no supported bindings.");
@@ -111,6 +113,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
         private Task RedirectAsync(HttpContext context, string base64, Uri destination, string relayState)
         {
+            using var activity = StartActivity(nameof(RedirectAsync));
             var queryBuilder = new StringBuilder();
             if (string.IsNullOrEmpty(destination.Query))
                 queryBuilder.Append("?");
@@ -133,6 +136,7 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Sp
 
         private async Task PostAsync(HttpContext context, string base64, Uri destination, string relayState)
         {
+            using var activity = StartActivity(nameof(PostAsync));
             var model = new AuthnRequestModel
             {
                 Destination = destination,

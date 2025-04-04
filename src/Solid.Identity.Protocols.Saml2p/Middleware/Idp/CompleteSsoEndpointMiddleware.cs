@@ -97,13 +97,16 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                     TokenDescriptor = descriptor,
                     Handler = _handler
                 };
+                
+                using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pIdentityProviderEvents)}.{nameof(Saml2pIdentityProviderEvents.OnCreatingSecurityToken)}"))
+                    await Events.InvokeAsync(Options, partner, e => e.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext));
 
-                await Events.InvokeAsync(Options, partner, e => e.OnCreatingSecurityToken(context.RequestServices, createSecurityTokenContext));
-
-                createSecurityTokenContext.SecurityToken ??=
-                    createSecurityTokenContext.Handler.CreateToken(createSecurityTokenContext.TokenDescriptor) as Saml2SecurityToken;
-
-                await Events.InvokeAsync(Options, partner, e => e.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext));
+                using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2SecurityTokenHandler)}.{nameof(Saml2SecurityTokenHandler.CreateToken)}"))
+                    createSecurityTokenContext.SecurityToken ??=
+                        createSecurityTokenContext.Handler.CreateToken(createSecurityTokenContext.TokenDescriptor) as Saml2SecurityToken;
+                
+                using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pIdentityProviderEvents)}.{nameof(Saml2pIdentityProviderEvents.OnCreatedSecurityToken)}"))
+                    await Events.InvokeAsync(Options, partner, e => e.OnCreatedSecurityToken(context.RequestServices, createSecurityTokenContext));
 
                 response = _responseFactory.Create(partner, authnRequestId: request.Id, relayState: request.RelayState, token: createSecurityTokenContext.SecurityToken);
             }
@@ -119,7 +122,9 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 Request = request,
                 Response = response
             };
-            await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
+            
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pIdentityProviderEvents)}.{nameof(Saml2pIdentityProviderEvents.OnCompleteSso)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnCompleteSso(context.RequestServices, completeSsoContext));
             
             var binding = Convert(request.ProtocolBinding) ??  partner.SupportedBindings.First();
             Trace($"Sending SAMLResponse using {binding} binding.", response);

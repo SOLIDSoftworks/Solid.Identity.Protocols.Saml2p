@@ -71,7 +71,8 @@ namespace Solid.Identity.Protocols.Saml2p.Middleware.Idp
                 ReturnUrl = GenerateReturnUrl(context, key)
             };
 
-            await Events.InvokeAsync(Options, partner, e => e.OnInitiateSso(context.RequestServices, ssoContext));
+            using (Saml2pConstants.Tracing.Saml2p.StartActivity($"{nameof(Saml2pIdentityProviderEvents)}.{nameof(Saml2pIdentityProviderEvents.OnInitiateSso)}"))
+                await Events.InvokeAsync(Options, partner, e => e.OnInitiateSso(context.RequestServices, ssoContext));
 
             if (ssoContext.AuthenticationScheme != null)
                 await ChallengeAsync(context, request, ssoContext.ReturnUrl, ssoContext.AuthenticationPropertyItems, ssoContext.AuthenticationScheme);
