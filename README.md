@@ -1,3 +1,6 @@
+# Archived
+This repository has been archived and all relevant code moved to the [Solid.Identity](https://github.com/SOLIDSoftworks/Solid.Identity) repository.
+
 # Solid.Identity.Protocols.Saml2p
 [![build](https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/SOLIDSoftworks/Solid.Identity.Protocols.Saml2p/actions/workflows/test.yml)
 
